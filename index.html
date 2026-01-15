@@ -1,0 +1,446 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+
+    <!-- This is the title -->
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Split-LAMP Primer Design Tool</title>
+
+    <!-- This is the style of the web-based tool -->
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: Arial, sans-serif;
+            background-color: #f5f5f5;
+            color: #333;
+        }
+
+        .header {
+            background-color: #2c5282;
+            color: white;
+            padding: 20px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .header-left {
+            text-align: left;
+        }
+
+        .header h1 {
+            font-size: 28px;
+            margin-bottom: 5px;
+        }
+
+        .header p {
+            font-size: 14px;
+            color: #e2e8f0;
+        }
+
+        .header-right {
+            display: flex;
+            align-items: center;
+        }
+
+        .header-right img {
+            height: 50px;
+            width: auto;
+        }
+
+        .container {
+            max-width: 1200px;
+            margin: 30px auto;
+            background-color: white;
+            border-radius: 8px;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+            overflow: hidden;
+        }
+
+        .tabs {
+            display: flex;
+            background-color: #edf2f7;
+            border-bottom: 2px solid #cbd5e0;
+        }
+
+        .tab {
+            padding: 15px 30px;
+            cursor: pointer;
+            background-color: #edf2f7;
+            border: none;
+            font-size: 16px;
+            font-weight: 500;
+            color: #4a5568;
+            transition: all 0.3s;
+        }
+
+        .tab:hover {
+            background-color: #e2e8f0;
+        }
+
+        .tab.active {
+            background-color: white;
+            color: #2c5282;
+            border-bottom: 3px solid #2c5282;
+        }
+
+        .tab-content {
+            display: none;
+            padding: 30px;
+        }
+
+        .tab-content.active {
+            display: block;
+        }
+
+        .input-section {
+            margin-bottom: 25px;
+        }
+
+        .input-section label {
+            display: block;
+            margin-bottom: 8px;
+            font-weight: 600;
+            color: #2d3748;
+        }
+
+        .input-section textarea {
+            width: 100%;
+            padding: 12px;
+            border: 1px solid #cbd5e0;
+            border-radius: 4px;
+            font-family: monospace;
+            font-size: 14px;
+            resize: vertical;
+            min-height: 150px;
+        }
+
+        .input-section input[type="text"] {
+            width: 100%;
+            padding: 10px;
+            border: 1px solid #cbd5e0;
+            border-radius: 4px;
+            font-size: 14px;
+        }
+
+        .info-text {
+            color: #718096;
+            font-size: 13px;
+            margin-top: 5px;
+        }
+
+        .button-group {
+            margin-top: 20px;
+            display: flex;
+            gap: 15px;
+        }
+
+        .btn {
+            padding: 12px 24px;
+            border: none;
+            border-radius: 4px;
+            font-size: 15px;
+            cursor: pointer;
+            font-weight: 500;
+            transition: all 0.3s;
+        }
+
+        .btn-primary {
+            background-color: #2c5282;
+            color: white;
+        }
+
+        .btn-primary:hover {
+            background-color: #2a4365;
+        }
+
+        .btn-secondary {
+            background-color: #e2e8f0;
+            color: #2d3748;
+        }
+
+        .btn-secondary:hover {
+            background-color: #cbd5e0;
+        }
+
+        .output-section {
+            margin-bottom: 25px;
+        }
+
+        .output-box {
+            background-color: #f7fafc;
+            border: 1px solid #e2e8f0;
+            border-radius: 4px;
+            padding: 20px;
+            margin-top: 10px;
+        }
+
+        .primer-group {
+            margin-bottom: 20px;
+        }
+
+        .primer-group h3 {
+            color: #2c5282;
+            font-size: 16px;
+            margin-bottom: 10px;
+            border-bottom: 2px solid #e2e8f0;
+            padding-bottom: 5px;
+        }
+
+        .primer-item {
+            display: flex;
+            justify-content: space-between;
+            padding: 8px 0;
+            border-bottom: 1px solid #edf2f7;
+        }
+
+        .primer-item:last-child {
+            border-bottom: none;
+        }
+
+        .primer-name {
+            font-weight: 600;
+            color: #4a5568;
+            min-width: 120px;
+        }
+
+        .primer-sequence {
+            font-family: monospace;
+            color: #2d3748;
+            flex: 1;
+            word-break: break-all;
+        }
+
+        .placeholder-text {
+            text-align: center;
+            color: #a0aec0;
+            padding: 40px;
+            font-style: italic;
+        }
+
+        .advanced-options {
+            margin-top: 20px;
+            padding: 15px;
+            background-color: #f7fafc;
+            border-radius: 4px;
+            border: 1px solid #e2e8f0;
+        }
+
+        .advanced-options h3 {
+            font-size: 14px;
+            color: #2d3748;
+            margin-bottom: 10px;
+        }
+
+        .checkbox-group {
+            margin: 10px 0;
+        }
+
+        .checkbox-group label {
+            display: inline;
+            font-weight: normal;
+            margin-left: 8px;
+        }
+    </style>
+</head>
+
+<!-- The title and the sub-title that will show in the web-tool w/ buttons -->
+<body>
+    <div class="header">
+        <div class="header-left">
+            <h1>Split-LAMP Primer Design Tool</h1>
+            <p>Web-based tool for designing Split-LAMP primers for microRNA detection</p>
+        </div>
+        <div class="header-right">
+            <a href="https://www.neb.com/en-us" target="_blank">
+                <img src="https://lamp.neb.com/images/2024_NEB_Logo_50-17f7464061.svg" alt="NEB Logo">
+            </a>
+        </div>
+    </div>
+
+    <div class="container">
+        <div class="tabs">
+            <button class="tab active" onclick="switchTab('input')">Input Sequence</button>
+            <button class="tab" onclick="switchTab('output')">Primer Output</button>
+        </div>
+
+        <div id="input-tab" class="tab-content active">
+            <div class="input-section">
+                <label for="mirna-name-1">First microRNA Name</label>
+                <input type="text" id="mirna-name-1" placeholder="Enter first microRNA name (e.g., miR-21)">
+                <p class="info-text">Enter the name of the first target microRNA</p>
+            </div>
+
+            <div class="input-section">
+                <label for="sequence-1">First Target Sequence</label>
+                <textarea id="sequence-1" placeholder="Enter your first target microRNA sequence here (FASTA format or plain sequence)"></textarea>
+                <p class="info-text">Paste your first target sequence in FASTA format or as a plain nucleotide sequence</p>
+            </div>
+
+            <div class="input-section">
+                <label for="mirna-name-2">Second microRNA Name</label>
+                <input type="text" id="mirna-name-2" placeholder="Enter second microRNA name (e.g., miR-155)">
+                <p class="info-text">Enter the name of the second target microRNA</p>
+            </div>
+
+            <div class="input-section">
+                <label for="sequence-2">Second Target Sequence</label>
+                <textarea id="sequence-2" placeholder="Enter your second target microRNA sequence here (FASTA format or plain sequence)"></textarea>
+                <p class="info-text">Paste your second target sequence in FASTA format or as a plain nucleotide sequence</p>
+            </div>
+
+            <div class="advanced-options">
+                <h3>Advanced Options (Optional)</h3>
+                <div class="checkbox-group">
+                    <input type="checkbox" id="loop-primers">
+                    <label for="loop-primers">Generate loop primers</label>
+                </div>
+                <div class="checkbox-group">
+                    <input type="checkbox" id="optimize">
+                    <label for="optimize">Optimize for specificity</label>
+                </div>
+            </div>
+
+            <div class="button-group">
+                <button class="btn btn-primary" onclick="generatePrimers()">Generate Primers</button>
+                <button class="btn btn-secondary" onclick="clearInput()">Clear</button>
+            </div>
+        </div>
+
+        <div id="output-tab" class="tab-content">
+            <div id="output-container">
+                <div class="placeholder-text">
+                    No primers generated yet. Go to the Input Sequence tab and click "Generate Primers" to see results here.
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Javascript for interactive (switchTab, generatePrimers, clearInput) -->
+    <script>
+        function switchTab(tabName) {
+            const tabs = document.querySelectorAll('.tab');
+            const contents = document.querySelectorAll('.tab-content');
+            
+            tabs.forEach(tab => tab.classList.remove('active'));
+            contents.forEach(content => content.classList.remove('active'));
+            
+            if (tabName === 'input') {
+                tabs[0].classList.add('active');
+                document.getElementById('input-tab').classList.add('active');
+            } else if (tabName === 'output') {
+                tabs[1].classList.add('active');
+                document.getElementById('output-tab').classList.add('active');
+            }
+        }
+
+        function generatePrimers() {
+            const mirnaName1 = document.getElementById('mirna-name-1').value;
+            const sequence1 = document.getElementById('sequence-1').value;
+            const mirnaName2 = document.getElementById('mirna-name-2').value;
+            const sequence2 = document.getElementById('sequence-2').value;
+
+            if ((!mirnaName1 && !sequence1) || (!mirnaName2 && !sequence2)) {
+                alert('Please enter both microRNA names or sequences');
+                return;
+            }
+
+            const outputContainer = document.getElementById('output-container');
+            outputContainer.innerHTML = `
+                <div class="output-section">
+                    <h2 style="color: #2c5282; margin-bottom: 20px;">Primer Design Results</h2>
+                    <p style="margin-bottom: 10px;"><strong>First Target:</strong> ${mirnaName1 || 'Custom Sequence 1'}</p>
+                    <p style="margin-bottom: 20px;"><strong>Second Target:</strong> ${mirnaName2 || 'Custom Sequence 2'}</p>
+                    
+                    <div class="output-box">
+                        <div class="primer-group">
+                            <h3>Template Ultramer</h3>
+                            <div class="primer-item">
+                                <span class="primer-name">Template Ultramer (double loop structure)</span>
+                                <span class="primer-sequence">Algorithm will generate this</span>
+                            </div>
+                        </div>
+
+                        <div class="primer-group">
+                            <h3>Loop Primers</h3>
+                            <div class="primer-item">
+                                <span class="primer-name">LF</span>
+                                <span class="primer-sequence">Algorithm will generate this</span>
+                            </div>
+                            <div class="primer-item">
+                                <span class="primer-name">LB</span>
+                                <span class="primer-sequence">Algorithm will generate this</span>
+                            </div>
+                        </div>
+
+                        <div class="primer-group">
+                            <h3>Inner Primers</h3>
+                            <div class="primer-item">
+                                <span class="primer-name">FIP</span>
+                                <span class="primer-sequence">Algorithm will generate this</span>
+                            </div>
+                            <div class="primer-item">
+                                <span class="primer-name">BIP</span>
+                                <span class="primer-sequence">Algorithm will generate this</span>
+                            </div>
+                        </div>
+
+                        <div class="primer-group">
+                            <h3>Primer Components</h3>
+                            <div class="primer-item">
+                                <span class="primer-name">F2</span>
+                                <span class="primer-sequence">Algorithm will generate this</span>
+                            </div>
+                            <div class="primer-item">
+                                <span class="primer-name">B2</span>
+                                <span class="primer-sequence">Algorithm will generate this</span>
+                            </div>
+                            <div class="primer-item">
+                                <span class="primer-name">F1C</span>
+                                <span class="primer-sequence">Algorithm will generate this</span>
+                            </div>
+                            <div class="primer-item">
+                                <span class="primer-name">B1C</span>
+                                <span class="primer-sequence">Algorithm will generate this</span>
+                            </div>
+                        </div>
+
+                        <div class="primer-group">
+                            <h3>miRNA Sequences</h3>
+                            <div class="primer-item">
+                                <span class="primer-name">miR-34 (miRNA B2)</span>
+                                <span class="primer-sequence">${mirnaName1 || 'First miRNA'} - User provided sequence</span>
+                            </div>
+                            <div class="primer-item">
+                                <span class="primer-name">miR-21 (miRNA F2)</span>
+                                <span class="primer-sequence">${mirnaName2 || 'Second miRNA'} - User provided sequence</span>
+                            </div>
+                        </div>
+                    </div>
+
+                    <p style="margin-top: 20px; color: #718096; font-size: 14px;">
+                        <strong>Note:</strong> Algorithm integration pending. This tool generates all Split-LAMP components including the template ultramer, loop primers (LF, LB), inner primers (FIP, BIP), primer components (F2, B2, F1C, B1C), and uses the input miRNA sequences as analytes.
+                    </p>
+                </div>
+            `;
+
+            switchTab('output');
+        }
+
+        function clearInput() {
+            document.getElementById('mirna-name-1').value = '';
+            document.getElementById('sequence-1').value = '';
+            document.getElementById('mirna-name-2').value = '';
+            document.getElementById('sequence-2').value = '';
+            document.getElementById('loop-primers').checked = false;
+            document.getElementById('optimize').checked = false;
+        }
+    </script>
+</body>
+</html>
