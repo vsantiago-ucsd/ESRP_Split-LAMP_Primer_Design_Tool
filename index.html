@@ -883,11 +883,11 @@ UAGCUUAUCAGACUGAUGUUGA"></textarea>
                 </div>
             </div>
 
-            <!-- Customize Tab -->
+            <!-- Customize Tab Optimal range: 40-60% Optimal range: 58-62°C for Split-LAMP Adjust primer length to optimize binding -->
             <div class="tab-content" id="customize">
                 <div class="editor-panel">
                     <h4>Adjust Primer Parameters</h4>
-                    <p class="help-text">Fine-tune your primers by adjusting these parameters. Changes will update all dependent primers automatically.</p>
+                    <p class="help-text">Fine tune your primers by adjusting these parameters.</p>
 
                     <div class="form-group" style="margin-top: 20px;">
                         <label for="edit-mirna">microRNA Sequence</label>
@@ -898,19 +898,19 @@ UAGCUUAUCAGACUGAUGUUGA"></textarea>
                     <div class="slider-group">
                         <label>Target GC Content: <span class="slider-value" id="gc-value">50%</span></label>
                         <input type="range" id="gc-slider" min="40" max="60" value="50" oninput="updateGCValue(this.value)">
-                        <p class="help-text">Optimal range: 40-60%</p>
+                        <p class="help-text"></p>
                     </div>
 
                     <div class="slider-group">
                         <label>Target Melting Temperature: <span class="slider-value" id="tm-value">60°C</span></label>
                         <input type="range" id="tm-slider" min="55" max="65" value="60" oninput="updateTmValue(this.value)">
-                        <p class="help-text">Optimal range: 58-62°C for Split-LAMP</p>
+                        <p class="help-text"> </p>
                     </div>
 
                     <div class="slider-group">
                         <label>Primer Length Adjustment: <span class="slider-value" id="length-value">±0 bp</span></label>
                         <input type="range" id="length-slider" min="-5" max="5" value="0" oninput="updateLengthValue(this.value)">
-                        <p class="help-text">Adjust primer length to optimize binding</p>
+                        <p class="help-text"> </p>
                     </div>
 
                     <div class="checkbox-group" style="margin-top: 20px;">
