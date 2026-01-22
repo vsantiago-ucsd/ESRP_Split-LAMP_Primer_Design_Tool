@@ -96,7 +96,8 @@
         }
 
         .form-group input[type="text"],
-        .form-group textarea {
+        .form-group textarea,
+        .form-group select {
             width: 100%;
             padding: 12px;
             border: 2px solid #e9ecef;
@@ -106,14 +107,19 @@
             font-family: 'Courier New', monospace;
         }
 
+        .form-group select {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, Cantarell, sans-serif;
+        }
+
         .form-group input[type="text"]:focus,
-        .form-group textarea:focus {
+        .form-group textarea:focus,
+        .form-group select:focus {
             outline: none;
             border-color: #ff6b35;
         }
 
         .form-group textarea {
-            min-height: 120px;
+            min-height: 100px;
             resize: vertical;
         }
 
@@ -121,6 +127,103 @@
             font-size: 0.85rem;
             color: #6c757d;
             margin-top: 5px;
+        }
+
+        .sequence-info {
+            background: #f8f9fa;
+            padding: 10px;
+            border-radius: 4px;
+            margin-top: 8px;
+            border: 1px solid #e9ecef;
+            display: none;
+        }
+
+        .sequence-info.visible {
+            display: block;
+        }
+
+        .sequence-info-item {
+            display: inline-block;
+            margin-right: 20px;
+            font-size: 0.9rem;
+        }
+
+        .sequence-info-label {
+            font-weight: 600;
+            color: #666;
+        }
+
+        .sequence-info-value {
+            color: #ff6b35;
+            font-weight: 600;
+        }
+
+        .architecture-selector {
+            background: #fff5f0;
+            padding: 20px;
+            border-radius: 8px;
+            margin: 20px 0;
+            border: 2px solid #ff6b35;
+        }
+
+        .architecture-selector h3 {
+            font-size: 1.1rem;
+            margin-bottom: 15px;
+            color: #333;
+        }
+
+        .architecture-options {
+            display: flex;
+            gap: 15px;
+            flex-wrap: wrap;
+        }
+
+        .architecture-option {
+            flex: 1;
+            min-width: 200px;
+            padding: 15px;
+            border: 2px solid #e9ecef;
+            border-radius: 6px;
+            cursor: pointer;
+            transition: all 0.3s;
+            background: white;
+        }
+
+        .architecture-option:hover {
+            border-color: #ff6b35;
+            box-shadow: 0 2px 8px rgba(255, 107, 53, 0.1);
+        }
+
+        .architecture-option.selected {
+            border-color: #ff6b35;
+            background: #fff5f0;
+        }
+
+        .architecture-option input[type="radio"] {
+            margin-right: 8px;
+            accent-color: #ff6b35;
+        }
+
+        .architecture-option label {
+            font-weight: 600;
+            color: #333;
+            cursor: pointer;
+            display: block;
+            margin-bottom: 5px;
+        }
+
+        .architecture-description {
+            font-size: 0.85rem;
+            color: #6c757d;
+            margin-top: 5px;
+        }
+
+        .mirna2-section {
+            display: none;
+        }
+
+        .mirna2-section.visible {
+            display: block;
         }
 
         .advanced-options {
@@ -178,13 +281,18 @@
             transition: all 0.3s;
         }
 
+        .btn:disabled {
+            opacity: 0.5;
+            cursor: not-allowed;
+        }
+
         .btn-primary {
             background: #ff6b35;
             color: white;
             flex: 1;
         }
 
-        .btn-primary:hover {
+        .btn-primary:hover:not(:disabled) {
             background: #e55a2b;
         }
 
@@ -275,22 +383,18 @@
             transition: all 0.2s;
         }
 
-        .btn-edit {
-            background: #ff6b35;
-            color: white;
-        }
-
-        .btn-edit:hover {
-            background: #e55a2b;
-        }
-
         .btn-copy {
             background: #28a745;
             color: white;
         }
 
-        .btn-copy:hover {
+        .btn-copy:hover:not(:disabled) {
             background: #218838;
+        }
+
+        .btn-copy:disabled {
+            opacity: 0.5;
+            cursor: not-allowed;
         }
 
         .primer-sequence {
@@ -306,7 +410,7 @@
 
         .primer-stats {
             display: grid;
-            grid-template-columns: repeat(auto-fit, minmax(150px, 1fr));
+            grid-template-columns: repeat(auto-fit, minmax(120px, 1fr));
             gap: 10px;
             margin-top: 10px;
         }
@@ -342,15 +446,6 @@
             color: #dc3545;
         }
 
-        .hairpin-warning {
-            background: #fff3cd;
-            border: 1px solid #ffc107;
-            padding: 12px;
-            border-radius: 4px;
-            margin-top: 10px;
-            color: #856404;
-        }
-
         .target-info {
             background: #fff5f0;
             padding: 15px;
@@ -363,62 +458,18 @@
             color: #ff6b35;
         }
 
-        .multiple-options {
-            margin-top: 20px;
+        .state-container {
+            min-height: 200px;
         }
 
-        .option-card {
-            border: 2px solid #e9ecef;
-            border-radius: 8px;
-            padding: 15px;
-            margin-bottom: 15px;
-            cursor: pointer;
-            transition: all 0.3s;
-            background: white;
-        }
-
-        .option-card:hover {
-            border-color: #ff6b35;
-            box-shadow: 0 2px 8px rgba(255, 107, 53, 0.1);
-        }
-
-        .option-card.selected {
-            border-color: #ff6b35;
-            background: #fff5f0;
-        }
-
-        .option-header {
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-            margin-bottom: 10px;
-        }
-
-        .option-title {
-            font-weight: 600;
-            color: #333;
-        }
-
-        .option-score {
-            background: #ff6b35;
-            color: white;
-            padding: 4px 12px;
-            border-radius: 20px;
-            font-size: 0.85rem;
-            font-weight: 600;
-        }
-
-        .loading {
+        #loading-state {
+            display: none;
             text-align: center;
-            padding: 40px;
+            padding: 60px 20px;
         }
 
-        .loading::after {
-            content: "Generating primers...";
+        #loading-state.visible {
             display: block;
-            margin-top: 20px;
-            color: #ff6b35;
-            font-weight: 600;
         }
 
         .spinner {
@@ -428,12 +479,37 @@
             width: 50px;
             height: 50px;
             animation: spin 1s linear infinite;
-            margin: 0 auto;
+            margin: 0 auto 20px;
         }
 
         @keyframes spin {
             0% { transform: rotate(0deg); }
             100% { transform: rotate(360deg); }
+        }
+
+        .loading-text {
+            color: #ff6b35;
+            font-weight: 600;
+            font-size: 1.1rem;
+        }
+
+        #idle-state {
+            display: block;
+            text-align: center;
+            padding: 60px 20px;
+            color: #6c757d;
+        }
+
+        #idle-state.hidden {
+            display: none;
+        }
+
+        #results-state {
+            display: none;
+        }
+
+        #results-state.visible {
+            display: block;
         }
 
         .editor-panel {
@@ -490,6 +566,21 @@
             line-height: 1.8;
             color: #666;
         }
+
+        .validation-error {
+            background: #f8d7da;
+            color: #721c24;
+            padding: 10px;
+            border-radius: 4px;
+            margin-top: 8px;
+            border: 1px solid #f5c6cb;
+            font-size: 0.9rem;
+            display: none;
+        }
+
+        .validation-error.visible {
+            display: block;
+        }
     </style>
 </head>
 <body>
@@ -508,23 +599,90 @@
         <div class="content">
             <!-- Input Tab -->
             <div class="tab-content active" id="input">
+                <!-- Architecture Selector -->
+                <div class="architecture-selector">
+                    <h3>Split-LAMP Architecture</h3>
+                    <p class="help-text" style="margin-bottom: 15px;">Select how your microRNA(s) will be used in the Split-LAMP design</p>
+                    <div class="architecture-options">
+                        <div class="architecture-option selected" onclick="selectArchitecture('f2-only')">
+                            <label>
+                                <input type="radio" name="architecture" value="f2-only" checked>
+                                F2 Only
+                            </label>
+                            <div class="architecture-description">One microRNA as F2 primer, algorithm generates B2</div>
+                        </div>
+                        <div class="architecture-option" onclick="selectArchitecture('b2-only')">
+                            <label>
+                                <input type="radio" name="architecture" value="b2-only">
+                                B2 Only
+                            </label>
+                            <div class="architecture-description">One microRNA as B2 primer, algorithm generates F2</div>
+                        </div>
+                        <div class="architecture-option" onclick="selectArchitecture('f2-and-b2')">
+                            <label>
+                                <input type="radio" name="architecture" value="f2-and-b2">
+                                F2 and B2 (AND-gate)
+                            </label>
+                            <div class="architecture-description">Two microRNAs (F2 and B2) for dual detection</div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- First microRNA -->
                 <div class="form-group">
-                    <label for="mirna-name">microRNA Name</label>
-                    <input type="text" id="mirna-name" placeholder="e.g., miR-21, miR-34a">
+                    <label for="mirna1-name">First microRNA Name</label>
+                    <input type="text" id="mirna1-name" placeholder="e.g., miR-21, miR-34a">
                     <p class="help-text">Enter the name of your target microRNA</p>
                 </div>
 
                 <div class="form-group">
-                    <label for="mirna-sequence">Target microRNA Sequence</label>
-                    <textarea id="mirna-sequence" placeholder="Enter your target microRNA sequence here (FASTA format or plain sequence)
+                    <label for="mirna1-sequence">First microRNA Sequence</label>
+                    <textarea id="mirna1-sequence" placeholder="Enter your first target microRNA sequence here (FASTA format or plain sequence)
 Example:
 UAGCUUAUCAGACUGAUGUUGA
 
 or
 
 >hsa-miR-21-5p
-UAGCUUAUCAGACUGAUGUUGA"></textarea>
+UAGCUUAUCAGACUGAUGUUGA" oninput="parseAndValidateSequence('mirna1')"></textarea>
                     <p class="help-text">Paste your target sequence in FASTA format or as a plain nucleotide sequence (RNA or DNA)</p>
+                    <div class="validation-error" id="mirna1-error"></div>
+                    <div class="sequence-info" id="mirna1-info">
+                        <span class="sequence-info-item">
+                            <span class="sequence-info-label">Length:</span>
+                            <span class="sequence-info-value" id="mirna1-length">--</span> nt
+                        </span>
+                        <span class="sequence-info-item">
+                            <span class="sequence-info-label">GC Content:</span>
+                            <span class="sequence-info-value" id="mirna1-gc">--%</span>
+                        </span>
+                    </div>
+                </div>
+
+                <!-- Second microRNA (shown only for F2-and-B2 architecture) -->
+                <div class="mirna2-section" id="mirna2-section">
+                    <div class="form-group">
+                        <label for="mirna2-name">Second microRNA Name</label>
+                        <input type="text" id="mirna2-name" placeholder="e.g., miR-34a">
+                        <p class="help-text">Enter the name of your second target microRNA</p>
+                    </div>
+
+                    <div class="form-group">
+                        <label for="mirna2-sequence">Second microRNA Sequence</label>
+                        <textarea id="mirna2-sequence" placeholder="Enter your second target microRNA sequence here (FASTA format or plain sequence)" oninput="parseAndValidateSequence('mirna2')"></textarea>
+                        <p class="help-text">Paste your second target sequence in FASTA format or as a plain nucleotide sequence (RNA or DNA)</p>
+                        <div class="validation-error" id="mirna2-error"></div>
+                        <div class="sequence-info" id="mirna2-info">
+                            <span class="sequence-info-item">
+                                <span class="sequence-info-label">Length:</span>
+                                <span class="sequence-info-value" id="mirna2-length">--</span> nt
+                            </span>
+                            <span class="sequence-info-item">
+                                <span class="sequence-info-label">GC Content:</span>
+                                <span class="sequence-info-value" id="mirna2-gc">--%</span>
+                            </span>
+                        </div>
+                    </div>
                 </div>
 
                 <div class="advanced-options">
@@ -543,8 +701,8 @@ UAGCUUAUCAGACUGAUGUUGA"></textarea>
                             <label for="check-hairpins">Check for hairpin structures</label>
                         </div>
                         <div class="checkbox-item">
-                            <input type="checkbox" id="multiple-options">
-                            <label for="multiple-options">Generate multiple primer set options</label>
+                            <input type="checkbox" id="calculate-dg" checked>
+                            <label for="calculate-dg">Calculate ΔG values</label>
                         </div>
                     </div>
                 </div>
@@ -557,360 +715,350 @@ UAGCUUAUCAGACUGAUGUUGA"></textarea>
 
             <!-- Output Tab -->
             <div class="tab-content" id="output">
-                <div class="results-section" id="results-container" style="display: none;">
-                    <div class="target-info">
-                        <strong>Target:</strong> <span id="target-name">miR-21</span><br>
-                        <strong>Sequence:</strong> <span id="target-sequence" style="font-family: 'Courier New', monospace;">UAGCUUAUCAGACUGAUGUUGA</span>
+                <div class="state-container">
+                    <!-- Idle State -->
+                    <div id="idle-state">
+                        <h3>No primers generated yet</h3>
+                        <p>Go to the Input Sequence tab to generate primers</p>
                     </div>
 
-                    <div class="results-header">
-                        <h2>Primer Design Results</h2>
+                    <!-- Loading State -->
+                    <div id="loading-state">
+                        <div class="spinner"></div>
+                        <div class="loading-text">Generating primers...</div>
                     </div>
 
-                    <div class="primer-set">
-                        <!-- Template Ultramer -->
-                        <div class="primer-category">
-                            <h3>Template Ultramer</h3>
-                            <div class="primer-item">
-                                <div class="primer-header">
-                                    <span class="primer-name">Template Ultramer (double loop structure)</span>
-                                    <div class="primer-controls">
-                                        <button class="btn-edit">Edit</button>
-                                        <button class="btn-copy">Copy</button>
-                                    </div>
-                                </div>
-                                <div class="primer-sequence" id="template-seq">Algorithm will generate this</div>
-                                <div class="primer-stats">
-                                    <div class="stat-item">
-                                        <div class="stat-label">Length</div>
-                                        <div class="stat-value">-- bp</div>
-                                    </div>
-                                    <div class="stat-item">
-                                        <div class="stat-label">GC Content</div>
-                                        <div class="stat-value">--%</div>
-                                    </div>
-                                </div>
-                            </div>
+                    <!-- Results State -->
+                    <div id="results-state">
+                        <div class="target-info">
+                            <strong>Architecture:</strong> <span id="result-architecture">--</span><br>
+                            <strong>Target 1:</strong> <span id="result-target1-name">--</span>
+                            (<span id="result-target1-seq" style="font-family: 'Courier New', monospace;">--</span>)<br>
+                            <span id="result-target2-info" style="display: none;">
+                                <strong>Target 2:</strong> <span id="result-target2-name">--</span>
+                                (<span id="result-target2-seq" style="font-family: 'Courier New', monospace;">--</span>)
+                            </span>
                         </div>
 
-                        <!-- Loop Primers -->
-                        <div class="primer-category">
-                            <h3>Loop Primers</h3>
-                            <div class="primer-item">
-                                <div class="primer-header">
-                                    <span class="primer-name">LF (Loop Forward)</span>
-                                    <div class="primer-controls">
-                                        <button class="btn-edit">Edit</button>
-                                        <button class="btn-copy">Copy</button>
-                                    </div>
-                                </div>
-                                <div class="primer-sequence">Algorithm will generate this</div>
-                                <div class="primer-stats">
-                                    <div class="stat-item">
-                                        <div class="stat-label">Length</div>
-                                        <div class="stat-value">-- bp</div>
-                                    </div>
-                                    <div class="stat-item">
-                                        <div class="stat-label">GC Content</div>
-                                        <div class="stat-value good">--%</div>
-                                    </div>
-                                    <div class="stat-item">
-                                        <div class="stat-label">Tm</div>
-                                        <div class="stat-value">--°C</div>
-                                    </div>
-                                    <div class="stat-item">
-                                        <div class="stat-label">Hairpins</div>
-                                        <div class="stat-value good">None</div>
-                                    </div>
-                                </div>
-                            </div>
-
-                            <div class="primer-item">
-                                <div class="primer-header">
-                                    <span class="primer-name">LB (Loop Backward)</span>
-                                    <div class="primer-controls">
-                                        <button class="btn-edit">Edit</button>
-                                        <button class="btn-copy">Copy</button>
-                                    </div>
-                                </div>
-                                <div class="primer-sequence">Algorithm will generate this</div>
-                                <div class="primer-stats">
-                                    <div class="stat-item">
-                                        <div class="stat-label">Length</div>
-                                        <div class="stat-value">-- bp</div>
-                                    </div>
-                                    <div class="stat-item">
-                                        <div class="stat-label">GC Content</div>
-                                        <div class="stat-value good">--%</div>
-                                    </div>
-                                    <div class="stat-item">
-                                        <div class="stat-label">Tm</div>
-                                        <div class="stat-value">--°C</div>
-                                    </div>
-                                    <div class="stat-item">
-                                        <div class="stat-label">Hairpins</div>
-                                        <div class="stat-value good">None</div>
-                                    </div>
-                                </div>
-                            </div>
+                        <div class="results-header">
+                            <h2>Primer Design Results</h2>
                         </div>
 
-                        <!-- Inner Primers -->
-                        <div class="primer-category">
-                            <h3>Inner Primers</h3>
-                            <div class="primer-item">
-                                <div class="primer-header">
-                                    <span class="primer-name">FIP (Forward Inner Primer)</span>
-                                    <div class="primer-controls">
-                                        <button class="btn-edit">Edit</button>
-                                        <button class="btn-copy">Copy</button>
+                        <div class="primer-set">
+                            <!-- Template Ultramer -->
+                            <div class="primer-category">
+                                <h3>Template Ultramer</h3>
+                                <div class="primer-item">
+                                    <div class="primer-header">
+                                        <span class="primer-name">Template Ultramer (double loop structure)</span>
+                                        <div class="primer-controls">
+                                            <button class="btn-copy" onclick="copySequence('template-seq')" disabled>Copy</button>
+                                        </div>
                                     </div>
-                                </div>
-                                <div class="primer-sequence">Algorithm will generate this</div>
-                                <div class="primer-stats">
-                                    <div class="stat-item">
-                                        <div class="stat-label">Length</div>
-                                        <div class="stat-value">-- bp</div>
-                                    </div>
-                                    <div class="stat-item">
-                                        <div class="stat-label">GC Content</div>
-                                        <div class="stat-value">--%</div>
-                                    </div>
-                                    <div class="stat-item">
-                                        <div class="stat-label">Tm</div>
-                                        <div class="stat-value">--°C</div>
-                                    </div>
-                                    <div class="stat-item">
-                                        <div class="stat-label">Hairpins</div>
-                                        <div class="stat-value">--</div>
+                                    <div class="primer-sequence" id="template-seq" data-sequence="">Algorithm will generate this</div>
+                                    <div class="primer-stats">
+                                        <div class="stat-item">
+                                            <div class="stat-label">Length</div>
+                                            <div class="stat-value" id="template-len">-- bp</div>
+                                        </div>
+                                        <div class="stat-item">
+                                            <div class="stat-label">GC Content</div>
+                                            <div class="stat-value" id="template-gc">--%</div>
+                                        </div>
                                     </div>
                                 </div>
                             </div>
 
-                            <div class="primer-item">
-                                <div class="primer-header">
-                                    <span class="primer-name">BIP (Backward Inner Primer)</span>
-                                    <div class="primer-controls">
-                                        <button class="btn-edit">Edit</button>
-                                        <button class="btn-copy">Copy</button>
+                            <!-- Loop Primers -->
+                            <div class="primer-category">
+                                <h3>Loop Primers</h3>
+                                <div class="primer-item">
+                                    <div class="primer-header">
+                                        <span class="primer-name">LF (Loop Forward)</span>
+                                        <div class="primer-controls">
+                                            <button class="btn-copy" onclick="copySequence('lf-seq')" disabled>Copy</button>
+                                        </div>
+                                    </div>
+                                    <div class="primer-sequence" id="lf-seq" data-sequence="">Algorithm will generate this</div>
+                                    <div class="primer-stats">
+                                        <div class="stat-item">
+                                            <div class="stat-label">Length</div>
+                                            <div class="stat-value" id="lf-len">-- bp</div>
+                                        </div>
+                                        <div class="stat-item">
+                                            <div class="stat-label">GC Content</div>
+                                            <div class="stat-value" id="lf-gc">--%</div>
+                                        </div>
+                                        <div class="stat-item">
+                                            <div class="stat-label">Tm</div>
+                                            <div class="stat-value" id="lf-tm">--°C</div>
+                                        </div>
+                                        <div class="stat-item">
+                                            <div class="stat-label">ΔG</div>
+                                            <div class="stat-value" id="lf-dg">-- kcal/mol</div>
+                                        </div>
+                                        <div class="stat-item">
+                                            <div class="stat-label">Hairpins</div>
+                                            <div class="stat-value" id="lf-hairpin">--</div>
+                                        </div>
                                     </div>
                                 </div>
-                                <div class="primer-sequence">Algorithm will generate this</div>
-                                <div class="primer-stats">
-                                    <div class="stat-item">
-                                        <div class="stat-label">Length</div>
-                                        <div class="stat-value">-- bp</div>
-                                    </div>
-                                    <div class="stat-item">
-                                        <div class="stat-label">GC Content</div>
-                                        <div class="stat-value">--%</div>
-                                    </div>
-                                    <div class="stat-item">
-                                        <div class="stat-label">Tm</div>
-                                        <div class="stat-value">--°C</div>
-                                    </div>
-                                    <div class="stat-item">
-                                        <div class="stat-label">Hairpins</div>
-                                        <div class="stat-value">--</div>
-                                    </div>
-                                </div>
-                            </div>
-                        </div>
 
-                        <!-- Primer Components -->
-                        <div class="primer-category">
-                            <h3>Primer Components (Split Primers)</h3>
-                            <div class="primer-item">
-                                <div class="primer-header">
-                                    <span class="primer-name">F2</span>
-                                    <div class="primer-controls">
-                                        <button class="btn-edit">Edit</button>
-                                        <button class="btn-copy">Copy</button>
+                                <div class="primer-item">
+                                    <div class="primer-header">
+                                        <span class="primer-name">LB (Loop Backward)</span>
+                                        <div class="primer-controls">
+                                            <button class="btn-copy" onclick="copySequence('lb-seq')" disabled>Copy</button>
+                                        </div>
                                     </div>
-                                </div>
-                                <div class="primer-sequence">Algorithm will generate this</div>
-                                <div class="primer-stats">
-                                    <div class="stat-item">
-                                        <div class="stat-label">Length</div>
-                                        <div class="stat-value">-- bp</div>
-                                    </div>
-                                    <div class="stat-item">
-                                        <div class="stat-label">GC Content</div>
-                                        <div class="stat-value">--%</div>
-                                    </div>
-                                    <div class="stat-item">
-                                        <div class="stat-label">Tm</div>
-                                        <div class="stat-value">--°C</div>
-                                    </div>
-                                </div>
-                            </div>
-
-                            <div class="primer-item">
-                                <div class="primer-header">
-                                    <span class="primer-name">B2 (Replaced by target microRNA)</span>
-                                    <div class="primer-controls">
-                                        <button class="btn-edit">Edit</button>
-                                        <button class="btn-copy">Copy</button>
-                                    </div>
-                                </div>
-                                <div class="primer-sequence">Algorithm will generate this</div>
-                                <div class="primer-stats">
-                                    <div class="stat-item">
-                                        <div class="stat-label">Length</div>
-                                        <div class="stat-value">-- bp</div>
-                                    </div>
-                                    <div class="stat-item">
-                                        <div class="stat-label">GC Content</div>
-                                        <div class="stat-value">--%</div>
-                                    </div>
-                                    <div class="stat-item">
-                                        <div class="stat-label">Tm</div>
-                                        <div class="stat-value">--°C</div>
+                                    <div class="primer-sequence" id="lb-seq" data-sequence="">Algorithm will generate this</div>
+                                    <div class="primer-stats">
+                                        <div class="stat-item">
+                                            <div class="stat-label">Length</div>
+                                            <div class="stat-value" id="lb-len">-- bp</div>
+                                        </div>
+                                        <div class="stat-item">
+                                            <div class="stat-label">GC Content</div>
+                                            <div class="stat-value" id="lb-gc">--%</div>
+                                        </div>
+                                        <div class="stat-item">
+                                            <div class="stat-label">Tm</div>
+                                            <div class="stat-value" id="lb-tm">--°C</div>
+                                        </div>
+                                        <div class="stat-item">
+                                            <div class="stat-label">ΔG</div>
+                                            <div class="stat-value" id="lb-dg">-- kcal/mol</div>
+                                        </div>
+                                        <div class="stat-item">
+                                            <div class="stat-label">Hairpins</div>
+                                            <div class="stat-value" id="lb-hairpin">--</div>
+                                        </div>
                                     </div>
                                 </div>
                             </div>
 
-                            <div class="primer-item">
-                                <div class="primer-header">
-                                    <span class="primer-name">F1C</span>
-                                    <div class="primer-controls">
-                                        <button class="btn-edit">Edit</button>
-                                        <button class="btn-copy">Copy</button>
+                            <!-- Inner Primers -->
+                            <div class="primer-category">
+                                <h3>Inner Primers</h3>
+                                <div class="primer-item">
+                                    <div class="primer-header">
+                                        <span class="primer-name">FIP (Forward Inner Primer)</span>
+                                        <div class="primer-controls">
+                                            <button class="btn-copy" onclick="copySequence('fip-seq')" disabled>Copy</button>
+                                        </div>
+                                    </div>
+                                    <div class="primer-sequence" id="fip-seq" data-sequence="">Algorithm will generate this</div>
+                                    <div class="primer-stats">
+                                        <div class="stat-item">
+                                            <div class="stat-label">Length</div>
+                                            <div class="stat-value" id="fip-len">-- bp</div>
+                                        </div>
+                                        <div class="stat-item">
+                                            <div class="stat-label">GC Content</div>
+                                            <div class="stat-value" id="fip-gc">--%</div>
+                                        </div>
+                                        <div class="stat-item">
+                                            <div class="stat-label">Tm</div>
+                                            <div class="stat-value" id="fip-tm">--°C</div>
+                                        </div>
+                                        <div class="stat-item">
+                                            <div class="stat-label">ΔG</div>
+                                            <div class="stat-value" id="fip-dg">-- kcal/mol</div>
+                                        </div>
+                                        <div class="stat-item">
+                                            <div class="stat-label">Hairpins</div>
+                                            <div class="stat-value" id="fip-hairpin">--</div>
+                                        </div>
                                     </div>
                                 </div>
-                                <div class="primer-sequence">Algorithm will generate this</div>
-                                <div class="primer-stats">
-                                    <div class="stat-item">
-                                        <div class="stat-label">Length</div>
-                                        <div class="stat-value">-- bp</div>
+
+                                <div class="primer-item">
+                                    <div class="primer-header">
+                                        <span class="primer-name">BIP (Backward Inner Primer)</span>
+                                        <div class="primer-controls">
+                                            <button class="btn-copy" onclick="copySequence('bip-seq')" disabled>Copy</button>
+                                        </div>
                                     </div>
-                                    <div class="stat-item">
-                                        <div class="stat-label">GC Content</div>
-                                        <div class="stat-value">--%</div>
-                                    </div>
-                                    <div class="stat-item">
-                                        <div class="stat-label">Tm</div>
-                                        <div class="stat-value">--°C</div>
+                                    <div class="primer-sequence" id="bip-seq" data-sequence="">Algorithm will generate this</div>
+                                    <div class="primer-stats">
+                                        <div class="stat-item">
+                                            <div class="stat-label">Length</div>
+                                            <div class="stat-value" id="bip-len">-- bp</div>
+                                        </div>
+                                        <div class="stat-item">
+                                            <div class="stat-label">GC Content</div>
+                                            <div class="stat-value" id="bip-gc">--%</div>
+                                        </div>
+                                        <div class="stat-item">
+                                            <div class="stat-label">Tm</div>
+                                            <div class="stat-value" id="bip-tm">--°C</div>
+                                        </div>
+                                        <div class="stat-item">
+                                            <div class="stat-label">ΔG</div>
+                                            <div class="stat-value" id="bip-dg">-- kcal/mol</div>
+                                        </div>
+                                        <div class="stat-item">
+                                            <div class="stat-label">Hairpins</div>
+                                            <div class="stat-value" id="bip-hairpin">--</div>
+                                        </div>
                                     </div>
                                 </div>
                             </div>
 
-                            <div class="primer-item">
-                                <div class="primer-header">
-                                    <span class="primer-name">B1C</span>
-                                    <div class="primer-controls">
-                                        <button class="btn-edit">Edit</button>
-                                        <button class="btn-copy">Copy</button>
+                            <!-- Primer Components -->
+                            <div class="primer-category">
+                                <h3>Primer Components (Split Primers)</h3>
+                                <div class="primer-item">
+                                    <div class="primer-header">
+                                        <span class="primer-name">F2</span>
+                                        <div class="primer-controls">
+                                            <button class="btn-copy" onclick="copySequence('f2-seq')" disabled>Copy</button>
+                                        </div>
+                                    </div>
+                                    <div class="primer-sequence" id="f2-seq" data-sequence="">Algorithm will generate this</div>
+                                    <div class="primer-stats">
+                                        <div class="stat-item">
+                                            <div class="stat-label">Length</div>
+                                            <div class="stat-value" id="f2-len">-- bp</div>
+                                        </div>
+                                        <div class="stat-item">
+                                            <div class="stat-label">GC Content</div>
+                                            <div class="stat-value" id="f2-gc">--%</div>
+                                        </div>
+                                        <div class="stat-item">
+                                            <div class="stat-label">Tm</div>
+                                            <div class="stat-value" id="f2-tm">--°C</div>
+                                        </div>
+                                        <div class="stat-item">
+                                            <div class="stat-label">ΔG</div>
+                                            <div class="stat-value" id="f2-dg">-- kcal/mol</div>
+                                        </div>
                                     </div>
                                 </div>
-                                <div class="primer-sequence">Algorithm will generate this</div>
-                                <div class="primer-stats">
-                                    <div class="stat-item">
-                                        <div class="stat-label">Length</div>
-                                        <div class="stat-value">-- bp</div>
+
+                                <div class="primer-item">
+                                    <div class="primer-header">
+                                        <span class="primer-name">B2</span>
+                                        <div class="primer-controls">
+                                            <button class="btn-copy" onclick="copySequence('b2-seq')" disabled>Copy</button>
+                                        </div>
                                     </div>
-                                    <div class="stat-item">
-                                        <div class="stat-label">GC Content</div>
-                                        <div class="stat-value">--%</div>
+                                    <div class="primer-sequence" id="b2-seq" data-sequence="">Algorithm will generate this</div>
+                                    <div class="primer-stats">
+                                        <div class="stat-item">
+                                            <div class="stat-label">Length</div>
+                                            <div class="stat-value" id="b2-len">-- bp</div>
+                                        </div>
+                                        <div class="stat-item">
+                                            <div class="stat-label">GC Content</div>
+                                            <div class="stat-value" id="b2-gc">--%</div>
+                                        </div>
+                                        <div class="stat-item">
+                                            <div class="stat-label">Tm</div>
+                                            <div class="stat-value" id="b2-tm">--°C</div>
+                                        </div>
+                                        <div class="stat-item">
+                                            <div class="stat-label">ΔG</div>
+                                            <div class="stat-value" id="b2-dg">-- kcal/mol</div>
+                                        </div>
                                     </div>
-                                    <div class="stat-item">
-                                        <div class="stat-label">Tm</div>
-                                        <div class="stat-value">--°C</div>
+                                </div>
+
+                                <div class="primer-item">
+                                    <div class="primer-header">
+                                        <span class="primer-name">F1C</span>
+                                        <div class="primer-controls">
+                                            <button class="btn-copy" onclick="copySequence('f1c-seq')" disabled>Copy</button>
+                                        </div>
+                                    </div>
+                                    <div class="primer-sequence" id="f1c-seq" data-sequence="">Algorithm will generate this</div>
+                                    <div class="primer-stats">
+                                        <div class="stat-item">
+                                            <div class="stat-label">Length</div>
+                                            <div class="stat-value" id="f1c-len">-- bp</div>
+                                        </div>
+                                        <div class="stat-item">
+                                            <div class="stat-label">GC Content</div>
+                                            <div class="stat-value" id="f1c-gc">--%</div>
+                                        </div>
+                                        <div class="stat-item">
+                                            <div class="stat-label">Tm</div>
+                                            <div class="stat-value" id="f1c-tm">--°C</div>
+                                        </div>
+                                        <div class="stat-item">
+                                            <div class="stat-label">ΔG</div>
+                                            <div class="stat-value" id="f1c-dg">-- kcal/mol</div>
+                                        </div>
+                                    </div>
+                                </div>
+
+                                <div class="primer-item">
+                                    <div class="primer-header">
+                                        <span class="primer-name">B1C</span>
+                                        <div class="primer-controls">
+                                            <button class="btn-copy" onclick="copySequence('b1c-seq')" disabled>Copy</button>
+                                        </div>
+                                    </div>
+                                    <div class="primer-sequence" id="b1c-seq" data-sequence="">Algorithm will generate this</div>
+                                    <div class="primer-stats">
+                                        <div class="stat-item">
+                                            <div class="stat-label">Length</div>
+                                            <div class="stat-value" id="b1c-len">-- bp</div>
+                                        </div>
+                                        <div class="stat-item">
+                                            <div class="stat-label">GC Content</div>
+                                            <div class="stat-value" id="b1c-gc">--%</div>
+                                        </div>
+                                        <div class="stat-item">
+                                            <div class="stat-label">Tm</div>
+                                            <div class="stat-value" id="b1c-tm">--°C</div>
+                                        </div>
+                                        <div class="stat-item">
+                                            <div class="stat-label">ΔG</div>
+                                            <div class="stat-value" id="b1c-dg">-- kcal/mol</div>
+                                        </div>
                                     </div>
                                 </div>
                             </div>
-                        </div>
-
-                        <!-- microRNA Sequence -->
-                        <div class="primer-category">
-                            <h3>Target microRNA Sequence</h3>
-                            <div class="primer-item">
-                                <div class="primer-header">
-                                    <span class="primer-name" id="mirna-result-name">miR-21 (microRNA input)</span>
-                                    <div class="primer-controls">
-                                        <button class="btn-copy">Copy</button>
-                                    </div>
-                                </div>
-                                <div class="primer-sequence" id="mirna-result-seq">User provided sequence</div>
-                                <div class="primer-stats">
-                                    <div class="stat-item">
-                                        <div class="stat-label">Length</div>
-                                        <div class="stat-value">-- nt</div>
-                                    </div>
-                                    <div class="stat-item">
-                                        <div class="stat-label">GC Content</div>
-                                        <div class="stat-value">--%</div>
-                                    </div>
-                                </div>
-                            </div>
-                        </div>
-                    </div>
-
-                    <!-- Multiple Options Section -->
-                    <div class="multiple-options" id="multiple-options-section" style="display: none;">
-                        <h3>Alternative Primer Sets</h3>
-                        <p class="help-text">Click on any option to view its details in the main panel</p>
-                        
-                        <div class="option-card selected">
-                            <div class="option-header">
-                                <span class="option-title">Option 1 (Recommended)</span>
-                                <span class="option-score">Score: 95/100</span>
-                            </div>
-                            <div class="help-text">Optimal GC content, no hairpins detected, ideal Tm range</div>
-                        </div>
-
-                        <div class="option-card">
-                            <div class="option-header">
-                                <span class="option-title">Option 2</span>
-                                <span class="option-score">Score: 88/100</span>
-                            </div>
-                            <div class="help-text">Good GC content, minor hairpin in LB, acceptable Tm range</div>
-                        </div>
-
-                        <div class="option-card">
-                            <div class="option-header">
-                                <span class="option-title">Option 3</span>
-                                <span class="option-score">Score: 82/100</span>
-                            </div>
-                            <div class="help-text">Moderate GC content, no hairpins, slightly lower Tm</div>
                         </div>
                     </div>
-                </div>
-
-                <div id="no-results" style="text-align: center; padding: 60px 20px; color: #6c757d;">
-                    <h3>No primers generated yet</h3>
-                    <p>Go to the Input Sequence tab to generate primers</p>
                 </div>
             </div>
 
-            <!-- Customize Tab Optimal range: 40-60% Optimal range: 58-62°C for Split-LAMP Adjust primer length to optimize binding -->
+            <!-- Customize Tab -->
             <div class="tab-content" id="customize">
                 <div class="editor-panel">
                     <h4>Adjust Primer Parameters</h4>
-                    <p class="help-text">Fine tune your primers by adjusting these parameters.</p>
+                    <p class="help-text">Fine-tune your primers by adjusting these parameters. Changes will update all dependent primers automatically.</p>
 
                     <div class="form-group" style="margin-top: 20px;">
-                        <label for="edit-mirna">microRNA Sequence</label>
-                        <textarea id="edit-mirna" placeholder="Modify your microRNA sequence here"></textarea>
-                        <button class="btn btn-primary" style="margin-top: 10px;" onclick="updatePrimers()">Update All Primers</button>
+                        <label for="edit-mirna1">First microRNA Sequence</label>
+                        <textarea id="edit-mirna1" placeholder="Modify your first microRNA sequence here"></textarea>
                     </div>
 
-                    <div class="slider-group">
+                    <div class="form-group" id="edit-mirna2-group" style="display: none;">
+                        <label for="edit-mirna2">Second microRNA Sequence</label>
+                        <textarea id="edit-mirna2" placeholder="Modify your second microRNA sequence here"></textarea>
+                    </div>
+
+                    <button class="btn btn-primary" style="margin-top: 10px;" onclick="updatePrimers()">Update All Primers</button>
+
+                    <div class="slider-group" style="margin-top: 30px;">
                         <label>Target GC Content: <span class="slider-value" id="gc-value">50%</span></label>
                         <input type="range" id="gc-slider" min="40" max="60" value="50" oninput="updateGCValue(this.value)">
-                        <p class="help-text"></p>
+                        <p class="help-text">Optimal range: 40-60%</p>
                     </div>
 
                     <div class="slider-group">
                         <label>Target Melting Temperature: <span class="slider-value" id="tm-value">60°C</span></label>
                         <input type="range" id="tm-slider" min="55" max="65" value="60" oninput="updateTmValue(this.value)">
-                        <p class="help-text"> </p>
+                        <p class="help-text">Optimal range: 58-62°C for Split-LAMP</p>
                     </div>
 
                     <div class="slider-group">
                         <label>Primer Length Adjustment: <span class="slider-value" id="length-value">±0 bp</span></label>
                         <input type="range" id="length-slider" min="-5" max="5" value="0" oninput="updateLengthValue(this.value)">
-                        <p class="help-text"> </p>
+                        <p class="help-text">Adjust primer length to optimize binding</p>
                     </div>
 
                     <div class="checkbox-group" style="margin-top: 20px;">
@@ -936,6 +1084,7 @@ UAGCUUAUCAGACUGAUGUUGA"></textarea>
                             <li>Keep GC content between 40-60% for stable binding</li>
                             <li>Target Tm around 60°C for optimal Split-LAMP reaction</li>
                             <li>If primers don't work in the lab, try adjusting length by ±2-3 bp</li>
+                            <li>ΔG values closer to zero indicate weaker secondary structures</li>
                         </ul>
                     </div>
                 </div>
@@ -944,104 +1093,376 @@ UAGCUUAUCAGACUGAUGUUGA"></textarea>
     </div>
 
     <script>
+        // Global state object - single source of truth
+        let designState = {
+            architecture: 'f2-only',
+            inputs: {
+                mirna1: { name: '', sequence: '', parsed: '', length: 0, gc: 0 },
+                mirna2: { name: '', sequence: '', parsed: '', length: 0, gc: 0 }
+            },
+            options: {
+                generateLoop: true,
+                optimizeSpecificity: true,
+                checkHairpins: true,
+                calculateDG: true
+            },
+            outputs: {
+                template: { seq: '', len: 0, gc: 0 },
+                lf: { seq: '', len: 0, gc: 0, tm: 0, dg: 0, hairpin: 'None' },
+                lb: { seq: '', len: 0, gc: 0, tm: 0, dg: 0, hairpin: 'None' },
+                fip: { seq: '', len: 0, gc: 0, tm: 0, dg: 0, hairpin: 'None' },
+                bip: { seq: '', len: 0, gc: 0, tm: 0, dg: 0, hairpin: 'None' },
+                f2: { seq: '', len: 0, gc: 0, tm: 0, dg: 0 },
+                b2: { seq: '', len: 0, gc: 0, tm: 0, dg: 0 },
+                f1c: { seq: '', len: 0, gc: 0, tm: 0, dg: 0 },
+                b1c: { seq: '', len: 0, gc: 0, tm: 0, dg: 0 }
+            },
+            parameters: {
+                targetGC: 50,
+                targetTm: 60,
+                lengthAdjustment: 0
+            }
+        };
+
+        // Normalize sequence parsing - single function used everywhere
+        function parseSequence(input) {
+            // Remove FASTA header(s)
+            let cleaned = input.replace(/^>.*$/gm, '');
+            
+            // Strip whitespace, numbers, and line breaks
+            cleaned = cleaned.replace(/[\s\d\r\n]/g, '');
+            
+            // Convert to uppercase
+            cleaned = cleaned.toUpperCase();
+            
+            // Validate alphabet - only ACGTU allowed
+            const validBases = /^[ACGTU]+$/;
+            if (cleaned && !validBases.test(cleaned)) {
+                return { valid: false, sequence: '', error: 'Invalid characters. Only A, C, G, T, U allowed.' };
+            }
+            
+            // Convert U to T for DNA oligos
+            const dnaSequence = cleaned.replace(/U/g, 'T');
+            
+            return { valid: true, sequence: dnaSequence, error: '' };
+        }
+
+        // Calculate GC content
+        function calculateGC(sequence) {
+            if (!sequence) return 0;
+            const gcCount = (sequence.match(/[GC]/g) || []).length;
+            return Math.round((gcCount / sequence.length) * 100);
+        }
+
+        // Parse and validate sequence with immediate feedback
+        function parseAndValidateSequence(mirnaId) {
+            const textarea = document.getElementById(`${mirnaId}-sequence`);
+            const errorDiv = document.getElementById(`${mirnaId}-error`);
+            const infoDiv = document.getElementById(`${mirnaId}-info`);
+            const lengthSpan = document.getElementById(`${mirnaId}-length`);
+            const gcSpan = document.getElementById(`${mirnaId}-gc`);
+            
+            const result = parseSequence(textarea.value);
+            
+            if (!textarea.value) {
+                errorDiv.classList.remove('visible');
+                infoDiv.classList.remove('visible');
+                return;
+            }
+            
+            if (!result.valid) {
+                errorDiv.textContent = result.error;
+                errorDiv.classList.add('visible');
+                infoDiv.classList.remove('visible');
+                return;
+            }
+            
+            errorDiv.classList.remove('visible');
+            
+            // Calculate and show length and GC
+            const length = result.sequence.length;
+            const gc = calculateGC(result.sequence);
+            
+            lengthSpan.textContent = length;
+            gcSpan.textContent = gc;
+            infoDiv.classList.add('visible');
+            
+            // Update state
+            if (mirnaId === 'mirna1') {
+                designState.inputs.mirna1.parsed = result.sequence;
+                designState.inputs.mirna1.length = length;
+                designState.inputs.mirna1.gc = gc;
+            } else {
+                designState.inputs.mirna2.parsed = result.sequence;
+                designState.inputs.mirna2.length = length;
+                designState.inputs.mirna2.gc = gc;
+            }
+        }
+
         // Tab switching
         document.querySelectorAll('.tab').forEach(tab => {
             tab.addEventListener('click', function() {
                 const targetTab = this.dataset.tab;
                 
-                // Update active tab
                 document.querySelectorAll('.tab').forEach(t => t.classList.remove('active'));
                 this.classList.add('active');
                 
-                // Update active content
                 document.querySelectorAll('.tab-content').forEach(content => content.classList.remove('active'));
                 document.getElementById(targetTab).classList.add('active');
             });
         });
 
+        // Architecture selection
+        function selectArchitecture(arch) {
+            designState.architecture = arch;
+            
+            // Update radio selection
+            document.querySelectorAll('input[name="architecture"]').forEach(radio => {
+                radio.checked = (radio.value === arch);
+            });
+            
+            // Update visual selection
+            document.querySelectorAll('.architecture-option').forEach(option => {
+                option.classList.remove('selected');
+            });
+            event.currentTarget.classList.add('selected');
+            
+            // Show/hide second microRNA section
+            const mirna2Section = document.getElementById('mirna2-section');
+            if (arch === 'f2-and-b2') {
+                mirna2Section.classList.add('visible');
+            } else {
+                mirna2Section.classList.remove('visible');
+            }
+        }
+
+        // Set state - idle, loading, or results
+        function setState(state) {
+            const idleState = document.getElementById('idle-state');
+            const loadingState = document.getElementById('loading-state');
+            const resultsState = document.getElementById('results-state');
+            
+            idleState.classList.remove('hidden');
+            loadingState.classList.remove('visible');
+            resultsState.classList.remove('visible');
+            
+            if (state === 'loading') {
+                idleState.classList.add('hidden');
+                loadingState.classList.add('visible');
+            } else if (state === 'results') {
+                idleState.classList.add('hidden');
+                resultsState.classList.add('visible');
+            }
+        }
+
         // Generate primers function
         function generatePrimers() {
-            const mirnaName = document.getElementById('mirna-name').value;
-            const mirnaSeq = document.getElementById('mirna-sequence').value;
+            // Validate inputs
+            const mirna1Name = document.getElementById('mirna1-name').value.trim();
+            const mirna1Seq = document.getElementById('mirna1-sequence').value.trim();
             
-            if (!mirnaName || !mirnaSeq) {
-                alert('Please enter both microRNA name and sequence');
+            if (!mirna1Name || !mirna1Seq) {
+                alert('Please enter the first microRNA name and sequence');
                 return;
             }
-
-            // Show loading
-            document.getElementById('no-results').innerHTML = '<div class="loading"><div class="spinner"></div></div>';
             
-            // Simulate processing (replace with actual algorithm call)
-            setTimeout(() => {
-                // Update target info
-                document.getElementById('target-name').textContent = mirnaName;
-                document.getElementById('target-sequence').textContent = mirnaSeq.replace(/^>.*\n/, '').trim();
-                document.getElementById('mirna-result-name').textContent = mirnaName + ' (microRNA input)';
-                document.getElementById('mirna-result-seq').textContent = mirnaSeq.replace(/^>.*\n/, '').trim();
+            const mirna1Result = parseSequence(mirna1Seq);
+            if (!mirna1Result.valid) {
+                alert('Invalid first microRNA sequence: ' + mirna1Result.error);
+                return;
+            }
+            
+            // If F2-and-B2 architecture, validate second microRNA
+            if (designState.architecture === 'f2-and-b2') {
+                const mirna2Name = document.getElementById('mirna2-name').value.trim();
+                const mirna2Seq = document.getElementById('mirna2-sequence').value.trim();
                 
-                // Show results
-                document.getElementById('no-results').style.display = 'none';
-                document.getElementById('results-container').style.display = 'block';
-                
-                // Show multiple options if checked
-                if (document.getElementById('multiple-options').checked) {
-                    document.getElementById('multiple-options-section').style.display = 'block';
+                if (!mirna2Name || !mirna2Seq) {
+                    alert('Please enter the second microRNA name and sequence for F2-and-B2 architecture');
+                    return;
                 }
                 
-                // Switch to output tab
-                document.querySelector('[data-tab="output"]').click();
+                const mirna2Result = parseSequence(mirna2Seq);
+                if (!mirna2Result.valid) {
+                    alert('Invalid second microRNA sequence: ' + mirna2Result.error);
+                    return;
+                }
+                
+                designState.inputs.mirna2.name = mirna2Name;
+                designState.inputs.mirna2.sequence = mirna2Seq;
+                designState.inputs.mirna2.parsed = mirna2Result.sequence;
+            }
+            
+            // Update state
+            designState.inputs.mirna1.name = mirna1Name;
+            designState.inputs.mirna1.sequence = mirna1Seq;
+            designState.inputs.mirna1.parsed = mirna1Result.sequence;
+            
+            // Show loading
+            setState('loading');
+            document.querySelector('[data-tab="output"]').click();
+            
+            // Simulate processing (replace with actual Python algorithm call)
+            setTimeout(() => {
+                // TODO: Call your Python algorithm here
+                // For now, using mock data
+                
+                // Update target info
+                document.getElementById('result-architecture').textContent = 
+                    designState.architecture === 'f2-only' ? 'F2 Only' :
+                    designState.architecture === 'b2-only' ? 'B2 Only' :
+                    'F2 and B2 (AND-gate)';
+                
+                document.getElementById('result-target1-name').textContent = mirna1Name;
+                document.getElementById('result-target1-seq').textContent = mirna1Result.sequence;
+                
+                if (designState.architecture === 'f2-and-b2') {
+                    const mirna2Result = parseSequence(document.getElementById('mirna2-sequence').value);
+                    document.getElementById('result-target2-info').style.display = 'block';
+                    document.getElementById('result-target2-name').textContent = 
+                        document.getElementById('mirna2-name').value;
+                    document.getElementById('result-target2-seq').textContent = mirna2Result.sequence;
+                } else {
+                    document.getElementById('result-target2-info').style.display = 'none';
+                }
+                
+                // Mock primer generation - replace with actual algorithm
+                updatePrimerOutput('template-seq', 'CGGAGAGGTCGCGATAGTCA...', 150, 55);
+                updatePrimerOutput('lf-seq', 'TCACTGATCTGGCCGTAGACCA', 22, 50, 62, -8.5, 'None');
+                updatePrimerOutput('lb-seq', 'TGACAGGACATCGGTGACAGT', 21, 52, 61, -7.2, 'None');
+                updatePrimerOutput('fip-seq', 'CGGAGAGGTCGCGATAGTCATGCTTATCAGACTGATGTTGA', 43, 48, 65, -12.3, '1 weak');
+                updatePrimerOutput('bip-seq', 'GATGACAGTGACATCCTGCCTAGGCAGTGTCTTAGCTGGTTGT', 44, 52, 66, -11.8, 'None');
+                updatePrimerOutput('f2-seq', mirna1Result.sequence, mirna1Result.sequence.length, calculateGC(mirna1Result.sequence), 58, -6.5);
+                updatePrimerOutput('b2-seq', 'TGGCAGTGTCTTAGCTGGTTGT', 22, 50, 59, -7.1);
+                updatePrimerOutput('f1c-seq', 'CGGAGAGGTCGCGATAGTCA', 20, 60, 61, -8.2);
+                updatePrimerOutput('b1c-seq', 'GATGACAGTGACATCCTGCCT', 21, 52, 60, -7.8);
                 
                 // Populate customize tab
-                document.getElementById('edit-mirna').value = mirnaSeq.replace(/^>.*\n/, '').trim();
+                document.getElementById('edit-mirna1').value = mirna1Result.sequence;
+                if (designState.architecture === 'f2-and-b2') {
+                    const mirna2Result = parseSequence(document.getElementById('mirna2-sequence').value);
+                    document.getElementById('edit-mirna2').value = mirna2Result.sequence;
+                    document.getElementById('edit-mirna2-group').style.display = 'block';
+                } else {
+                    document.getElementById('edit-mirna2-group').style.display = 'none';
+                }
+                
+                // Show results
+                setState('results');
             }, 1500);
+        }
+
+        // Update primer output with stable IDs
+        function updatePrimerOutput(seqId, sequence, length, gc, tm, dg, hairpin) {
+            const seqElement = document.getElementById(seqId);
+            const primerPrefix = seqId.replace('-seq', '');
+            
+            // Update sequence
+            seqElement.textContent = sequence;
+            seqElement.setAttribute('data-sequence', sequence);
+            
+            // Enable copy button
+            const copyBtn = seqElement.parentElement.querySelector('.btn-copy');
+            if (copyBtn) copyBtn.disabled = false;
+            
+            // Update stats
+            document.getElementById(`${primerPrefix}-len`).textContent = length + ' bp';
+            document.getElementById(`${primerPrefix}-gc`).textContent = gc + '%';
+            
+            if (tm !== undefined) {
+                const tmElement = document.getElementById(`${primerPrefix}-tm`);
+                if (tmElement) tmElement.textContent = tm + '°C';
+            }
+            
+            if (dg !== undefined) {
+                const dgElement = document.getElementById(`${primerPrefix}-dg`);
+                if (dgElement) dgElement.textContent = dg + ' kcal/mol';
+            }
+            
+            if (hairpin !== undefined) {
+                const hairpinElement = document.getElementById(`${primerPrefix}-hairpin`);
+                if (hairpinElement) {
+                    hairpinElement.textContent = hairpin;
+                    hairpinElement.className = 'stat-value ' + 
+                        (hairpin === 'None' ? 'good' : hairpin.includes('weak') ? 'warning' : 'bad');
+                }
+            }
+        }
+
+        // Copy sequence to clipboard
+        function copySequence(seqId) {
+            const seqElement = document.getElementById(seqId);
+            const sequence = seqElement.getAttribute('data-sequence');
+            
+            if (!sequence || sequence === '') {
+                alert('No sequence to copy');
+                return;
+            }
+            
+            navigator.clipboard.writeText(sequence).then(() => {
+                const btn = seqElement.parentElement.querySelector('.btn-copy');
+                const originalText = btn.textContent;
+                btn.textContent = 'Copied!';
+                setTimeout(() => {
+                    btn.textContent = originalText;
+                }, 1500);
+            });
         }
 
         // Clear form
         function clearForm() {
-            document.getElementById('mirna-name').value = '';
-            document.getElementById('mirna-sequence').value = '';
+            document.getElementById('mirna1-name').value = '';
+            document.getElementById('mirna1-sequence').value = '';
+            document.getElementById('mirna2-name').value = '';
+            document.getElementById('mirna2-sequence').value = '';
+            
+            document.getElementById('mirna1-info').classList.remove('visible');
+            document.getElementById('mirna2-info').classList.remove('visible');
+            document.getElementById('mirna1-error').classList.remove('visible');
+            document.getElementById('mirna2-error').classList.remove('visible');
+            
+            // Reset to default architecture
+            selectArchitecture('f2-only');
+            document.querySelector('input[value="f2-only"]').checked = true;
         }
-
-        // Copy to clipboard
-        document.querySelectorAll('.btn-copy').forEach(btn => {
-            btn.addEventListener('click', function() {
-                const sequence = this.closest('.primer-item').querySelector('.primer-sequence').textContent;
-                navigator.clipboard.writeText(sequence);
-                
-                // Visual feedback
-                const originalText = this.textContent;
-                this.textContent = 'Copied!';
-                setTimeout(() => {
-                    this.textContent = originalText;
-                }, 1500);
-            });
-        });
 
         // Slider updates
         function updateGCValue(value) {
             document.getElementById('gc-value').textContent = value + '%';
+            designState.parameters.targetGC = parseInt(value);
         }
 
         function updateTmValue(value) {
             document.getElementById('tm-value').textContent = value + '°C';
+            designState.parameters.targetTm = parseInt(value);
         }
 
         function updateLengthValue(value) {
             const sign = value > 0 ? '+' : '';
             document.getElementById('length-value').textContent = sign + value + ' bp';
+            designState.parameters.lengthAdjustment = parseInt(value);
         }
 
         // Update primers when microRNA changes
         function updatePrimers() {
-            const newSeq = document.getElementById('edit-mirna').value;
-            alert('Updating all primers based on new microRNA sequence: ' + newSeq + '\n\nThis will recalculate all primer components.');
+            const newSeq1 = document.getElementById('edit-mirna1').value;
+            const result = parseSequence(newSeq1);
+            
+            if (!result.valid) {
+                alert('Invalid sequence: ' + result.error);
+                return;
+            }
+            
+            alert('Updating all primers based on new microRNA sequence(s).\n\nThis will recalculate all primer components.');
+            // TODO: Call your algorithm here to regenerate primers with new sequence
         }
 
         // Apply customizations
         function applyCustomizations() {
-            alert('Applying customizations...\nThis will adjust primers based on your parameter settings.');
-            // Apply the slider values and regenerate primers
+            alert('Applying customizations...\n\nTarget GC: ' + designState.parameters.targetGC + '%\n' +
+                  'Target Tm: ' + designState.parameters.targetTm + '°C\n' +
+                  'Length adjustment: ' + designState.parameters.lengthAdjustment + ' bp');
+            // TODO: Rerun algorithm with new parameters
         }
 
         // Reset to default
@@ -1053,16 +1474,6 @@ UAGCUUAUCAGACUGAUGUUGA"></textarea>
             updateTmValue(60);
             updateLengthValue(0);
         }
-
-        // Option card selection
-        document.querySelectorAll('.option-card').forEach(card => {
-            card.addEventListener('click', function() {
-                document.querySelectorAll('.option-card').forEach(c => c.classList.remove('selected'));
-                this.classList.add('selected');
-                alert('Loading ' + this.querySelector('.option-title').textContent);
-                // Load the selected primer set
-            });
-        });
     </script>
 </body>
 </html>
