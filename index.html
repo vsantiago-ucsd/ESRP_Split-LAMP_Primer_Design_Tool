@@ -1136,7 +1136,7 @@ UAGCUUAUCAGACUGAUGUUGA" oninput="parseAndValidateSequence('mirna1')"></textarea>
             return { valid: true, sequence: dnaSequence, error: '' };
         }
 
-        // Calculate GC content
+        // Calculate GC content ---------********---------
         function calculateGC(sequence) {
             if (!sequence) return 0;
             const gcCount = (sequence.match(/[GC]/g) || []).length;
