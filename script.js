@@ -219,14 +219,16 @@ function generatePrimers() {
             'F2 and B2 (AND-gate)';
         
         document.getElementById('result-target1-name').textContent = mirna1Name;
-        document.getElementById('result-target1-seq').textContent = mirna1Result.sequence;
+        const r1seqEl = document.getElementById('result-target1-seq');
+        if (r1seqEl) r1seqEl.textContent = mirna1Result.sequence;
         
         if (designState.architecture === 'f2-and-b2') {
             const mirna2Result = parseSequence(document.getElementById('mirna2-sequence').value);
             document.getElementById('result-target2-info').style.display = 'block';
             document.getElementById('result-target2-name').textContent = 
                 document.getElementById('mirna2-name').value;
-            document.getElementById('result-target2-seq').textContent = mirna2Result.sequence;
+            const r2seqEl = document.getElementById('result-target2-seq');
+            if (r2seqEl) r2seqEl.textContent = mirna2Result.sequence;
         } else {
             document.getElementById('result-target2-info').style.display = 'none';
         }
