@@ -35,15 +35,15 @@ function parseSequence(input) {
     let cleaned = input.replace(/^>.*$/gm, '');
     
     // Strip whitespace, numbers, and line breaks
-    cleaned = cleaned.replace(/[\s\d\r\n]/g, '');
+    cleaned = cleaned.replace(/[^a-zA-Z]/g, '');
     
     // Convert to uppercase
     cleaned = cleaned.toUpperCase();
     
     // Validate alphabet - only ACGTU allowed
-    const validBases = /^[ACGTU]+$/;
+    const validBases = /^[ACGU]+$/;
     if (cleaned && !validBases.test(cleaned)) {
-        return { valid: false, sequence: '', error: 'Invalid characters. Only A, C, G, T, U allowed.' };
+        return { valid: false, sequence: '', error: 'Invalid characters. Only A, C, G, U allowed.' };
     }
     
     // Convert U to T for DNA oligos
