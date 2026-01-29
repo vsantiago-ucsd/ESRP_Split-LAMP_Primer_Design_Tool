@@ -234,10 +234,12 @@ function generatePrimers() {
         }
         
         // Mock primer generation - replace with actual algorithm
+        let fip_sequence = 'CGG​AGA​GGT​CGC​GAT​AGT​CAT' + mirna1Result.sequence;
+
         updatePrimerOutput('template-seq', 'CGGAGAGGTCGCGATAGTCA...', 150, 55);
         updatePrimerOutput('lf-seq', 'TCACTGATCTGGCCGTAGACCA', 22, 50, 62, -8.5, 'None');
         updatePrimerOutput('lb-seq', 'TGACAGGACATCGGTGACAGT', 21, 52, 61, -7.2, 'None');
-        updatePrimerOutput('fip-seq', 'CGGAGAGGTCGCGATAGTCATGCTTATCAGACTGATGTTGA', 43, 48, 65, -12.3, '1 weak');
+        updatePrimerOutput('fip-seq', fip_sequence, fip_sequence.length, calculateGC(fip_sequence), 65, -12.3, '1 weak');
         updatePrimerOutput('bip-seq', 'GATGACAGTGACATCCTGCCTAGGCAGTGTCTTAGCTGGTTGT', 44, 52, 66, -11.8, 'None');
         updatePrimerOutput('f2-seq', mirna1Result.sequence, mirna1Result.sequence.length, calculateGC(mirna1Result.sequence), 58, -6.5);
         updatePrimerOutput('b2-seq', 'TGGCAGTGTCTTAGCTGGTTGT', 22, 50, 59, -7.1);
