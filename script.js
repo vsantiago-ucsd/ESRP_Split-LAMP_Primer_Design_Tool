@@ -209,7 +209,7 @@ function generatePrimers() {
     
     // Simulate processing (replace with actual Python algorithm call)
     setTimeout(() => {
-        // TODO: Call your Python(OR Javascript) algorithm here*************************
+        // TODO: Call your Javascript algorithm here*************************
         // For now, using mock data*************************
         
         // Update target info
@@ -294,6 +294,7 @@ function updatePrimerOutput(seqId, sequence, length, gc, tm, dg, hairpin) {
     }
 }
 
+// EXTRAS (NONE IMPORTANT FUNCTIONS)
 // Copy sequence to clipboard
 function copySequence(seqId) {
     const seqElement = document.getElementById(seqId);
