@@ -209,8 +209,8 @@ function generatePrimers() {
     
     // Simulate processing (replace with actual Python algorithm call)
     setTimeout(() => {
-        // TODO: Call your Python algorithm here
-        // For now, using mock data
+        // TODO: Call your Python(OR Javascript) algorithm here*************************
+        // For now, using mock data*************************
         
         // Update target info
         document.getElementById('result-architecture').textContent = 
@@ -359,7 +359,7 @@ function updatePrimers() {
     }
     
     alert('Updating all primers based on new microRNA sequence(s).\n\nThis will recalculate all primer components.');
-    // TODO: Call your algorithm here to regenerate primers with new sequence
+    // TODO: Call algorithm here to regenerate primers with new sequence****************???
 }
 
 // Apply customizations
@@ -367,7 +367,7 @@ function applyCustomizations() {
     alert('Applying customizations...\n\nTarget GC: ' + designState.parameters.targetGC + '%\n' +
           'Target Tm: ' + designState.parameters.targetTm + '°C\n' +
           'Length adjustment: ' + designState.parameters.lengthAdjustment + ' bp');
-    // TODO: Rerun algorithm with new parameters
+    // TODO: Rerun algorithm with new parameters***********************************************??????
 }
 
 // Reset to default
