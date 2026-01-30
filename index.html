@@ -60,14 +60,7 @@
 
                 <div class="form-group">
                     <label for="mirna1-sequence">First microRNA Sequence</label>
-                    <textarea id="mirna1-sequence" placeholder="Enter your first target microRNA sequence here (FASTA format or plain sequence)
-Example:
-UAGCUUAUCAGACUGAUGUUGA
-
-or
-
->hsa-miR-21-5p
-UAGCUUAUCAGACUGAUGUUGA" oninput="parseAndValidateSequence('mirna1')"></textarea>
+                    <input type="text" id="mirna1-sequence" placeholder="Enter your first target microRNA sequence here (FASTA format or plain sequence)" oninput="parseAndValidateSequence('mirna1')">
                     <p class="help-text">Paste your target sequence in FASTA format or as a plain nucleotide sequence (RNA or DNA)</p>
                     <div class="validation-error" id="mirna1-error"></div>
                     <div class="sequence-info" id="mirna1-info">
@@ -92,7 +85,7 @@ UAGCUUAUCAGACUGAUGUUGA" oninput="parseAndValidateSequence('mirna1')"></textarea>
 
                     <div class="form-group">
                         <label for="mirna2-sequence">Second microRNA Sequence</label>
-                        <textarea id="mirna2-sequence" placeholder="Enter your second target microRNA sequence here (FASTA format or plain sequence)" oninput="parseAndValidateSequence('mirna2')"></textarea>
+                        <input type="text" id="mirna2-sequence" placeholder="Enter your second target microRNA sequence here (FASTA format or plain sequence)" oninput="parseAndValidateSequence('mirna2')">
                         <p class="help-text">Paste your second target sequence in FASTA format or as a plain nucleotide sequence (RNA or DNA)</p>
                         <div class="validation-error" id="mirna2-error"></div>
                         <div class="sequence-info" id="mirna2-info">
