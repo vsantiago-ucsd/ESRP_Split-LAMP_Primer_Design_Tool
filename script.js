@@ -35,15 +35,15 @@ function parseSequence(input) {
     let cleaned = input.replace(/^>.*$/gm, '');
     
     // Strip whitespace, numbers, and line breaks
-    cleaned = cleaned.replace(/[^a-zA-Z]/g, '');
+    cleaned = cleaned.replace(/[\s\d\r\n]/g, '');
     
     // Convert to uppercase
     cleaned = cleaned.toUpperCase();
     
     // Validate alphabet - only ACGTU allowed
-    const validBases = /^[ACGU]+$/;
+    const validBases = /^[ACGTU]+$/;
     if (cleaned && !validBases.test(cleaned)) {
-        return { valid: false, sequence: '', error: 'Invalid characters. Only A, C, G, U allowed.' };
+        return { valid: false, sequence: '', error: 'Invalid characters. Only A, C, G, T, U allowed.' };
     }
     
     // Convert U to T for DNA oligos
@@ -57,6 +57,76 @@ function calculateGC(sequence) {
     if (!sequence) return 0;
     const gcCount = (sequence.match(/[GC]/g) || []).length;
     return Math.round((gcCount / sequence.length) * 100);
+}
+
+// Calculate melting temperature (Tm) using nearest-neighbor method
+function calculateTm(sequence, naConc = 50, primerConc = 0.25) {
+    if (!sequence) return 0;
+    
+    // For short sequences (<14 bp), use Wallace rule: Tm = 2(A+T) + 4(G+C)
+    if (sequence.length < 14) {
+        const aCount = (sequence.match(/A/g) || []).length;
+        const tCount = (sequence.match(/T/g) || []).length;
+        const gCount = (sequence.match(/G/g) || []).length;
+        const cCount = (sequence.match(/C/g) || []).length;
+        return 2 * (aCount + tCount) + 4 * (gCount + cCount);
+    }
+    
+    // For longer sequences, use salt-adjusted nearest-neighbor method
+    // Nearest-neighbor thermodynamic parameters (ΔH in kcal/mol, ΔS in cal/mol·K)
+    // Looks at each pair of adjacent bases. 
+    const nnParams = {
+        'AA': { dH: -7.9, dS: -22.2 }, 'TT': { dH: -7.9, dS: -22.2 },
+        'AT': { dH: -7.2, dS: -20.4 },
+        'TA': { dH: -7.2, dS: -21.3 },
+        'CA': { dH: -8.5, dS: -22.7 }, 'TG': { dH: -8.5, dS: -22.7 },
+        'GT': { dH: -8.4, dS: -22.4 }, 'AC': { dH: -8.4, dS: -22.4 },
+        'CT': { dH: -7.8, dS: -21.0 }, 'AG': { dH: -7.8, dS: -21.0 },
+        'GA': { dH: -8.2, dS: -22.2 }, 'TC': { dH: -8.2, dS: -22.2 },
+        'CG': { dH: -10.6, dS: -27.2 },
+        'GC': { dH: -9.8, dS: -24.4 },
+        'GG': { dH: -8.0, dS: -19.9 }, 'CC': { dH: -8.0, dS: -19.9 }
+    };
+    
+    // Initiation parameters
+    const initDH = 0.2;  // kcal/mol
+    const initDS = -5.7; // cal/mol·K
+    
+    // Adds up all the dinucleotides contributions plus inititation parameters 
+    let totalDH = initDH;
+    let totalDS = initDS;
+    
+    // Sum nearest-neighbor contributions
+    for (let i = 0; i < sequence.length - 1; i++) {
+        const dinuc = sequence.substring(i, i + 2);
+        if (nnParams[dinuc]) {
+            totalDH += nnParams[dinuc].dH;
+            totalDS += nnParams[dinuc].dS;
+        }
+    }
+    
+    // Terminal AT penalty
+    if (sequence[0] === 'A' || sequence[0] === 'T') {
+        totalDH += 2.3;
+        totalDS += 4.1;
+    }
+    if (sequence[sequence.length - 1] === 'A' || sequence[sequence.length - 1] === 'T') {
+        totalDH += 2.3;
+        totalDS += 4.1;
+    }
+    
+    // Salt correction (von Ahsen et al., 2001)
+    const saltCorrection = 0.368 * (sequence.length - 1) * Math.log(naConc / 1000);
+    
+    // Calculate Tm in Kelvin, then convert to Celsius
+    // Tm = (ΔH / (ΔS + R·ln(Ct/4))) - 273.15 + salt_correction
+    // Where R = 1.987 cal/mol·K, Ct = primer concentration
+    const R = 1.987; // cal/mol·K
+    const Ct = primerConc / 1e6; // Convert μM to M
+    
+    const tm = (totalDH * 1000) / (totalDS + R * Math.log(Ct / 4)) - 273.15 + saltCorrection;
+    
+    return Math.round(tm * 10) / 10; // Round to 1 decimal place
 }
 
 // Parse and validate sequence with immediate feedback
@@ -209,8 +279,8 @@ function generatePrimers() {
     
     // Simulate processing (replace with actual Python algorithm call)
     setTimeout(() => {
-        // TODO: Call your Javascript algorithm here*************************
-        // For now, using mock data*************************
+        // TODO: Call algorithm here
+        // For now, using mock data
         
         // Update target info
         document.getElementById('result-architecture').textContent = 
@@ -232,15 +302,24 @@ function generatePrimers() {
         }
         
         // Mock primer generation - replace with actual algorithm
+        // Using real sequences and calculating actual Tm values
+        const lfSeq = 'TCACTGATCTGGCCGTAGACCA';
+        const lbSeq = 'TGACAGGACATCGGTGACAGT';
+        const fipSeq = 'CGGAGAGGTCGCGATAGTCATGCTTATCAGACTGATGTTGA';
+        const bipSeq = 'GATGACAGTGACATCCTGCCTAGGCAGTGTCTTAGCTGGTTGT';
+        const b2Seq = 'TGGCAGTGTCTTAGCTGGTTGT';
+        const f1cSeq = 'CGGAGAGGTCGCGATAGTCA';
+        const b1cSeq = 'GATGACAGTGACATCCTGCCT';
+        
         updatePrimerOutput('template-seq', 'CGGAGAGGTCGCGATAGTCA...', 150, 55);
-        updatePrimerOutput('lf-seq', 'TCACTGATCTGGCCGTAGACCA', 22, 50, 62, -8.5, 'None');
-        updatePrimerOutput('lb-seq', 'TGACAGGACATCGGTGACAGT', 21, 52, 61, -7.2, 'None');
-        updatePrimerOutput('fip-seq', 'CGGAGAGGTCGCGATAGTCATGCTTATCAGACTGATGTTGA', 43, 48, 65, -12.3, '1 weak');
-        updatePrimerOutput('bip-seq', 'GATGACAGTGACATCCTGCCTAGGCAGTGTCTTAGCTGGTTGT', 44, 52, 66, -11.8, 'None');
-        updatePrimerOutput('f2-seq', mirna1Result.sequence, mirna1Result.sequence.length, calculateGC(mirna1Result.sequence), 58, -6.5);
-        updatePrimerOutput('b2-seq', 'TGGCAGTGTCTTAGCTGGTTGT', 22, 50, 59, -7.1);
-        updatePrimerOutput('f1c-seq', 'CGGAGAGGTCGCGATAGTCA', 20, 60, 61, -8.2);
-        updatePrimerOutput('b1c-seq', 'GATGACAGTGACATCCTGCCT', 21, 52, 60, -7.8);
+        updatePrimerOutput('lf-seq', lfSeq, lfSeq.length, calculateGC(lfSeq), calculateTm(lfSeq), -8.5, 'None');
+        updatePrimerOutput('lb-seq', lbSeq, lbSeq.length, calculateGC(lbSeq), calculateTm(lbSeq), -7.2, 'None');
+        updatePrimerOutput('fip-seq', fipSeq, fipSeq.length, calculateGC(fipSeq), calculateTm(fipSeq), -12.3, '1 weak');
+        updatePrimerOutput('bip-seq', bipSeq, bipSeq.length, calculateGC(bipSeq), calculateTm(bipSeq), -11.8, 'None');
+        updatePrimerOutput('f2-seq', mirna1Result.sequence, mirna1Result.sequence.length, calculateGC(mirna1Result.sequence), calculateTm(mirna1Result.sequence), -6.5);
+        updatePrimerOutput('b2-seq', b2Seq, b2Seq.length, calculateGC(b2Seq), calculateTm(b2Seq), -7.1);
+        updatePrimerOutput('f1c-seq', f1cSeq, f1cSeq.length, calculateGC(f1cSeq), calculateTm(f1cSeq), -8.2);
+        updatePrimerOutput('b1c-seq', b1cSeq, b1cSeq.length, calculateGC(b1cSeq), calculateTm(b1cSeq), -7.8);
         
         // Populate customize tab
         document.getElementById('edit-mirna1').value = mirna1Result.sequence;
@@ -294,7 +373,6 @@ function updatePrimerOutput(seqId, sequence, length, gc, tm, dg, hairpin) {
     }
 }
 
-// EXTRAS (NONE IMPORTANT FUNCTIONS)
 // Copy sequence to clipboard
 function copySequence(seqId) {
     const seqElement = document.getElementById(seqId);
@@ -360,7 +438,7 @@ function updatePrimers() {
     }
     
     alert('Updating all primers based on new microRNA sequence(s).\n\nThis will recalculate all primer components.');
-    // TODO: Call algorithm here to regenerate primers with new sequence****************???
+    // TODO: Call your algorithm here to regenerate primers with new sequence
 }
 
 // Apply customizations
@@ -368,7 +446,7 @@ function applyCustomizations() {
     alert('Applying customizations...\n\nTarget GC: ' + designState.parameters.targetGC + '%\n' +
           'Target Tm: ' + designState.parameters.targetTm + '°C\n' +
           'Length adjustment: ' + designState.parameters.lengthAdjustment + ' bp');
-    // TODO: Rerun algorithm with new parameters***********************************************??????
+    // TODO: Rerun algorithm with new parameters
 }
 
 // Reset to default
