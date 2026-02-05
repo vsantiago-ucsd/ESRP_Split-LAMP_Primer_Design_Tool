@@ -233,16 +233,25 @@ function generatePrimers() {
         
         // Mock primer generation - replace with actual algorithm
         let fip_sequence = 'CGG​AGA​GGT​CGC​GAT​AGT​CAT' + mirna1Result.sequence;
-
+        let bip_sequence;
+        
         updatePrimerOutput('template-seq', 'CGGAGAGGTCGCGATAGTCA...', 150, 55);
         updatePrimerOutput('lf-seq', 'TCACTGATCTGGCCGTAGACCA', 22, 50, 62, -8.5, 'None');
         updatePrimerOutput('lb-seq', 'TGACAGGACATCGGTGACAGT', 21, 52, 61, -7.2, 'None');
         updatePrimerOutput('fip-seq', fip_sequence, fip_sequence.length, calculateGC(fip_sequence), 65, -12.3, '1 weak');
-        updatePrimerOutput('bip-seq', 'GATGACAGTGACATCCTGCCTAGGCAGTGTCTTAGCTGGTTGT', 44, 52, 66, -11.8, 'None');
         updatePrimerOutput('f2-seq', mirna1Result.sequence, mirna1Result.sequence.length, calculateGC(mirna1Result.sequence), 58, -6.5);
-        updatePrimerOutput('b2-seq', 'TGGCAGTGTCTTAGCTGGTTGT', 22, 50, 59, -7.1);
         updatePrimerOutput('f1c-seq', 'CGGAGAGGTCGCGATAGTCA', 20, 60, 61, -8.2);
         updatePrimerOutput('b1c-seq', 'GATGACAGTGACATCCTGCCT', 21, 52, 60, -7.8);
+
+        if (designState.architecture === 'f2-and-b2') {
+            const mirna2Result = parseSequence(document.getElementById('mirna2-sequence').value);
+            bip_sequence = 'GAT​GAC​AGT​GAC​ATC​CTG​CCT​' + mirna2Result.sequence;
+            updatePrimerOutput('bip-seq', bip_sequence, bip_sequence.length, calculateGC(bip_sequence), 66, -11.8, 'None');
+            updatePrimerOutput('b2-seq', mirna2Result.sequence, mirna2Result.sequence.length, calculateGC(mirna2Result.sequence), 59, -7.1);
+        } else {
+            updatePrimerOutput('bip-seq', 'GATGACAGTGACATCCTGCCTAGGCAGTGTCTTAGCTGGTTGT', 44, 52, 66, -11.8, 'None');
+            updatePrimerOutput('b2-seq', 'TGGCAGTGTCTTAGCTGGTTGT', 22, 50, 59, -7.1);
+        }
         
         // Populate customize tab
         document.getElementById('edit-mirna1').value = mirna1Result.sequence;
