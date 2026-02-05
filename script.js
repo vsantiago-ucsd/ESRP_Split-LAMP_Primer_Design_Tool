@@ -214,57 +214,50 @@ function generatePrimers() {
         
         // Update target info
         document.getElementById('result-architecture').textContent = 
-            designState.architecture === 'f2-only' ? 'F2 Only' :
-            designState.architecture === 'b2-only' ? 'B2 Only' :
-            'F2 and B2 (AND-gate)';
+            designState.architecture === 'f2-only' ? 'F2 Only' : 'F2 and B2 (AND-gate)';
         
         document.getElementById('result-target1-name').textContent = mirna1Name;
-        document.getElementById('result-target1-seq').textContent = mirna1Result.sequence;
+        const r1seqEl = document.getElementById('result-target1-seq');
+        if (r1seqEl) r1seqEl.textContent = mirna1Result.sequence;
         
         if (designState.architecture === 'f2-and-b2') {
             const mirna2Result = parseSequence(document.getElementById('mirna2-sequence').value);
             document.getElementById('result-target2-info').style.display = 'block';
             document.getElementById('result-target2-name').textContent = 
                 document.getElementById('mirna2-name').value;
-            document.getElementById('result-target2-seq').textContent = mirna2Result.sequence;
+            const r2seqEl = document.getElementById('result-target2-seq');
+            if (r2seqEl) r2seqEl.textContent = mirna2Result.sequence;
         } else {
             document.getElementById('result-target2-info').style.display = 'none';
         }
         
         // Mock primer generation - replace with actual algorithm
-        //updatePrimerOutput('template-seq', 'CGGAGAGGTCGCGATAGTCA...', 150, 55);
-
-        //Create a constant so that it is easier to call, discluding loop primers
-
-        //Save sequences first
-        designState.outputs.f1c.seq = "CGGAGAGGTCGCGATAGTCA";
-        designState.outputs.f2.seq = mirna1Result.sequence;
-        designState.outputs.b2.seq = "TGGCAGTGTCTTAGCTGGTTGT";
-        designState.outputs.b1c.seq = "GATGACAGTGACATCCTGCCT";
-
-        const templateSeq = generateTemplateUltramer(
-            designState.outputs.f1c.seq,
-            //designState.outputs.f1.seq,
-            designState.outputs.f2.seq,
-            designState.outputs.b2.seq,
-            //designState.outputs.b1.seq,
-            designState.outputs.b1c.seq
-        );
-
-        updatePrimerOutput(
-            "template-seq",
-            templateSeq,
-            templateSeq.length,
-            calculateGC(templateSeq)
-        );
+         
+        let template_seq;
+        let fip_sequence = 'CGG​AGA​GGT​CGC​GAT​AGT​CAT' + mirna1Result.sequence;
+        let bip_sequence;
+        
+        updatePrimerOutput('template-seq', 'CGGAGAGGTCGCGATAGTCA...', 150, 55);
         updatePrimerOutput('lf-seq', 'TCACTGATCTGGCCGTAGACCA', 22, 50, 62, -8.5, 'None');
         updatePrimerOutput('lb-seq', 'TGACAGGACATCGGTGACAGT', 21, 52, 61, -7.2, 'None');
-        updatePrimerOutput('fip-seq', 'CGGAGAGGTCGCGATAGTCATGCTTATCAGACTGATGTTGA', 43, 48, 65, -12.3, '1 weak');
-        updatePrimerOutput('bip-seq', 'GATGACAGTGACATCCTGCCTAGGCAGTGTCTTAGCTGGTTGT', 44, 52, 66, -11.8, 'None');
+        updatePrimerOutput('fip-seq', fip_sequence, fip_sequence.length, calculateGC(fip_sequence), 65, -12.3, '1 weak');
         updatePrimerOutput('f2-seq', mirna1Result.sequence, mirna1Result.sequence.length, calculateGC(mirna1Result.sequence), 58, -6.5);
-        updatePrimerOutput('b2-seq', 'TGGCAGTGTCTTAGCTGGTTGT', 22, 50, 59, -7.1);
         updatePrimerOutput('f1c-seq', 'CGGAGAGGTCGCGATAGTCA', 20, 60, 61, -8.2);
         updatePrimerOutput('b1c-seq', 'GATGACAGTGACATCCTGCCT', 21, 52, 60, -7.8);
+
+        if (designState.architecture === 'f2-and-b2') {
+            const mirna2Result = parseSequence(document.getElementById('mirna2-sequence').value);
+            template_seq = generateTemplateUltramer("CGGAGAGGTCGCGATAGTCA", mirna1Result.sequence, mirna2Result.sequence,"GATGACAGTGACATCCTGCCT");
+            bip_sequence = 'GAT​GAC​AGT​GAC​ATC​CTG​CCT​' + mirna2Result.sequence;
+            updatePrimerOutput("template-seq", template_seq, template_seq.length, calculateGC(template_seq));
+            updatePrimerOutput('bip-seq', bip_sequence, bip_sequence.length, calculateGC(bip_sequence), 66, -11.8, 'None');
+            updatePrimerOutput('b2-seq', mirna2Result.sequence, mirna2Result.sequence.length, calculateGC(mirna2Result.sequence), 59, -7.1);
+        } else {
+            template_seq = generateTemplateUltramer("CGGAGAGGTCGCGATAGTCA", mirna1Result.sequence, "TGGCAGTGTCTTAGCTGGTTGT","GATGACAGTGACATCCTGCCT");
+            updatePrimerOutput("template-seq", template_seq, template_seq.length, calculateGC(template_seq));
+            updatePrimerOutput('bip-seq', 'GATGACAGTGACATCCTGCCTAGGCAGTGTCTTAGCTGGTTGT', 44, 52, 66, -11.8, 'None');
+            updatePrimerOutput('b2-seq', 'TGGCAGTGTCTTAGCTGGTTGT', 22, 50, 59, -7.1);
+        }
         
         // Populate customize tab
         document.getElementById('edit-mirna1').value = mirna1Result.sequence;
