@@ -214,9 +214,7 @@ function generatePrimers() {
         
         // Update target info
         document.getElementById('result-architecture').textContent = 
-            designState.architecture === 'f2-only' ? 'F2 Only' :
-            designState.architecture === 'b2-only' ? 'B2 Only' :
-            'F2 and B2 (AND-gate)';
+            designState.architecture === 'f2-only' ? 'F2 Only' : 'F2 and B2 (AND-gate)';
         
         document.getElementById('result-target1-name').textContent = mirna1Name;
         const r1seqEl = document.getElementById('result-target1-seq');
