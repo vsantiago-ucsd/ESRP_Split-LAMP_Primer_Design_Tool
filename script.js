@@ -232,7 +232,31 @@ function generatePrimers() {
         }
         
         // Mock primer generation - replace with actual algorithm
-        updatePrimerOutput('template-seq', 'CGGAGAGGTCGCGATAGTCA...', 150, 55);
+        //updatePrimerOutput('template-seq', 'CGGAGAGGTCGCGATAGTCA...', 150, 55);
+
+        //Create a constant so that it is easier to call, discluding loop primers
+
+        //Save sequences first
+        designState.outputs.f1c.seq = "CGGAGAGGTCGCGATAGTCA";
+        designState.outputs.f2.seq = mirna1Result.sequence;
+        designState.outputs.b2.seq = "TGGCAGTGTCTTAGCTGGTTGT";
+        designState.outputs.b1c.seq = "GATGACAGTGACATCCTGCCT";
+
+        const templateSeq = generateTemplateUltramer(
+            designState.outputs.f1c.seq,
+            //designState.outputs.f1.seq,
+            designState.outputs.f2.seq,
+            designState.outputs.b2.seq,
+            //designState.outputs.b1.seq,
+            designState.outputs.b1c.seq
+        );
+
+        updatePrimerOutput(
+            "template-seq",
+            templateSeq,
+            templateSeq.length,
+            calculateGC(templateSeq)
+        );
         updatePrimerOutput('lf-seq', 'TCACTGATCTGGCCGTAGACCA', 22, 50, 62, -8.5, 'None');
         updatePrimerOutput('lb-seq', 'TGACAGGACATCGGTGACAGT', 21, 52, 61, -7.2, 'None');
         updatePrimerOutput('fip-seq', 'CGGAGAGGTCGCGATAGTCATGCTTATCAGACTGATGTTGA', 43, 48, 65, -12.3, '1 weak');
@@ -379,3 +403,51 @@ function resetToDefault() {
     updateTmValue(60);
     updateLengthValue(0);
 }
+
+//Get the reverse complement
+function reverseComplement(sequence){
+    //Dictionary for bases and their comeplements
+    const complement = {
+        A: 'T',
+        T: 'A',
+        C: 'G',
+        G: 'C' 
+    };
+    
+     // Normalize input
+    sequence = sequence.toUpperCase();
+
+    const bases = sequence.split('');
+
+    //Check if correct
+    for (let i = 0; i < bases.length; i++) {
+        if (
+            bases[i] !== 'A' &&
+            bases[i] !== 'T' &&
+            bases[i] !== 'C' &&
+            bases[i] !== 'G'
+        ) {
+            console.error("Incorrect sequence for reverse complement");
+            return null;
+        }
+    }
+
+    //.split('') turns into array
+    //.reverse reverses the sequence
+    //.map 
+    //Return to a string
+    return bases
+        .reverse()
+        .map(base => complement[base])
+        .join('');
+}
+
+//Create template ultramer, disclusing F1, B1, LF, and BF, and spacers
+function generateTemplateUltramer(f1c,f2, b2, b1c){
+    //Ultramer = F1c + F1 + F2 + B2 + B1 + B1c
+    return f1c + f2 + b2 + b1c;
+}
+
+
+
+
