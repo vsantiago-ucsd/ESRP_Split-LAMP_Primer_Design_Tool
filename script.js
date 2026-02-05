@@ -302,36 +302,16 @@ function generatePrimers() {
         }
         
         // Mock primer generation - replace with actual algorithm
-<<<<<<< HEAD
-        // Using real sequences and calculating actual Tm values
-        const lfSeq = 'TCACTGATCTGGCCGTAGACCA';
-        const lbSeq = 'TGACAGGACATCGGTGACAGT';
-        const fipSeq = 'CGGAGAGGTCGCGATAGTCATGCTTATCAGACTGATGTTGA';
-        const bipSeq = 'GATGACAGTGACATCCTGCCTAGGCAGTGTCTTAGCTGGTTGT';
-        const b2Seq = 'TGGCAGTGTCTTAGCTGGTTGT';
-        const f1cSeq = 'CGGAGAGGTCGCGATAGTCA';
-        const b1cSeq = 'GATGACAGTGACATCCTGCCT';
-        
-        updatePrimerOutput('template-seq', 'CGGAGAGGTCGCGATAGTCA...', 150, 55);
-        updatePrimerOutput('lf-seq', lfSeq, lfSeq.length, calculateGC(lfSeq), calculateTm(lfSeq), -8.5, 'None');
-        updatePrimerOutput('lb-seq', lbSeq, lbSeq.length, calculateGC(lbSeq), calculateTm(lbSeq), -7.2, 'None');
-        updatePrimerOutput('fip-seq', fipSeq, fipSeq.length, calculateGC(fipSeq), calculateTm(fipSeq), -12.3, '1 weak');
-        updatePrimerOutput('bip-seq', bipSeq, bipSeq.length, calculateGC(bipSeq), calculateTm(bipSeq), -11.8, 'None');
-        updatePrimerOutput('f2-seq', mirna1Result.sequence, mirna1Result.sequence.length, calculateGC(mirna1Result.sequence), calculateTm(mirna1Result.sequence), -6.5);
-        updatePrimerOutput('b2-seq', b2Seq, b2Seq.length, calculateGC(b2Seq), calculateTm(b2Seq), -7.1);
-        updatePrimerOutput('f1c-seq', f1cSeq, f1cSeq.length, calculateGC(f1cSeq), calculateTm(f1cSeq), -8.2);
-        updatePrimerOutput('b1c-seq', b1cSeq, b1cSeq.length, calculateGC(b1cSeq), calculateTm(b1cSeq), -7.8);
-=======
          
         let template_seq;
         let fip_sequence = 'CGG​AGA​GGT​CGC​GAT​AGT​CAT' + mirna1Result.sequence;
         let bip_sequence;
         
         updatePrimerOutput('template-seq', 'CGGAGAGGTCGCGATAGTCA...', 150, 55);
-        updatePrimerOutput('lf-seq', 'TCACTGATCTGGCCGTAGACCA', 22, 50, 62, -8.5, 'None');
+        updatePrimerOutput('lf-seq', 'TCACTGATCTGGCCGTAGACCA', 22, 50, 61, -8.5, 'None');
         updatePrimerOutput('lb-seq', 'TGACAGGACATCGGTGACAGT', 21, 52, 61, -7.2, 'None');
-        updatePrimerOutput('fip-seq', fip_sequence, fip_sequence.length, calculateGC(fip_sequence), 65, -12.3, '1 weak');
-        updatePrimerOutput('f2-seq', mirna1Result.sequence, mirna1Result.sequence.length, calculateGC(mirna1Result.sequence), 58, -6.5);
+        updatePrimerOutput('fip-seq', fip_sequence, fip_sequence.length, calculateGC(fip_sequence), calculateTm(fip_sequence), -12.3, '1 weak');
+        updatePrimerOutput('f2-seq', mirna1Result.sequence, mirna1Result.sequence.length, calculateGC(mirna1Result.sequence), calculateTm(mirna1Result.sequence), -6.5);
         updatePrimerOutput('f1c-seq', 'CGGAGAGGTCGCGATAGTCA', 20, 60, 61, -8.2);
         updatePrimerOutput('b1c-seq', 'GATGACAGTGACATCCTGCCT', 21, 52, 60, -7.8);
 
@@ -340,15 +320,14 @@ function generatePrimers() {
             template_seq = generateTemplateUltramer("CGGAGAGGTCGCGATAGTCA", mirna1Result.sequence, mirna2Result.sequence,"GATGACAGTGACATCCTGCCT");
             bip_sequence = 'GAT​GAC​AGT​GAC​ATC​CTG​CCT​' + mirna2Result.sequence;
             updatePrimerOutput("template-seq", template_seq, template_seq.length, calculateGC(template_seq));
-            updatePrimerOutput('bip-seq', bip_sequence, bip_sequence.length, calculateGC(bip_sequence), 66, -11.8, 'None');
-            updatePrimerOutput('b2-seq', mirna2Result.sequence, mirna2Result.sequence.length, calculateGC(mirna2Result.sequence), 59, -7.1);
+            updatePrimerOutput('bip-seq', bip_sequence, bip_sequence.length, calculateGC(bip_sequence), calculateTm(bip_sequence), -11.8, 'None');
+            updatePrimerOutput('b2-seq', mirna2Result.sequence, mirna2Result.sequence.length, calculateGC(mirna2Result.sequence), calculateTm(mirna2Result.sequence), -7.1);
         } else {
             template_seq = generateTemplateUltramer("CGGAGAGGTCGCGATAGTCA", mirna1Result.sequence, "TGGCAGTGTCTTAGCTGGTTGT","GATGACAGTGACATCCTGCCT");
             updatePrimerOutput("template-seq", template_seq, template_seq.length, calculateGC(template_seq));
             updatePrimerOutput('bip-seq', 'GATGACAGTGACATCCTGCCTAGGCAGTGTCTTAGCTGGTTGT', 44, 52, 66, -11.8, 'None');
             updatePrimerOutput('b2-seq', 'TGGCAGTGTCTTAGCTGGTTGT', 22, 50, 59, -7.1);
         }
->>>>>>> 8934e9aaec85a8a3a118cef5cc9efb085660e8e7
         
         // Populate customize tab
         document.getElementById('edit-mirna1').value = mirna1Result.sequence;
