@@ -304,26 +304,26 @@ function generatePrimers() {
         // Mock primer generation - replace with actual algorithm
          
         let template_seq;
-        let fip_sequence = 'CGG​AGA​GGT​CGC​GAT​AGT​CAT' + mirna1Result.sequence;
-        let bip_sequence;
+        let f2 = mirna1Result.sequence.substring(2, mirna1Result.sequence.length);
+        let fip_seq = 'CGGAGAGGTCGCGATAGTCAT' + f2;
+        let bip_seq;
         
-        updatePrimerOutput('template-seq', 'CGGAGAGGTCGCGATAGTCA...', 150, 55);
         updatePrimerOutput('lf-seq', 'TCACTGATCTGGCCGTAGACCA', 22, 50, 61, -8.5, 'None');
         updatePrimerOutput('lb-seq', 'TGACAGGACATCGGTGACAGT', 21, 52, 61, -7.2, 'None');
-        updatePrimerOutput('fip-seq', fip_sequence, fip_sequence.length, calculateGC(fip_sequence), calculateTm(fip_sequence), -12.3, '1 weak');
-        updatePrimerOutput('f2-seq', mirna1Result.sequence, mirna1Result.sequence.length, calculateGC(mirna1Result.sequence), calculateTm(mirna1Result.sequence), -6.5);
+        updatePrimerOutput('fip-seq', fip_seq, fip_seq.length, calculateGC(fip_seq), calculateTm(fip_seq), -12.3, '1 weak');
+        updatePrimerOutput('f2-seq', f2, f2.length, calculateGC(f2), calculateTm(f2), -6.5);
         updatePrimerOutput('f1c-seq', 'CGGAGAGGTCGCGATAGTCA', 20, 60, 61, -8.2);
         updatePrimerOutput('b1c-seq', 'GATGACAGTGACATCCTGCCT', 21, 52, 60, -7.8);
 
         if (designState.architecture === 'f2-and-b2') {
             const mirna2Result = parseSequence(document.getElementById('mirna2-sequence').value);
-            template_seq = generateTemplateUltramer("CGGAGAGGTCGCGATAGTCA", mirna1Result.sequence, "TCACTGATCTGGCCGTAGACCA", "GATGACAGTGACATCCTGCCT", "TGACAGGACATCGGTGACAGT", mirna2Result.sequence);
-            bip_sequence = 'GAT​GAC​AGT​GAC​ATC​CTG​CCT​' + mirna2Result.sequence;
+            bip_seq = 'GATGACAGTGACATCCTGCCTA' + mirna2Result.sequence.substring(1); // b2 is slightly different in bip
+            template_seq = generateTemplateUltramer(fip_seq, 'TCACTGATCTGGCCGTAGACCA', 'CGGAGAGGTCGCGATAGTCA', 'GATGACAGTGACATCCTGCCT', 'TGACAGGACATCGGTGACAGT', bip_seq);
             updatePrimerOutput("template-seq", template_seq, template_seq.length, calculateGC(template_seq));
-            updatePrimerOutput('bip-seq', bip_sequence, bip_sequence.length, calculateGC(bip_sequence), calculateTm(bip_sequence), -11.8, 'None');
+            updatePrimerOutput('bip-seq', bip_seq, bip_seq.length, calculateGC(bip_seq), calculateTm(bip_seq), -11.8, 'None');
             updatePrimerOutput('b2-seq', mirna2Result.sequence, mirna2Result.sequence.length, calculateGC(mirna2Result.sequence), calculateTm(mirna2Result.sequence), -7.1);
         } else {
-            template_seq = generateTemplateUltramer("CGGAGAGGTCGCGATAGTCA", mirna1Result.sequence, "TCACTGATCTGGCCGTAGACCA","GATGACAGTGACATCCTGCCT", "TGACAGGACATCGGTGACAGT","TGGCAGTGTCTTAGCTGGTTGT");
+            template_seq = generateTemplateUltramer(fip_seq, 'TCACTGATCTGGCCGTAGACCA', 'CGGAGAGGTCGCGATAGTCA', 'GATGACAGTGACATCCTGCCT', 'TGACAGGACATCGGTGACAGT', 'GATGACAGTGACATCCTGCCTAGGCAGTGTCTTAGCTGGTTGT');
             updatePrimerOutput("template-seq", template_seq, template_seq.length, calculateGC(template_seq));
             updatePrimerOutput('bip-seq', 'GATGACAGTGACATCCTGCCTAGGCAGTGTCTTAGCTGGTTGT', 44, 52, 66, -11.8, 'None');
             updatePrimerOutput('b2-seq', 'TGGCAGTGTCTTAGCTGGTTGT', 22, 50, 59, -7.1);
@@ -454,7 +454,7 @@ function applyCustomizations() {
     alert('Applying customizations...\n\nTarget GC: ' + designState.parameters.targetGC + '%\n' +
           'Target Tm: ' + designState.parameters.targetTm + '°C\n' +
           'Length adjustment: ' + designState.parameters.lengthAdjustment + ' bp');
-    // TODO: Rerun algorithm with new parameters
+    // TODO: Rerun algorithm with new parameters***********************************************??????
 }
 
 // Reset to default
@@ -506,13 +506,12 @@ function reverseComplement(sequence){
 }
 
 //Create template ultramer, disclusing F1, B1, LF, and BF, and spacers
-function generateTemplateUltramer(f1c,f2,lf,b1c,lb,b2){
+function generateTemplateUltramer(fip, lf, f1c, b1c, lb, bip){
     //Ultramer = F1c+F2+LF+F1+B1c+LB+B2c+B1
-    let f1 = reverseComplement(f1c);
-    let b1 = reverseComplement(b1c);
-    let b2c = reverseComplement(b2);
-
-    return f1c + f2 + lf + f1 + b1c + lb + b2c + b1;
+    let lf_rc = reverseComplement(lf);
+    let bip_rc = reverseComplement(bip);
+    let f1 = reverseComplement(f1c)
+    return fip + lf_rc + 'C' + f1 + 'GT' + b1c + 'G' + lb + 'T' + bip_rc;
 }
 
 
