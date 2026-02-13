@@ -59,14 +59,50 @@ function calculateGC(sequence) {
     return Math.round((gcCount / sequence.length) * 100);
 }
 
+// Calculate the Gibbs Free Energy 
+function calcDeltaG(sequence){
+    if (!sequence) return 0; 
+
+    const nnParams = {
+        'AA': { dH: -7.9, dS: -22.2 }, 'TT': { dH: -7.9, dS: -22.2 },
+        'AT': { dH: -7.2, dS: -20.4 },
+        'TA': { dH: -7.2, dS: -21.3 },
+        'CA': { dH: -8.5, dS: -22.7 }, 'TG': { dH: -8.5, dS: -22.7 },
+        'GT': { dH: -8.4, dS: -22.4 }, 'AC': { dH: -8.4, dS: -22.4 },
+        'CT': { dH: -7.8, dS: -21.0 }, 'AG': { dH: -7.8, dS: -21.0 },
+        'GA': { dH: -8.2, dS: -22.2 }, 'TC': { dH: -8.2, dS: -22.2 },
+        'CG': { dH: -10.6, dS: -27.2 },
+        'GC': { dH: -9.8, dS: -24.4 },
+        'GG': { dH: -8.0, dS: -19.9 }, 'CC': { dH: -8.0, dS: -19.9 }
+    };
+
+    let deltaH = 0;
+    let deltaS = 0; 
+    for (let i = 0; i < sequence.length - 1; i++){
+        let basePair = sequence.substring(i, i+2);
+        deltaH += nnParams[basePair].dH;
+        deltaS += nnParams[basePair].dS;
+    }
+
+    deltaH += 0.2;
+    deltaS -= 5.7;
+    if (sequence == reverseComplement(sequence)){
+        deltaS -= 1.4;
+    }
+
+    let tempC = calculateTm(sequence); 
+    let T = tempC + 273.15;
+    let deltaS_kcal = deltaS/1000;
+
+    return Math.round((deltaH - T * deltaS_kcal) * 100) / 100;
+}
+
 // Calculate melting temperature (Tm) using nearest-neighbor method
 function calculateTm(sequence, naConc = 50, primerConc = 0.25) {
     if (!sequence) return 0;
-            
-    const length = sequence.length;
     
-    // For very short sequences (<14 bp), use Wallace rule
-    if (length < 14) {
+    // For short sequences (<14 bp), use Wallace rule: Tm = 2(A+T) + 4(G+C)
+    if (sequence.length < 14) {
         const aCount = (sequence.match(/A/g) || []).length;
         const tCount = (sequence.match(/T/g) || []).length;
         const gCount = (sequence.match(/G/g) || []).length;
@@ -74,13 +110,59 @@ function calculateTm(sequence, naConc = 50, primerConc = 0.25) {
         return 2 * (aCount + tCount) + 4 * (gCount + cCount);
     }
     
-    const gcCount = (sequence.match(/[GC]/g) || []).length;
-    const gcPercent = (gcCount / length) * 100;
+    // For longer sequences, use salt-adjusted nearest-neighbor method
+    // Nearest-neighbor thermodynamic parameters (ΔH in kcal/mol, ΔS in cal/mol·K)
+    const nnParams = {
+        'AA': { dH: -7.9, dS: -22.2 }, 'TT': { dH: -7.9, dS: -22.2 },
+        'AT': { dH: -7.2, dS: -20.4 },
+        'TA': { dH: -7.2, dS: -21.3 },
+        'CA': { dH: -8.5, dS: -22.7 }, 'TG': { dH: -8.5, dS: -22.7 },
+        'GT': { dH: -8.4, dS: -22.4 }, 'AC': { dH: -8.4, dS: -22.4 },
+        'CT': { dH: -7.8, dS: -21.0 }, 'AG': { dH: -7.8, dS: -21.0 },
+        'GA': { dH: -8.2, dS: -22.2 }, 'TC': { dH: -8.2, dS: -22.2 },
+        'CG': { dH: -10.6, dS: -27.2 },
+        'GC': { dH: -9.8, dS: -24.4 },
+        'GG': { dH: -8.0, dS: -19.9 }, 'CC': { dH: -8.0, dS: -19.9 }
+    };
     
-    // Base Tm calculation
-    let tm = 81.5 + (0.41 * gcPercent) - (675 / length);
+    // Initiation parameters
+    const initDH = 0.2;  // kcal/mol
+    const initDS = -5.7; // cal/mol·K
     
-    return Math.round(tm * 10) / 10;
+    let totalDH = initDH;
+    let totalDS = initDS;
+    
+    // Sum nearest-neighbor contributions
+    for (let i = 0; i < sequence.length - 1; i++) {
+        const dinuc = sequence.substring(i, i + 2);
+        if (nnParams[dinuc]) {
+            totalDH += nnParams[dinuc].dH;
+            totalDS += nnParams[dinuc].dS;
+        }
+    }
+    
+    // Terminal AT penalty
+    if (sequence[0] === 'A' || sequence[0] === 'T') {
+        totalDH += 2.3;
+        totalDS += 4.1;
+    }
+    if (sequence[sequence.length - 1] === 'A' || sequence[sequence.length - 1] === 'T') {
+        totalDH += 2.3;
+        totalDS += 4.1;
+    }
+    
+    // Salt correction (von Ahsen et al., 2001)
+    const saltCorrection = 0.368 * (sequence.length - 1) * Math.log(naConc / 1000);
+    
+    // Calculate Tm in Kelvin, then convert to Celsius
+    // Tm = (ΔH / (ΔS + R·ln(Ct/4))) - 273.15 + salt_correction
+    // Where R = 1.987 cal/mol·K, Ct = primer concentration
+    const R = 1.987; // cal/mol·K
+    const Ct = primerConc / 1e6; // Convert μM to M
+    
+    const tm = (totalDH * 1000) / (totalDS + R * Math.log(Ct / 4)) - 273.15 + saltCorrection;
+    
+    return Math.round(tm * 10) / 10; // Round to 1 decimal place
 }
 
 // Parse and validate sequence with immediate feedback
@@ -263,6 +345,7 @@ function generatePrimers() {
         let bip_seq;
         
         updatePrimerOutput('lf-seq', 'TCACTGATCTGGCCGTAGACCA', 22, 50, 61, -8.5, 'None');
+        // calc tm and delta G test: updatePrimerOutput('lf-seq', 'TCACTGATCTGGCCGTAGACCA', 22, calculateGC('TCACTGATCTGGCCGTAGACCA'), calculateTm('TCACTGATCTGGCCGTAGACCA'), calcDeltaG("TCACTGATCTGGCCGTAGACCA"), 'None');       
         updatePrimerOutput('lb-seq', 'TGACAGGACATCGGTGACAGT', 21, 52, 61, -7.2, 'None');
         updatePrimerOutput('fip-seq', fip_seq, fip_seq.length, calculateGC(fip_seq), calculateTm(fip_seq), -12.3, '1 weak');
         updatePrimerOutput('f2-seq', f2, f2.length, calculateGC(f2), calculateTm(f2), -6.5);
