@@ -350,7 +350,7 @@ function generatePrimers() {
         const f1cSeq = 'CGGAGAGGTCGCGATAGTCA';
         const b1cSeq = 'GATGACAGTGACATCCTGCCT';
         
-        // ✅ NOW USING CORRECTED calculateTm() and calculateDeltaG() for all primers
+        // CalculateTm() and calculateDeltaG() for all primers
         // Loop primers (LF, LB)
         updatePrimerOutput('lf-seq', lfSeq, lfSeq.length, 
             calculateGC(lfSeq), 
