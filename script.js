@@ -338,17 +338,18 @@ function generatePrimers() {
         }
         
         // Mock primer generation - replace with actual algorithm
-         
-        let template_seq;
-        let f2 = mirna1Result.sequence.substring(2, mirna1Result.sequence.length);
-        let fip_seq = 'CGGAGAGGTCGCGATAGTCAT' + f2;
-        let bip_seq;
         
         // Define all primer sequences
         const lfSeq = 'TCACTGATCTGGCCGTAGACCA';
         const lbSeq = 'TGACAGGACATCGGTGACAGT';
         const f1cSeq = 'CGGAGAGGTCGCGATAGTCA';
         const b1cSeq = 'GATGACAGTGACATCCTGCCT';
+
+        let templateSeq;
+        let f2Seq = mirna1Result.sequence.substring(2, mirna1Result.sequence.length);
+        let fipSeq = 'CGGAGAGGTCGCGATAGTCAT' + f2Seq; // f1c + T + f2
+        let b2Seq;
+        let bipSeq;
         
         // CalculateTm() and calculateDeltaG() for all primers
         // Loop primers (LF, LB)
@@ -365,16 +366,16 @@ function generatePrimers() {
             'None');
         
         // Inner primers (FIP with F2, F1C, B1C)
-        updatePrimerOutput('fip-seq', fip_seq, fip_seq.length, 
-            calculateGC(fip_seq), 
-            calculateTm(fip_seq), 
-            calculateDeltaG(fip_seq), 
+        updatePrimerOutput('fip-seq', fipSeq, fipSeq.length, 
+            calculateGC(fipSeq), 
+            calculateTm(fipSeq), 
+            calculateDeltaG(fipSeq), 
             '1 weak');
         
-        updatePrimerOutput('f2-seq', f2, f2.length, 
-            calculateGC(f2), 
-            calculateTm(f2), 
-            calculateDeltaG(f2));
+        updatePrimerOutput('f2-seq', f2Seq, f2Seq.length, 
+            calculateGC(f2Seq), 
+            calculateTm(f2Seq), 
+            calculateDeltaG(f2Seq));
         
         updatePrimerOutput('f1c-seq', f1cSeq, f1cSeq.length, 
             calculateGC(f1cSeq), 
@@ -389,41 +390,42 @@ function generatePrimers() {
         // Architecture-specific primers (BIP, B2)
         if (designState.architecture === 'f2-and-b2') {
             const mirna2Result = parseSequence(document.getElementById('mirna2-sequence').value);
-            bip_seq = 'GATGACAGTGACATCCTGCCTA' + mirna2Result.sequence.substring(1);
+            b2Seq = mirna2Result.sequence;
+            bipSeq = 'GATGACAGTGACATCCTGCCTA' + b2Seq.substring(1); // b1c + A + (b2 - T)
             
             // Generate template
-            template_seq = generateTemplateUltramer(fip_seq, lfSeq, f1cSeq, b1cSeq, lbSeq, bip_seq);
-            updatePrimerOutput("template-seq", template_seq, template_seq.length, calculateGC(template_seq));
+            templateSeq = generateTemplateUltramer(fipSeq, lfSeq, f1cSeq, b1cSeq, lbSeq, bipSeq);
+            updatePrimerOutput("template-seq", templateSeq, templateSeq.length, calculateGC(templateSeq));
             
             // BIP and B2 for two-input architecture
-            updatePrimerOutput('bip-seq', bip_seq, bip_seq.length, 
-                calculateGC(bip_seq), 
-                calculateTm(bip_seq), 
-                calculateDeltaG(bip_seq), 
+            updatePrimerOutput('bip-seq', bipSeq, bipSeq.length, 
+                calculateGC(bipSeq), 
+                calculateTm(bipSeq), 
+                calculateDeltaG(bipSeq), 
                 'None');
             
-            updatePrimerOutput('b2-seq', mirna2Result.sequence, mirna2Result.sequence.length, 
-                calculateGC(mirna2Result.sequence), 
-                calculateTm(mirna2Result.sequence), 
-                calculateDeltaG(mirna2Result.sequence));
+            updatePrimerOutput('b2-seq', b2Seq, b2Seq.length, 
+                calculateGC(b2Seq), 
+                calculateTm(b2Seq), 
+                calculateDeltaG(b2Seq));
         } else {
             // Single-input architecture
-            const bipSeqSingle = 'GATGACAGTGACATCCTGCCTAGGCAGTGTCTTAGCTGGTTGT';
-            const b2SeqSingle = 'TGGCAGTGTCTTAGCTGGTTGT';
+            b2Seq = 'TGGCAGTGTCTTAGCTGGTTGT';
+            bipSeq = 'GATGACAGTGACATCCTGCCTAGGCAGTGTCTTAGCTGGTTGT';
             
-            template_seq = generateTemplateUltramer(fip_seq, lfSeq, f1cSeq, b1cSeq, lbSeq, bipSeqSingle);
-            updatePrimerOutput("template-seq", template_seq, template_seq.length, calculateGC(template_seq));
+            templateSeq = generateTemplateUltramer(fipSeq, lfSeq, f1cSeq, b1cSeq, lbSeq, bipSeq);
+            updatePrimerOutput("template-seq", templateSeq, templateSeq.length, calculateGC(templateSeq));
             
-            updatePrimerOutput('bip-seq', bipSeqSingle, bipSeqSingle.length, 
-                calculateGC(bipSeqSingle), 
-                calculateTm(bipSeqSingle), 
-                calculateDeltaG(bipSeqSingle), 
+            updatePrimerOutput('bip-seq', bipSeq, bipSeq.length, 
+                calculateGC(bipSeq), 
+                calculateTm(bipSeq), 
+                calculateDeltaG(bipSeq), 
                 'None');
             
-            updatePrimerOutput('b2-seq', b2SeqSingle, b2SeqSingle.length, 
-                calculateGC(b2SeqSingle), 
-                calculateTm(b2SeqSingle), 
-                calculateDeltaG(b2SeqSingle));
+            updatePrimerOutput('b2-seq', b2Seq, b2Seq.length, 
+                calculateGC(b2Seq), 
+                calculateTm(b2Seq), 
+                calculateDeltaG(b2Seq));
         }
         
         // Populate customize tab
