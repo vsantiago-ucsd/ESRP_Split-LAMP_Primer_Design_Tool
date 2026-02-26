@@ -61,7 +61,12 @@ function calculateGC(sequence) {
 
 function calculateDeltaG(sequence, temperature = 65, naConc = 50, mgConc = 8, dntpConc = 0.8) {
     if (!sequence) return 0;
-    
+
+    // only consider the last six bases for the delta G calculation
+    if (sequence.length > 6) {
+        sequence = sequence.slice(6);
+    }
+
     const nnParams = {
         'AA': { dH: -7.9, dS: -22.2 }, 'TT': { dH: -7.9, dS: -22.2 },
         'AT': { dH: -7.2, dS: -20.4 }, 'TA': { dH: -7.2, dS: -21.3 },
