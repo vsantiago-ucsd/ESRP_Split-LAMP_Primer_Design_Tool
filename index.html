@@ -176,82 +176,6 @@
                                 </div>
                             </div>
 
-                            <!-- Loop Primers -->
-                            <div class="primer-category">
-                                <h3>Loop Primers</h3>
-                                <div class="primer-item">
-                                    <div class="primer-header">
-                                        <span class="primer-name">LF (Loop Forward)</span>
-                                        <div class="primer-controls">
-                                            <button class="btn-copy" onclick="copySequence('lf-seq')" disabled>Copy</button>
-                                        </div>
-                                    </div>
-                                    <div class="primer-sequence" id="lf-seq" data-sequence="">Algorithm will generate this</div>
-                                    <div class="primer-stats">
-                                        <div class="stat-item">
-                                            <div class="stat-label">Length</div>
-                                            <div class="stat-value" id="lf-len">-- bp</div>
-                                        </div>
-                                        <div class="stat-item">
-                                            <div class="stat-label">GC Content</div>
-                                            <div class="stat-value" id="lf-gc">--%</div>
-                                        </div>
-                                        <div class="stat-item">
-                                            <div class="stat-label">Tm</div>
-                                            <div class="stat-value" id="lf-tm">--°C</div>
-                                        </div>
-                                        <div class="stat-item">
-                                            <div class="stat-label">ΔG (5' end)</div>
-                                            <div class="stat-value" id="lf-dg5">-- kcal/mol</div>
-                                        </div>
-                                        <div class="stat-item">
-                                            <div class="stat-label">ΔG (3' end)</div>
-                                            <div class="stat-value" id="lf-dg3">-- kcal/mol</div>
-                                        </div>
-                                        <div class="stat-item">
-                                            <div class="stat-label">Hairpins</div>
-                                            <div class="stat-value" id="lf-hairpin">--</div>
-                                        </div>
-                                    </div>
-                                </div>
-
-                                <div class="primer-item">
-                                    <div class="primer-header">
-                                        <span class="primer-name">LB (Loop Backward)</span>
-                                        <div class="primer-controls">
-                                            <button class="btn-copy" onclick="copySequence('lb-seq')" disabled>Copy</button>
-                                        </div>
-                                    </div>
-                                    <div class="primer-sequence" id="lb-seq" data-sequence="">Algorithm will generate this</div>
-                                    <div class="primer-stats">
-                                        <div class="stat-item">
-                                            <div class="stat-label">Length</div>
-                                            <div class="stat-value" id="lb-len">-- bp</div>
-                                        </div>
-                                        <div class="stat-item">
-                                            <div class="stat-label">GC Content</div>
-                                            <div class="stat-value" id="lb-gc">--%</div>
-                                        </div>
-                                        <div class="stat-item">
-                                            <div class="stat-label">Tm</div>
-                                            <div class="stat-value" id="lb-tm">--°C</div>
-                                        </div>
-                                        <div class="stat-item">
-                                            <div class="stat-label">ΔG (5' end)</div>
-                                            <div class="stat-value" id="lb-dg5">-- kcal/mol</div>
-                                        </div>
-                                        <div class="stat-item">
-                                            <div class="stat-label">ΔG (3' end)</div>
-                                            <div class="stat-value" id="lb-dg3">-- kcal/mol</div>
-                                        </div>
-                                        <div class="stat-item">
-                                            <div class="stat-label">Hairpins</div>
-                                            <div class="stat-value" id="lb-hairpin">--</div>
-                                        </div>
-                                    </div>
-                                </div>
-                            </div>
-
                             <!-- Inner Primers -->
                             <div class="primer-category">
                                 <h3>Inner Primers</h3>
@@ -459,12 +383,88 @@
                                     </div>
                                 </div>
                             </div>
+
+                            <!-- Loop Primers -->
+                            <div class="primer-category">
+                                <h3>Loop Primers</h3>
+                                <div class="primer-item">
+                                    <div class="primer-header">
+                                        <span class="primer-name">LF (Loop Forward)</span>
+                                        <div class="primer-controls">
+                                            <button class="btn-copy" onclick="copySequence('lf-seq')" disabled>Copy</button>
+                                        </div>
+                                    </div>
+                                    <div class="primer-sequence" id="lf-seq" data-sequence="">Algorithm will generate this</div>
+                                    <div class="primer-stats">
+                                        <div class="stat-item">
+                                            <div class="stat-label">Length</div>
+                                            <div class="stat-value" id="lf-len">-- bp</div>
+                                        </div>
+                                        <div class="stat-item">
+                                            <div class="stat-label">GC Content</div>
+                                            <div class="stat-value" id="lf-gc">--%</div>
+                                        </div>
+                                        <div class="stat-item">
+                                            <div class="stat-label">Tm</div>
+                                            <div class="stat-value" id="lf-tm">--°C</div>
+                                        </div>
+                                        <div class="stat-item">
+                                            <div class="stat-label">ΔG (5' end)</div>
+                                            <div class="stat-value" id="lf-dg5">-- kcal/mol</div>
+                                        </div>
+                                        <div class="stat-item">
+                                            <div class="stat-label">ΔG (3' end)</div>
+                                            <div class="stat-value" id="lf-dg3">-- kcal/mol</div>
+                                        </div>
+                                        <div class="stat-item">
+                                            <div class="stat-label">Hairpins</div>
+                                            <div class="stat-value" id="lf-hairpin">--</div>
+                                        </div>
+                                    </div>
+                                </div>
+
+                                <div class="primer-item">
+                                    <div class="primer-header">
+                                        <span class="primer-name">LB (Loop Backward)</span>
+                                        <div class="primer-controls">
+                                            <button class="btn-copy" onclick="copySequence('lb-seq')" disabled>Copy</button>
+                                        </div>
+                                    </div>
+                                    <div class="primer-sequence" id="lb-seq" data-sequence="">Algorithm will generate this</div>
+                                    <div class="primer-stats">
+                                        <div class="stat-item">
+                                            <div class="stat-label">Length</div>
+                                            <div class="stat-value" id="lb-len">-- bp</div>
+                                        </div>
+                                        <div class="stat-item">
+                                            <div class="stat-label">GC Content</div>
+                                            <div class="stat-value" id="lb-gc">--%</div>
+                                        </div>
+                                        <div class="stat-item">
+                                            <div class="stat-label">Tm</div>
+                                            <div class="stat-value" id="lb-tm">--°C</div>
+                                        </div>
+                                        <div class="stat-item">
+                                            <div class="stat-label">ΔG (5' end)</div>
+                                            <div class="stat-value" id="lb-dg5">-- kcal/mol</div>
+                                        </div>
+                                        <div class="stat-item">
+                                            <div class="stat-label">ΔG (3' end)</div>
+                                            <div class="stat-value" id="lb-dg3">-- kcal/mol</div>
+                                        </div>
+                                        <div class="stat-item">
+                                            <div class="stat-label">Hairpins</div>
+                                            <div class="stat-value" id="lb-hairpin">--</div>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
                         </div>
                     </div>
                 </div>
             </div>
 
-            <!-- Customize Tab -->
+
             <div class="tab-content" id="customize">
                 <div class="editor-panel">
                     <h4>Adjust Primer Parameters</h4>
