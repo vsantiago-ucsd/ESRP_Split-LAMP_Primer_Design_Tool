@@ -383,9 +383,9 @@ function generatePrimers() {
         // Inner primers (FIP with F2, F1C, B1C)
         updatePrimerOutput('fip-seq', fipSeq, fipSeq.length, 
             calculateGC(fipSeq), 
-            calculateTm(fipSeq), 
-            calculateDeltaG5Prime(fipSeq), 
-            calculateDeltaG3Prime(fipSeq), 
+            undefined, 
+            undefined, 
+            undefined, 
             '1 weak');
         
         updatePrimerOutput('f2-seq', f2Seq, f2Seq.length, 
@@ -419,9 +419,9 @@ function generatePrimers() {
             // BIP and B2 for two-input architecture
             updatePrimerOutput('bip-seq', bipSeq, bipSeq.length, 
                 calculateGC(bipSeq), 
-                calculateTm(bipSeq), 
-                calculateDeltaG5Prime(bipSeq), 
-                calculateDeltaG3Prime(bipSeq), 
+                undefined, 
+                undefined, 
+                undefined, 
                 'None');
             
             updatePrimerOutput('b2-seq', b2Seq, b2Seq.length, 
@@ -439,9 +439,9 @@ function generatePrimers() {
             
             updatePrimerOutput('bip-seq', bipSeq, bipSeq.length, 
                 calculateGC(bipSeq), 
-                calculateTm(bipSeq), 
-                calculateDeltaG5Prime(bipSeq), 
-                calculateDeltaG3Prime(bipSeq), 
+                undefined, 
+                undefined, 
+                undefined, 
                 'None');
             
             updatePrimerOutput('b2-seq', b2Seq, b2Seq.length, 
