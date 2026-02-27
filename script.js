@@ -30,22 +30,14 @@ let designState = {
 };
 
 const NN_PARAMS = {
-    'AA': { dH: -7.9,  dS: -22.2 },
-    'TT': { dH: -7.9,  dS: -22.2 },
-    'AT': { dH: -7.2,  dS: -20.4 },
-    'TA': { dH: -7.2,  dS: -21.3 },
-    'CA': { dH: -8.5,  dS: -22.7 },
-    'TG': { dH: -8.5,  dS: -22.7 },
-    'GT': { dH: -8.4,  dS: -22.4 },
-    'AC': { dH: -8.4,  dS: -22.4 },
-    'CT': { dH: -7.8,  dS: -21.0 },
-    'AG': { dH: -7.8,  dS: -21.0 },
-    'GA': { dH: -8.2,  dS: -22.2 },
-    'TC': { dH: -8.2,  dS: -22.2 },
-    'CG': { dH: -10.6, dS: -27.2 },
-    'GC': { dH: -9.8,  dS: -24.4 },
-    'GG': { dH: -8.0,  dS: -19.9 },
-    'CC': { dH: -8.0,  dS: -19.9 }
+    'AA': { dH: -7.9, dS: -22.2 }, 'TT': { dH: -7.9, dS: -22.2 },
+    'AT': { dH: -7.2, dS: -20.4 }, 'TA': { dH: -7.2, dS: -21.3 },
+    'CA': { dH: -8.5, dS: -22.7 }, 'TG': { dH: -8.5, dS: -22.7 },
+    'GT': { dH: -8.4, dS: -22.4 }, 'AC': { dH: -8.4, dS: -22.4 },
+    'CT': { dH: -7.8, dS: -21.0 }, 'AG': { dH: -7.8, dS: -21.0 },
+    'GA': { dH: -8.2, dS: -22.2 }, 'TC': { dH: -8.2, dS: -22.2 },
+    'CG': { dH: -10.6, dS: -27.2 }, 'GC': { dH: -9.8, dS: -24.4 },
+    'GG': { dH: -8.0, dS: -19.9 }, 'CC': { dH: -8.0, dS: -19.9 }
 };
 
 // Normalize sequence parsing - single function used everywhere
@@ -154,7 +146,7 @@ function calculateTm(sequence, naConc = 50, mgConc = 8, primerConc = 0.25, dntpC
     return Math.round(Tm * 10) / 10;
 }
 
-function calculateDeltaG(sequence, temperature = 65, naConc = 50, mgConc = 8, dntpConc = 0.8) {
+function calculateDeltaG(sequence, temperature = 37, naConc = 50, mgConc = 8, dntpConc = 0.8) {
     if (!sequence) return 0;
     sequence = sequence.toUpperCase();
 
@@ -171,6 +163,20 @@ function calculateDeltaG(sequence, temperature = 65, naConc = 50, mgConc = 8, dn
     const deltaG = dH - (tempK * correctedDS / 1000);
 
     return Math.round(deltaG * 100) / 100;
+}
+
+// Calculate ΔG for the 5' end (first 6 bp)
+function calculateDeltaG5Prime(sequence, temperature = 37, naConc = 50, mgConc = 8, dntpConc = 0.8) {
+    if (!sequence) return 0;
+    let fiveEnd = sequence.length > 6 ? sequence.slice(0,6) : sequence;
+    return calculateDeltaG(fiveEnd, temperature, naConc, mgConc, dntpConc);
+}
+
+// Calculate ΔG for the 3' end (last 6 bp)
+function calculateDeltaG3Prime(sequence, temperature = 37, naConc = 50, mgConc = 8, dntpConc = 0.8) {
+    if (!sequence) return 0;
+    let threeEnd = sequence.length > 6 ? sequence.slice(-6) : sequence;
+    return calculateDeltaG(threeEnd, temperature, naConc, mgConc, dntpConc);
 }
 
 // // Helper function to calculate ΔG for any sequence segment
@@ -225,20 +231,6 @@ function calculateDeltaG(sequence, temperature = 65, naConc = 50, mgConc = 8, dn
     
 //     return Math.round(deltaG * 100) / 100;
 // }
-
-// Calculate ΔG for the 5' end (first 6 bp)
-function calculateDeltaG5Prime(sequence, temperature = 65, naConc = 50, mgConc = 8, dntpConc = 0.8) {
-    if (!sequence) return 0;
-    let fiveEnd = sequence.length > 6 ? sequence.slice(0,6) : sequence;
-    return calculateDeltaG(fiveEnd, temperature, naConc, mgConc, dntpConc);
-}
-
-// Calculate ΔG for the 3' end (last 6 bp)
-function calculateDeltaG3Prime(sequence, temperature = 65, naConc = 50, mgConc = 8, dntpConc = 0.8) {
-    if (!sequence) return 0;
-    let threeEnd = sequence.length > 6 ? sequence.slice(-6) : sequence;
-    return calculateDeltaG(threeEnd, temperature, naConc, mgConc, dntpConc);
-}
 
 // function calculateTm(sequence, naConc = 50, mgConc = 8, primerConc = 0.25, dntpConc = 0.8) {
 //     if (!sequence) return 0;
@@ -480,7 +472,6 @@ function generatePrimers() {
         let b2Seq;
         let bipSeq;
         
-        // CalculateTm() and calculateDeltaG() for all primers
         // Loop primers (LF, LB)
         updatePrimerOutput('lf-seq', lfSeq, lfSeq.length, 
             calculateGC(lfSeq), 
