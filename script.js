@@ -29,6 +29,17 @@ let designState = {
     }
 };
 
+const NN_PARAMS = {
+    'AA': { dH: -7.9, dS: -22.2 }, 'TT': { dH: -7.9, dS: -22.2 },
+    'AT': { dH: -7.2, dS: -20.4 }, 'TA': { dH: -7.2, dS: -21.3 },
+    'CA': { dH: -8.5, dS: -22.7 }, 'TG': { dH: -8.5, dS: -22.7 },
+    'GT': { dH: -8.4, dS: -22.4 }, 'AC': { dH: -8.4, dS: -22.4 },
+    'CT': { dH: -7.8, dS: -21.0 }, 'AG': { dH: -7.8, dS: -21.0 },
+    'GA': { dH: -8.2, dS: -22.2 }, 'TC': { dH: -8.2, dS: -22.2 },
+    'CG': { dH: -10.6, dS: -27.2 }, 'GC': { dH: -9.8, dS: -24.4 },
+    'GG': { dH: -8.0, dS: -19.9 }, 'CC': { dH: -8.0, dS: -19.9 }
+};
+
 // Normalize sequence parsing - single function used everywhere
 function parseSequence(input) {
     // Remove FASTA header(s)
@@ -59,110 +70,113 @@ function calculateGC(sequence) {
     return Math.round((gcCount / sequence.length) * 100);
 }
 
-function calculateDeltaG(sequence, temperature = 65, naConc = 50, mgConc = 8, dntpConc = 0.8) {
-    if (!sequence) return 0;
-    
-    const nnParams = {
-        'AA': { dH: -7.9, dS: -22.2 }, 'TT': { dH: -7.9, dS: -22.2 },
-        'AT': { dH: -7.2, dS: -20.4 }, 'TA': { dH: -7.2, dS: -21.3 },
-        'CA': { dH: -8.5, dS: -22.7 }, 'TG': { dH: -8.5, dS: -22.7 },
-        'GT': { dH: -8.4, dS: -22.4 }, 'AC': { dH: -8.4, dS: -22.4 },
-        'CT': { dH: -7.8, dS: -21.0 }, 'AG': { dH: -7.8, dS: -21.0 },
-        'GA': { dH: -8.2, dS: -22.2 }, 'TC': { dH: -8.2, dS: -22.2 },
-        'CG': { dH: -10.6, dS: -27.2 }, 'GC': { dH: -9.8, dS: -24.4 },
-        'GG': { dH: -8.0, dS: -19.9 }, 'CC': { dH: -8.0, dS: -19.9 }
-    };
-    
-    let totalDH = 0.2;
-    let totalDS = -5.7;
-    
+// Strictly SantaLucia 1998 compliant thermodynamic calculation
+function calcThermo(sequence) {
+    sequence = sequence.toUpperCase();
+
+    // 1. Sum nearest-neighbor parameters
+    let totalDH = 0;
+    let totalDS = 0;
+
     for (let i = 0; i < sequence.length - 1; i++) {
         const dinuc = sequence.substring(i, i + 2);
-        if (nnParams[dinuc]) {
-            totalDH += nnParams[dinuc].dH;
-            totalDS += nnParams[dinuc].dS;
+        if (NN_PARAMS[dinuc]) {
+            totalDH += NN_PARAMS[dinuc].dH;
+            totalDS += NN_PARAMS[dinuc].dS;
         }
     }
-    
-    if (sequence[0] === 'A' || sequence[0] === 'T') {
+
+    // 2. Initiation — one correction per terminal end (SantaLucia 1998, Table 2)
+    const fiveEnd  = sequence[0];
+    const threeEnd = sequence[sequence.length - 1];
+
+    // 5' terminal
+    if (fiveEnd === 'G' || fiveEnd === 'C') {
+        totalDH += 0.1;
+        totalDS += -2.8;
+    } else {
         totalDH += 2.3;
         totalDS += 4.1;
     }
-    if (sequence[sequence.length - 1] === 'A' || sequence[sequence.length - 1] === 'T') {
+
+    // 3' terminal
+    if (threeEnd === 'G' || threeEnd === 'C') {
+        totalDH += 0.1;
+        totalDS += -2.8;
+    } else {
         totalDH += 2.3;
         totalDS += 4.1;
     }
-    
-    // Symmetry correction
+
+    // 3. Symmetry correction (only if self-complementary)
     if (sequence === reverseComplement(sequence)) {
         totalDS -= 1.4;
     }
-    
-    // Salt correction (same as Tm)
-    const effectiveMg = Math.max(0, mgConc - dntpConc);
-    const naEffective = naConc + 120 * Math.sqrt(effectiveMg);
-    const saltCorrection = 0.368 * (sequence.length - 1) * Math.log(naEffective / 1000);
-    const correctedDS = totalDS + saltCorrection;
-    
-    // ✅ KEY FIX: Use reaction temperature (65°C), not Tm!
-    const tempK = temperature + 273.15;
-    const deltaG = totalDH - (tempK * correctedDS / 1000);
-    
-    return Math.round(deltaG * 100) / 100;
+
+    return { dH: totalDH, dS: totalDS };
 }
 
 function calculateTm(sequence, naConc = 50, mgConc = 8, primerConc = 0.25, dntpConc = 0.8) {
     if (!sequence) return 0;
-    
+    sequence = sequence.toUpperCase();
+
+    // Short sequence fallback (Wallace rule) — SantaLucia recommends NN for all lengths
+    // but <8 bp is unreliable with NN; keeping your threshold at 14 is reasonable
     if (sequence.length < 14) {
-        const aCount = (sequence.match(/A/g) || []).length;
-        const tCount = (sequence.match(/T/g) || []).length;
-        const gCount = (sequence.match(/G/g) || []).length;
-        const cCount = (sequence.match(/C/g) || []).length;
-        return 2 * (aCount + tCount) + 4 * (gCount + cCount) + 5;
+        const a = (sequence.match(/A/g) || []).length;
+        const t = (sequence.match(/T/g) || []).length;
+        const g = (sequence.match(/G/g) || []).length;
+        const c = (sequence.match(/C/g) || []).length;
+        return 2 * (a + t) + 4 * (g + c);
     }
-    
-    const nnParams = {
-        'AA': { dH: -7.9, dS: -22.2 }, 'TT': { dH: -7.9, dS: -22.2 },
-        'AT': { dH: -7.2, dS: -20.4 }, 'TA': { dH: -7.2, dS: -21.3 },
-        'CA': { dH: -8.5, dS: -22.7 }, 'TG': { dH: -8.5, dS: -22.7 },
-        'GT': { dH: -8.4, dS: -22.4 }, 'AC': { dH: -8.4, dS: -22.4 },
-        'CT': { dH: -7.8, dS: -21.0 }, 'AG': { dH: -7.8, dS: -21.0 },
-        'GA': { dH: -8.2, dS: -22.2 }, 'TC': { dH: -8.2, dS: -22.2 },
-        'CG': { dH: -10.6, dS: -27.2 }, 'GC': { dH: -9.8, dS: -24.4 },
-        'GG': { dH: -8.0, dS: -19.9 }, 'CC': { dH: -8.0, dS: -19.9 }
-    };
-    
-    let totalDH = 0.2;
-    let totalDS = -5.7;
-    
-    for (let i = 0; i < sequence.length - 1; i++) {
-        const dinuc = sequence.substring(i, i + 2);
-        if (nnParams[dinuc]) {
-            totalDH += nnParams[dinuc].dH;
-            totalDS += nnParams[dinuc].dS;
-        }
-    }
-    
-    if (sequence[0] === 'A' || sequence[0] === 'T') {
-        totalDH += 2.3;
-        totalDS += 4.1;
-    }
-    if (sequence[sequence.length - 1] === 'A' || sequence[sequence.length - 1] === 'T') {
-        totalDH += 2.3;
-        totalDS += 4.1;
-    }
-    
+
+    const { dH, dS } = calcThermo(sequence);
+
+    // Salt correction on ΔS (SantaLucia 1998 Eq. 6 / Owczarzy approximation)
+    const effectiveMg  = Math.max(0, mgConc - dntpConc);
+    const naEffective  = naConc + 120 * Math.sqrt(effectiveMg);  // mM equivalent
+    const saltCorr     = 0.368 * (sequence.length - 1) * Math.log(naEffective / 1000);
+    const correctedDS  = dS + saltCorr;
+
+    // Tm equation (SantaLucia 1998, Eq. 3) — non-self-complementary: CT/4
+    const R  = 1.987;       // cal/mol·K
+    const Ct = primerConc / 1e6;  // convert µM → M
+    const Tm = (dH * 1000) / (correctedDS + R * Math.log(Ct / 4)) - 273.15;
+
+    return Math.round(Tm * 10) / 10;
+}
+
+function calculateDeltaG(sequence, temperature = 37, naConc = 50, mgConc = 8, dntpConc = 0.8) {
+    if (!sequence) return 0;
+    sequence = sequence.toUpperCase();
+
+    const { dH, dS } = calcThermo(sequence);
+
+    // Salt correction on ΔS
     const effectiveMg = Math.max(0, mgConc - dntpConc);
     const naEffective = naConc + 120 * Math.sqrt(effectiveMg);
-    const saltCorrection = 0.368 * (sequence.length - 1) * Math.log(naEffective / 1000);
-    const correctedDS = totalDS + saltCorrection;
-    
-    const R = 1.987;
-    const Ct = primerConc / 1e6;
-    const tm = (totalDH * 1000) / (correctedDS + R * Math.log(Ct / 4)) - 273.15;
-    
-    return Math.round(tm * 10) / 10;
+    const saltCorr    = 0.368 * (sequence.length - 1) * Math.log(naEffective / 1000);
+    const correctedDS = dS + saltCorr;
+
+    // ΔG at reaction temperature (65°C for LAMP)
+    const tempK  = temperature + 273.15;
+    const deltaG = dH - (tempK * correctedDS / 1000);
+
+    return Math.round(deltaG * 100) / 100;
+}
+
+// Calculate ΔG for the 5' end (first 6 bp)
+function calculateDeltaG5Prime(sequence, temperature = 37, naConc = 50, mgConc = 8, dntpConc = 0.8) {
+    if (!sequence) return 0;
+    let fiveEnd = sequence.length > 6 ? sequence.slice(0,6) : sequence;
+    return calculateDeltaG(fiveEnd, temperature, naConc, mgConc, dntpConc);
+}
+
+// Calculate ΔG for the 3' end (last 6 bp)
+function calculateDeltaG3Prime(sequence, temperature = 37, naConc = 50, mgConc = 8, dntpConc = 0.8) {
+    if (!sequence) return 0;
+    let threeEnd = sequence.length > 6 ? sequence.slice(-6) : sequence;
+    return calculateDeltaG(threeEnd, temperature, naConc, mgConc, dntpConc);
 }
 
 // Parse and validate sequence with immediate feedback
@@ -338,92 +352,103 @@ function generatePrimers() {
         }
         
         // Mock primer generation - replace with actual algorithm
-         
-        let template_seq;
-        let f2 = mirna1Result.sequence.substring(2, mirna1Result.sequence.length);
-        let fip_seq = 'CGGAGAGGTCGCGATAGTCAT' + f2;
-        let bip_seq;
         
         // Define all primer sequences
         const lfSeq = 'TCACTGATCTGGCCGTAGACCA';
         const lbSeq = 'TGACAGGACATCGGTGACAGT';
         const f1cSeq = 'CGGAGAGGTCGCGATAGTCA';
         const b1cSeq = 'GATGACAGTGACATCCTGCCT';
+
+        let templateSeq;
+        let f2Seq = mirna1Result.sequence.substring(2, mirna1Result.sequence.length);
+        let fipSeq = 'CGGAGAGGTCGCGATAGTCAT' + f2Seq; // f1c + T + f2
+        let b2Seq;
+        let bipSeq;
         
-        // CalculateTm() and calculateDeltaG() for all primers
         // Loop primers (LF, LB)
         updatePrimerOutput('lf-seq', lfSeq, lfSeq.length, 
             calculateGC(lfSeq), 
             calculateTm(lfSeq), 
-            calculateDeltaG(lfSeq), 
+            calculateDeltaG5Prime(lfSeq), 
+            calculateDeltaG3Prime(lfSeq), 
             'None');
         
         updatePrimerOutput('lb-seq', lbSeq, lbSeq.length, 
             calculateGC(lbSeq), 
             calculateTm(lbSeq), 
-            calculateDeltaG(lbSeq), 
+            calculateDeltaG5Prime(lbSeq), 
+            calculateDeltaG3Prime(lbSeq), 
             'None');
         
         // Inner primers (FIP with F2, F1C, B1C)
-        updatePrimerOutput('fip-seq', fip_seq, fip_seq.length, 
-            calculateGC(fip_seq), 
-            calculateTm(fip_seq), 
-            calculateDeltaG(fip_seq), 
+        updatePrimerOutput('fip-seq', fipSeq, fipSeq.length, 
+            calculateGC(fipSeq), 
+            undefined, 
+            undefined, 
+            undefined, 
             '1 weak');
         
-        updatePrimerOutput('f2-seq', f2, f2.length, 
-            calculateGC(f2), 
-            calculateTm(f2), 
-            calculateDeltaG(f2));
+        updatePrimerOutput('f2-seq', f2Seq, f2Seq.length, 
+            calculateGC(f2Seq), 
+            calculateTm(f2Seq), 
+            calculateDeltaG5Prime(f2Seq), 
+            calculateDeltaG3Prime(f2Seq));
         
         updatePrimerOutput('f1c-seq', f1cSeq, f1cSeq.length, 
             calculateGC(f1cSeq), 
             calculateTm(f1cSeq), 
-            calculateDeltaG(f1cSeq));
+            calculateDeltaG5Prime(f1cSeq), 
+            calculateDeltaG3Prime(f1cSeq));
         
         updatePrimerOutput('b1c-seq', b1cSeq, b1cSeq.length, 
             calculateGC(b1cSeq), 
             calculateTm(b1cSeq), 
-            calculateDeltaG(b1cSeq));
+            calculateDeltaG5Prime(b1cSeq), 
+            calculateDeltaG3Prime(b1cSeq));
 
         // Architecture-specific primers (BIP, B2)
         if (designState.architecture === 'f2-and-b2') {
             const mirna2Result = parseSequence(document.getElementById('mirna2-sequence').value);
-            bip_seq = 'GATGACAGTGACATCCTGCCTA' + mirna2Result.sequence.substring(1);
+            b2Seq = mirna2Result.sequence;
+            bipSeq = 'GATGACAGTGACATCCTGCCTA' + b2Seq.substring(1); // b1c + A + (b2 - T)
             
             // Generate template
-            template_seq = generateTemplateUltramer(fip_seq, lfSeq, f1cSeq, b1cSeq, lbSeq, bip_seq);
-            updatePrimerOutput("template-seq", template_seq, template_seq.length, calculateGC(template_seq));
+            templateSeq = generateTemplateUltramer(fipSeq, lfSeq, f1cSeq, b1cSeq, lbSeq, bipSeq);
+            updatePrimerOutput("template-seq", templateSeq, templateSeq.length, calculateGC(templateSeq));
             
             // BIP and B2 for two-input architecture
-            updatePrimerOutput('bip-seq', bip_seq, bip_seq.length, 
-                calculateGC(bip_seq), 
-                calculateTm(bip_seq), 
-                calculateDeltaG(bip_seq), 
+            updatePrimerOutput('bip-seq', bipSeq, bipSeq.length, 
+                calculateGC(bipSeq), 
+                undefined, 
+                undefined, 
+                undefined, 
                 'None');
             
-            updatePrimerOutput('b2-seq', mirna2Result.sequence, mirna2Result.sequence.length, 
-                calculateGC(mirna2Result.sequence), 
-                calculateTm(mirna2Result.sequence), 
-                calculateDeltaG(mirna2Result.sequence));
+            updatePrimerOutput('b2-seq', b2Seq, b2Seq.length, 
+                calculateGC(b2Seq), 
+                calculateTm(b2Seq), 
+                calculateDeltaG5Prime(b2Seq), 
+                calculateDeltaG3Prime(b2Seq));
         } else {
             // Single-input architecture
-            const bipSeqSingle = 'GATGACAGTGACATCCTGCCTAGGCAGTGTCTTAGCTGGTTGT';
-            const b2SeqSingle = 'TGGCAGTGTCTTAGCTGGTTGT';
+            b2Seq = 'TGGCAGTGTCTTAGCTGGTTGT';
+            bipSeq = 'GATGACAGTGACATCCTGCCTAGGCAGTGTCTTAGCTGGTTGT';
             
-            template_seq = generateTemplateUltramer(fip_seq, lfSeq, f1cSeq, b1cSeq, lbSeq, bipSeqSingle);
-            updatePrimerOutput("template-seq", template_seq, template_seq.length, calculateGC(template_seq));
+            templateSeq = generateTemplateUltramer(fipSeq, lfSeq, f1cSeq, b1cSeq, lbSeq, bipSeq);
+            updatePrimerOutput("template-seq", templateSeq, templateSeq.length, calculateGC(templateSeq));
             
-            updatePrimerOutput('bip-seq', bipSeqSingle, bipSeqSingle.length, 
-                calculateGC(bipSeqSingle), 
-                calculateTm(bipSeqSingle), 
-                calculateDeltaG(bipSeqSingle), 
+            updatePrimerOutput('bip-seq', bipSeq, bipSeq.length, 
+                calculateGC(bipSeq), 
+                undefined, 
+                undefined, 
+                undefined, 
                 'None');
             
-            updatePrimerOutput('b2-seq', b2SeqSingle, b2SeqSingle.length, 
-                calculateGC(b2SeqSingle), 
-                calculateTm(b2SeqSingle), 
-                calculateDeltaG(b2SeqSingle));
+            updatePrimerOutput('b2-seq', b2Seq, b2Seq.length, 
+                calculateGC(b2Seq), 
+                calculateTm(b2Seq), 
+                calculateDeltaG5Prime(b2Seq), 
+                calculateDeltaG3Prime(b2Seq));
         }
         
         // Populate customize tab
@@ -442,7 +467,7 @@ function generatePrimers() {
 }
 
 // Update primer output with stable IDs
-function updatePrimerOutput(seqId, sequence, length, gc, tm, dg, hairpin) {
+function updatePrimerOutput(seqId, sequence, length, gc, tm, dg5, dg3, hairpin) {
     const seqElement = document.getElementById(seqId);
     const primerPrefix = seqId.replace('-seq', '');
     
@@ -463,9 +488,14 @@ function updatePrimerOutput(seqId, sequence, length, gc, tm, dg, hairpin) {
         if (tmElement) tmElement.textContent = tm + '°C';
     }
     
-    if (dg !== undefined) {
-        const dgElement = document.getElementById(`${primerPrefix}-dg`);
-        if (dgElement) dgElement.textContent = dg + ' kcal/mol';
+    if (dg5 !== undefined) {
+        const dg5Element = document.getElementById(`${primerPrefix}-dg5`);
+        if (dg5Element) dg5Element.textContent = dg5 + ' kcal/mol';
+    }
+    
+    if (dg3 !== undefined) {
+        const dg3Element = document.getElementById(`${primerPrefix}-dg3`);
+        if (dg3Element) dg3Element.textContent = dg3 + ' kcal/mol';
     }
     
     if (hairpin !== undefined) {

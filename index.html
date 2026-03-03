@@ -176,6 +176,192 @@
                                 </div>
                             </div>
 
+                            <!-- Inner Primers -->
+                            <div class="primer-category">
+                                <h3>Inner Primers</h3>
+                                <div class="primer-item">
+                                    <div class="primer-header">
+                                        <span class="primer-name">FIP (Forward Inner Primer)</span>
+                                        <div class="primer-controls">
+                                            <button class="btn-copy" onclick="copySequence('fip-seq')" disabled>Copy</button>
+                                        </div>
+                                    </div>
+                                    <div class="primer-sequence" id="fip-seq" data-sequence="">Algorithm will generate this</div>
+                                    <div class="primer-stats">
+                                        <div class="stat-item">
+                                            <div class="stat-label">Length</div>
+                                            <div class="stat-value" id="fip-len">-- bp</div>
+                                        </div>
+                                        <div class="stat-item">
+                                            <div class="stat-label">GC Content</div>
+                                            <div class="stat-value" id="fip-gc">--%</div>
+                                        </div>
+        
+                                        <div class="stat-item">
+                                            <div class="stat-label">Hairpins</div>
+                                            <div class="stat-value" id="fip-hairpin">--</div>
+                                        </div>
+                                    </div>
+                                </div>
+
+                                <div class="primer-item">
+                                    <div class="primer-header">
+                                        <span class="primer-name">BIP (Backward Inner Primer)</span>
+                                        <div class="primer-controls">
+                                            <button class="btn-copy" onclick="copySequence('bip-seq')" disabled>Copy</button>
+                                        </div>
+                                    </div>
+                                    <div class="primer-sequence" id="bip-seq" data-sequence="">Algorithm will generate this</div>
+                                    <div class="primer-stats">
+                                        <div class="stat-item">
+                                            <div class="stat-label">Length</div>
+                                            <div class="stat-value" id="bip-len">-- bp</div>
+                                        </div>
+                                        <div class="stat-item">
+                                            <div class="stat-label">GC Content</div>
+                                            <div class="stat-value" id="bip-gc">--%</div>
+                                        </div>
+
+                                        <div class="stat-item">
+                                            <div class="stat-label">Hairpins</div>
+                                            <div class="stat-value" id="bip-hairpin">--</div>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+
+                            <!-- Primer Components -->
+                            <div class="primer-category">
+                                <h3>Primer Components</h3>
+                                <div class="primer-item">
+                                    <div class="primer-header">
+                                        <span class="primer-name">F2</span>
+                                        <div class="primer-controls">
+                                            <button class="btn-copy" onclick="copySequence('f2-seq')" disabled>Copy</button>
+                                        </div>
+                                    </div>
+                                    <div class="primer-sequence" id="f2-seq" data-sequence="">Algorithm will generate this</div>
+                                    <div class="primer-stats">
+                                        <div class="stat-item">
+                                            <div class="stat-label">Length</div>
+                                            <div class="stat-value" id="f2-len">-- bp</div>
+                                        </div>
+                                        <div class="stat-item">
+                                            <div class="stat-label">GC Content</div>
+                                            <div class="stat-value" id="f2-gc">--%</div>
+                                        </div>
+                                        <div class="stat-item">
+                                            <div class="stat-label">Tm</div>
+                                            <div class="stat-value" id="f2-tm">--°C</div>
+                                        </div>
+                                        <div class="stat-item">
+                                            <div class="stat-label">ΔG (5' end)</div>
+                                            <div class="stat-value" id="f2-dg5">-- kcal/mol</div>
+                                        </div>
+                                        <div class="stat-item">
+                                            <div class="stat-label">ΔG (3' end)</div>
+                                            <div class="stat-value" id="f2-dg3">-- kcal/mol</div>
+                                        </div>
+                                    </div>
+                                </div>
+
+                                <div class="primer-item">
+                                    <div class="primer-header">
+                                        <span class="primer-name">B2</span>
+                                        <div class="primer-controls">
+                                            <button class="btn-copy" onclick="copySequence('b2-seq')" disabled>Copy</button>
+                                        </div>
+                                    </div>
+                                    <div class="primer-sequence" id="b2-seq" data-sequence="">Algorithm will generate this</div>
+                                    <div class="primer-stats">
+                                        <div class="stat-item">
+                                            <div class="stat-label">Length</div>
+                                            <div class="stat-value" id="b2-len">-- bp</div>
+                                        </div>
+                                        <div class="stat-item">
+                                            <div class="stat-label">GC Content</div>
+                                            <div class="stat-value" id="b2-gc">--%</div>
+                                        </div>
+                                        <div class="stat-item">
+                                            <div class="stat-label">Tm</div>
+                                            <div class="stat-value" id="b2-tm">--°C</div>
+                                        </div>
+                                        <div class="stat-item">
+                                            <div class="stat-label">ΔG (5' end)</div>
+                                            <div class="stat-value" id="b2-dg5">-- kcal/mol</div>
+                                        </div>
+                                        <div class="stat-item">
+                                            <div class="stat-label">ΔG (3' end)</div>
+                                            <div class="stat-value" id="b2-dg3">-- kcal/mol</div>
+                                        </div>
+                                    </div>
+                                </div>
+
+                                <div class="primer-item">
+                                    <div class="primer-header">
+                                        <span class="primer-name">F1C</span>
+                                        <div class="primer-controls">
+                                            <button class="btn-copy" onclick="copySequence('f1c-seq')" disabled>Copy</button>
+                                        </div>
+                                    </div>
+                                    <div class="primer-sequence" id="f1c-seq" data-sequence="">Algorithm will generate this</div>
+                                    <div class="primer-stats">
+                                        <div class="stat-item">
+                                            <div class="stat-label">Length</div>
+                                            <div class="stat-value" id="f1c-len">-- bp</div>
+                                        </div>
+                                        <div class="stat-item">
+                                            <div class="stat-label">GC Content</div>
+                                            <div class="stat-value" id="f1c-gc">--%</div>
+                                        </div>
+                                        <div class="stat-item">
+                                            <div class="stat-label">Tm</div>
+                                            <div class="stat-value" id="f1c-tm">--°C</div>
+                                        </div>
+                                        <div class="stat-item">
+                                            <div class="stat-label">ΔG (5' end)</div>
+                                            <div class="stat-value" id="f1c-dg5">-- kcal/mol</div>
+                                        </div>
+                                        <div class="stat-item">
+                                            <div class="stat-label">ΔG (3' end)</div>
+                                            <div class="stat-value" id="f1c-dg3">-- kcal/mol</div>
+                                        </div>
+                                    </div>
+                                </div>
+
+                                <div class="primer-item">
+                                    <div class="primer-header">
+                                        <span class="primer-name">B1C</span>
+                                        <div class="primer-controls">
+                                            <button class="btn-copy" onclick="copySequence('b1c-seq')" disabled>Copy</button>
+                                        </div>
+                                    </div>
+                                    <div class="primer-sequence" id="b1c-seq" data-sequence="">Algorithm will generate this</div>
+                                    <div class="primer-stats">
+                                        <div class="stat-item">
+                                            <div class="stat-label">Length</div>
+                                            <div class="stat-value" id="b1c-len">-- bp</div>
+                                        </div>
+                                        <div class="stat-item">
+                                            <div class="stat-label">GC Content</div>
+                                            <div class="stat-value" id="b1c-gc">--%</div>
+                                        </div>
+                                        <div class="stat-item">
+                                            <div class="stat-label">Tm</div>
+                                            <div class="stat-value" id="b1c-tm">--°C</div>
+                                        </div>
+                                        <div class="stat-item">
+                                            <div class="stat-label">ΔG (5' end)</div>
+                                            <div class="stat-value" id="b1c-dg5">-- kcal/mol</div>
+                                        </div>
+                                        <div class="stat-item">
+                                            <div class="stat-label">ΔG (3' end)</div>
+                                            <div class="stat-value" id="b1c-dg3">-- kcal/mol</div>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+
                             <!-- Loop Primers -->
                             <div class="primer-category">
                                 <h3>Loop Primers</h3>
@@ -201,8 +387,12 @@
                                             <div class="stat-value" id="lf-tm">--°C</div>
                                         </div>
                                         <div class="stat-item">
-                                            <div class="stat-label">ΔG</div>
-                                            <div class="stat-value" id="lf-dg">-- kcal/mol</div>
+                                            <div class="stat-label">ΔG (5' end)</div>
+                                            <div class="stat-value" id="lf-dg5">-- kcal/mol</div>
+                                        </div>
+                                        <div class="stat-item">
+                                            <div class="stat-label">ΔG (3' end)</div>
+                                            <div class="stat-value" id="lf-dg3">-- kcal/mol</div>
                                         </div>
                                         <div class="stat-item">
                                             <div class="stat-label">Hairpins</div>
@@ -233,196 +423,16 @@
                                             <div class="stat-value" id="lb-tm">--°C</div>
                                         </div>
                                         <div class="stat-item">
-                                            <div class="stat-label">ΔG</div>
-                                            <div class="stat-value" id="lb-dg">-- kcal/mol</div>
+                                            <div class="stat-label">ΔG (5' end)</div>
+                                            <div class="stat-value" id="lb-dg5">-- kcal/mol</div>
+                                        </div>
+                                        <div class="stat-item">
+                                            <div class="stat-label">ΔG (3' end)</div>
+                                            <div class="stat-value" id="lb-dg3">-- kcal/mol</div>
                                         </div>
                                         <div class="stat-item">
                                             <div class="stat-label">Hairpins</div>
                                             <div class="stat-value" id="lb-hairpin">--</div>
-                                        </div>
-                                    </div>
-                                </div>
-                            </div>
-
-                            <!-- Inner Primers -->
-                            <div class="primer-category">
-                                <h3>Inner Primers</h3>
-                                <div class="primer-item">
-                                    <div class="primer-header">
-                                        <span class="primer-name">FIP (Forward Inner Primer)</span>
-                                        <div class="primer-controls">
-                                            <button class="btn-copy" onclick="copySequence('fip-seq')" disabled>Copy</button>
-                                        </div>
-                                    </div>
-                                    <div class="primer-sequence" id="fip-seq" data-sequence="">Algorithm will generate this</div>
-                                    <div class="primer-stats">
-                                        <div class="stat-item">
-                                            <div class="stat-label">Length</div>
-                                            <div class="stat-value" id="fip-len">-- bp</div>
-                                        </div>
-                                        <div class="stat-item">
-                                            <div class="stat-label">GC Content</div>
-                                            <div class="stat-value" id="fip-gc">--%</div>
-                                        </div>
-                                        <div class="stat-item">
-                                            <div class="stat-label">Tm</div>
-                                            <div class="stat-value" id="fip-tm">--°C</div>
-                                        </div>
-                                        <div class="stat-item">
-                                            <div class="stat-label">ΔG</div>
-                                            <div class="stat-value" id="fip-dg">-- kcal/mol</div>
-                                        </div>
-                                        <div class="stat-item">
-                                            <div class="stat-label">Hairpins</div>
-                                            <div class="stat-value" id="fip-hairpin">--</div>
-                                        </div>
-                                    </div>
-                                </div>
-
-                                <div class="primer-item">
-                                    <div class="primer-header">
-                                        <span class="primer-name">BIP (Backward Inner Primer)</span>
-                                        <div class="primer-controls">
-                                            <button class="btn-copy" onclick="copySequence('bip-seq')" disabled>Copy</button>
-                                        </div>
-                                    </div>
-                                    <div class="primer-sequence" id="bip-seq" data-sequence="">Algorithm will generate this</div>
-                                    <div class="primer-stats">
-                                        <div class="stat-item">
-                                            <div class="stat-label">Length</div>
-                                            <div class="stat-value" id="bip-len">-- bp</div>
-                                        </div>
-                                        <div class="stat-item">
-                                            <div class="stat-label">GC Content</div>
-                                            <div class="stat-value" id="bip-gc">--%</div>
-                                        </div>
-                                        <div class="stat-item">
-                                            <div class="stat-label">Tm</div>
-                                            <div class="stat-value" id="bip-tm">--°C</div>
-                                        </div>
-                                        <div class="stat-item">
-                                            <div class="stat-label">ΔG</div>
-                                            <div class="stat-value" id="bip-dg">-- kcal/mol</div>
-                                        </div>
-                                        <div class="stat-item">
-                                            <div class="stat-label">Hairpins</div>
-                                            <div class="stat-value" id="bip-hairpin">--</div>
-                                        </div>
-                                    </div>
-                                </div>
-                            </div>
-
-                            <!-- Primer Components -->
-                            <div class="primer-category">
-                                <h3>Primer Components (Split Primers)</h3>
-                                <div class="primer-item">
-                                    <div class="primer-header">
-                                        <span class="primer-name">F2</span>
-                                        <div class="primer-controls">
-                                            <button class="btn-copy" onclick="copySequence('f2-seq')" disabled>Copy</button>
-                                        </div>
-                                    </div>
-                                    <div class="primer-sequence" id="f2-seq" data-sequence="">Algorithm will generate this</div>
-                                    <div class="primer-stats">
-                                        <div class="stat-item">
-                                            <div class="stat-label">Length</div>
-                                            <div class="stat-value" id="f2-len">-- bp</div>
-                                        </div>
-                                        <div class="stat-item">
-                                            <div class="stat-label">GC Content</div>
-                                            <div class="stat-value" id="f2-gc">--%</div>
-                                        </div>
-                                        <div class="stat-item">
-                                            <div class="stat-label">Tm</div>
-                                            <div class="stat-value" id="f2-tm">--°C</div>
-                                        </div>
-                                        <div class="stat-item">
-                                            <div class="stat-label">ΔG</div>
-                                            <div class="stat-value" id="f2-dg">-- kcal/mol</div>
-                                        </div>
-                                    </div>
-                                </div>
-
-                                <div class="primer-item">
-                                    <div class="primer-header">
-                                        <span class="primer-name">B2</span>
-                                        <div class="primer-controls">
-                                            <button class="btn-copy" onclick="copySequence('b2-seq')" disabled>Copy</button>
-                                        </div>
-                                    </div>
-                                    <div class="primer-sequence" id="b2-seq" data-sequence="">Algorithm will generate this</div>
-                                    <div class="primer-stats">
-                                        <div class="stat-item">
-                                            <div class="stat-label">Length</div>
-                                            <div class="stat-value" id="b2-len">-- bp</div>
-                                        </div>
-                                        <div class="stat-item">
-                                            <div class="stat-label">GC Content</div>
-                                            <div class="stat-value" id="b2-gc">--%</div>
-                                        </div>
-                                        <div class="stat-item">
-                                            <div class="stat-label">Tm</div>
-                                            <div class="stat-value" id="b2-tm">--°C</div>
-                                        </div>
-                                        <div class="stat-item">
-                                            <div class="stat-label">ΔG</div>
-                                            <div class="stat-value" id="b2-dg">-- kcal/mol</div>
-                                        </div>
-                                    </div>
-                                </div>
-
-                                <div class="primer-item">
-                                    <div class="primer-header">
-                                        <span class="primer-name">F1C</span>
-                                        <div class="primer-controls">
-                                            <button class="btn-copy" onclick="copySequence('f1c-seq')" disabled>Copy</button>
-                                        </div>
-                                    </div>
-                                    <div class="primer-sequence" id="f1c-seq" data-sequence="">Algorithm will generate this</div>
-                                    <div class="primer-stats">
-                                        <div class="stat-item">
-                                            <div class="stat-label">Length</div>
-                                            <div class="stat-value" id="f1c-len">-- bp</div>
-                                        </div>
-                                        <div class="stat-item">
-                                            <div class="stat-label">GC Content</div>
-                                            <div class="stat-value" id="f1c-gc">--%</div>
-                                        </div>
-                                        <div class="stat-item">
-                                            <div class="stat-label">Tm</div>
-                                            <div class="stat-value" id="f1c-tm">--°C</div>
-                                        </div>
-                                        <div class="stat-item">
-                                            <div class="stat-label">ΔG</div>
-                                            <div class="stat-value" id="f1c-dg">-- kcal/mol</div>
-                                        </div>
-                                    </div>
-                                </div>
-
-                                <div class="primer-item">
-                                    <div class="primer-header">
-                                        <span class="primer-name">B1C</span>
-                                        <div class="primer-controls">
-                                            <button class="btn-copy" onclick="copySequence('b1c-seq')" disabled>Copy</button>
-                                        </div>
-                                    </div>
-                                    <div class="primer-sequence" id="b1c-seq" data-sequence="">Algorithm will generate this</div>
-                                    <div class="primer-stats">
-                                        <div class="stat-item">
-                                            <div class="stat-label">Length</div>
-                                            <div class="stat-value" id="b1c-len">-- bp</div>
-                                        </div>
-                                        <div class="stat-item">
-                                            <div class="stat-label">GC Content</div>
-                                            <div class="stat-value" id="b1c-gc">--%</div>
-                                        </div>
-                                        <div class="stat-item">
-                                            <div class="stat-label">Tm</div>
-                                            <div class="stat-value" id="b1c-tm">--°C</div>
-                                        </div>
-                                        <div class="stat-item">
-                                            <div class="stat-label">ΔG</div>
-                                            <div class="stat-value" id="b1c-dg">-- kcal/mol</div>
                                         </div>
                                     </div>
                                 </div>
@@ -432,7 +442,7 @@
                 </div>
             </div>
 
-            <!-- Customize Tab -->
+
             <div class="tab-content" id="customize">
                 <div class="editor-panel">
                     <h4>Adjust Primer Parameters</h4>
