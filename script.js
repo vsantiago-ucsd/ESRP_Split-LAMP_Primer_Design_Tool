@@ -465,11 +465,11 @@ function generatePrimers() {
         f2Input.addEventListener('input', primerInputHandler('f2'));
 
         // // Enable B2 input and attach live-edit listener (attach once per generation)
-        // const b2Input = document.getElementById('b2-seq');
-        // b2Input.disabled = false;
-        // document.getElementById('b2-reset').disabled = false;
-        // b2Input.removeEventListener('input', primerInputHandler('b2'));
-        // b2Input.addEventListener('input', primerInputHandler('b2'));
+        const b2Input = document.getElementById('b2-seq');
+        b2Input.disabled = false;
+        document.getElementById('b2-reset').disabled = false;
+        b2Input.removeEventListener('input', primerInputHandler('b2'));
+        b2Input.addEventListener('input', primerInputHandler('b2'));
     }, 1500);
 }
 
