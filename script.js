@@ -22,7 +22,10 @@ let designState = {
         f1c: { seq: '', len: 0, gc: 0, tm: 0, dg: 0 },
         b1c: { seq: '', len: 0, gc: 0, tm: 0, dg: 0 }
     },
-
+    // Snapshot written once at generation — never mutated, used by Reset
+    original: {
+        f2: ''
+    }
 };
 
 const NN_PARAMS = {
@@ -392,6 +395,8 @@ function generatePrimers() {
         // Save f2 and f1c to designState for downstream cascade
         designState.outputs.f2.seq = f2Seq;
         designState.outputs.f1c.seq = f1cSeq;
+        // Lock in the original — never overwritten, used by Reset
+        designState.original.f2 = f2Seq;
 
         updatePrimerOutput('f2-seq', f2Seq, f2Seq.length, 
             calculateGC(f2Seq), 
@@ -475,7 +480,7 @@ function f2InputHandler() {
     onF2Change(this.value);
 }
 
-// Live edit handler for F2
+// Live-edit handler for F2
 function onF2Change(rawValue) {
     const errorDiv = document.getElementById('f2-edit-error');
     const result = parseSequence(rawValue);
@@ -514,9 +519,9 @@ function onF2Change(rawValue) {
     updatePrimerOutput('template-seq', newTemplate, newTemplate.length, calculateGC(newTemplate));
 }
 
-// Reset F2 to originally generated sequence (i still need to fix this is not working)
+// Reset F2 to originally generated sequence
 function resetPrimer(primerName) {
-    const original = designState.outputs[primerName].seq;
+    const original = designState.original[primerName];
     const inputEl = document.getElementById(`${primerName}-seq`);
     inputEl.value = original;
     document.getElementById('f2-edit-error').classList.remove('visible');
@@ -607,8 +612,6 @@ function clearForm() {
     selectArchitecture('f2-only');
     document.querySelector('input[value="f2-only"]').checked = true;
 }
-
-
 
 //Get the reverse complement
 function reverseComplement(sequence){
