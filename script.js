@@ -24,7 +24,8 @@ let designState = {
     },
     // Snapshot written once at generation — never mutated, used by Reset
     original: {
-        f2: ''
+        f2: '',
+        b2: ''
     }
 };
 
@@ -368,6 +369,8 @@ function generatePrimers() {
         designState.outputs.b1c.seq = b1cSeq;
         designState.outputs.f2.seq = f2Seq;
         designState.outputs.f1c.seq = f1cSeq;
+        // Lock in the original — never overwritten, used by Reset
+        designState.original.f2 = f2Seq;
         
         // Loop primers (LF, LB)
         updatePrimerOutput('lf-seq', lfSeq, lfSeq.length, 
@@ -456,6 +459,8 @@ function generatePrimers() {
                 calculateDeltaG5Prime(b2Seq), 
                 calculateDeltaG3Prime(b2Seq));
         }
+        // Lock in the original — never overwritten, used by Reset
+        designState.original.b2 = b2Seq;
         
         // Show results
         setState('results');
@@ -537,13 +542,17 @@ function onPrimerChange(primerName, rawValue) {
     updatePrimerOutput('template-seq', newTemplate, newTemplate.length, calculateGC(newTemplate));
 }
 
-// Reset F2 to originally generated sequence
+// Reset primer to originally generated sequence
 function resetPrimer(primerName) {
     const original = designState.original[primerName];
+    if (!original) return;
+
     const inputEl = document.getElementById(`${primerName}-seq`);
     inputEl.value = original;
-    document.getElementById('f2-edit-error').classList.remove('visible');
-    onF2Change(original);
+    document.getElementById(`${primerName}-edit-error`).classList.remove('visible');
+
+    // Re-run the normal change handler so dependent sequences (FIP, template, etc.) update
+    onPrimerChange(primerName, original);
 }
 
 // Update primer output with stable IDs
