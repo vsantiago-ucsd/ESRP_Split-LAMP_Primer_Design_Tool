@@ -22,11 +22,7 @@ let designState = {
         f1c: { seq: '', len: 0, gc: 0, tm: 0, dg: 0 },
         b1c: { seq: '', len: 0, gc: 0, tm: 0, dg: 0 }
     },
-    parameters: {
-        targetGC: 50,
-        targetTm: 60,
-        lengthAdjustment: 0
-    }
+
 };
 
 const NN_PARAMS = {
@@ -51,10 +47,10 @@ function parseSequence(input) {
     // Convert to uppercase
     cleaned = cleaned.toUpperCase();
     
-    // Validate alphabet - only ACGTU allowed
-    const validBases = /^[ACGU]+$/;
+    // Validate alphabet - ACGTU and T (DNA) all allowed
+    const validBases = /^[ACGTU]+$/;
     if (cleaned && !validBases.test(cleaned)) {
-        return { valid: false, sequence: '', error: 'Invalid characters. Only A, C, G, U allowed.' };
+        return { valid: false, sequence: '', error: 'Invalid characters. Only A, C, G, T/U allowed.' };
     }
     
     // Convert U to T for DNA oligos
@@ -366,6 +362,11 @@ function generatePrimers() {
         let bipSeq;
         
         // Loop primers (LF, LB)
+        // Save loop primers to designState for template cascade
+        designState.outputs.lf.seq = lfSeq;
+        designState.outputs.lb.seq = lbSeq;
+        designState.outputs.b1c.seq = b1cSeq;
+
         updatePrimerOutput('lf-seq', lfSeq, lfSeq.length, 
             calculateGC(lfSeq), 
             calculateTm(lfSeq), 
@@ -388,6 +389,10 @@ function generatePrimers() {
             undefined, 
             '1 weak');
         
+        // Save f2 and f1c to designState for downstream cascade
+        designState.outputs.f2.seq = f2Seq;
+        designState.outputs.f1c.seq = f1cSeq;
+
         updatePrimerOutput('f2-seq', f2Seq, f2Seq.length, 
             calculateGC(f2Seq), 
             calculateTm(f2Seq), 
@@ -435,6 +440,8 @@ function generatePrimers() {
             bipSeq = 'GATGACAGTGACATCCTGCCTAGGCAGTGTCTTAGCTGGTTGT';
             
             templateSeq = generateTemplateUltramer(fipSeq, lfSeq, f1cSeq, b1cSeq, lbSeq, bipSeq);
+            designState.outputs.bip.seq = bipSeq;
+            designState.outputs.fip.seq = fipSeq;
             updatePrimerOutput("template-seq", templateSeq, templateSeq.length, calculateGC(templateSeq));
             
             updatePrimerOutput('bip-seq', bipSeq, bipSeq.length, 
@@ -451,19 +458,70 @@ function generatePrimers() {
                 calculateDeltaG3Prime(b2Seq));
         }
         
-        // Populate customize tab
-        document.getElementById('edit-mirna1').value = mirna1Result.sequence;
-        if (designState.architecture === 'f2-and-b2') {
-            const mirna2Result = parseSequence(document.getElementById('mirna2-sequence').value);
-            document.getElementById('edit-mirna2').value = mirna2Result.sequence;
-            document.getElementById('edit-mirna2-group').style.display = 'block';
-        } else {
-            document.getElementById('edit-mirna2-group').style.display = 'none';
-        }
-        
         // Show results
         setState('results');
+
+        // Enable F2 input and attach live-edit listener (attach once per generation)
+        const f2Input = document.getElementById('f2-seq');
+        f2Input.disabled = false;
+        document.getElementById('f2-reset').disabled = false;
+        f2Input.removeEventListener('input', f2InputHandler);
+        f2Input.addEventListener('input', f2InputHandler);
     }, 1500);
+}
+
+// Named handler so we can remove/re-add it cleanly on each generation
+function f2InputHandler() {
+    onF2Change(this.value);
+}
+
+// Live-edit handler for F2
+function onF2Change(rawValue) {
+    const errorDiv = document.getElementById('f2-edit-error');
+    const result = parseSequence(rawValue);
+
+    if (!result.valid) {
+        errorDiv.textContent = result.error;
+        errorDiv.classList.add('visible');
+        return;
+    }
+    errorDiv.classList.remove('visible');
+
+    const f2Seq = result.sequence;
+
+    // Update F2 stats and designState
+    designState.outputs.f2.seq = f2Seq;
+    updatePrimerOutput('f2-seq', f2Seq, f2Seq.length, calculateGC(f2Seq),
+        calculateTm(f2Seq), calculateDeltaG5Prime(f2Seq), calculateDeltaG3Prime(f2Seq));
+
+    // Recompute FIP: f1c + T + f2 (same join logic as generation)
+    const f1cSeq = designState.outputs.f1c.seq;
+    const newFip = f1cSeq + 'T' + f2Seq;
+    designState.outputs.fip.seq = newFip;
+    updatePrimerOutput('fip-seq', newFip, newFip.length, calculateGC(newFip),
+        undefined, undefined, undefined, 'None');
+
+    // Recompute template ultramer
+    const newTemplate = generateTemplateUltramer(
+        newFip,
+        designState.outputs.lf.seq,
+        designState.outputs.f1c.seq,
+        designState.outputs.b1c.seq,
+        designState.outputs.lb.seq,
+        designState.outputs.bip.seq
+    );
+    designState.outputs.template.seq = newTemplate;
+    updatePrimerOutput('template-seq', newTemplate, newTemplate.length, calculateGC(newTemplate));
+}
+
+// Reset F2 (and cascade) to originally generated sequence
+function resetPrimer(primerName) {
+    const original = designState.outputs[primerName].seq;
+    const inputEl = document.getElementById(`${primerName}-seq`);
+    inputEl.value = original;
+    document.getElementById('f2-edit-error').classList.remove('visible');
+    // Trigger cascade directly with the stored DNA sequence (bypasses U/T validation edge cases)
+    onF2Change(original);
 }
 
 // Update primer output with stable IDs
@@ -471,8 +529,12 @@ function updatePrimerOutput(seqId, sequence, length, gc, tm, dg5, dg3, hairpin) 
     const seqElement = document.getElementById(seqId);
     const primerPrefix = seqId.replace('-seq', '');
     
-    // Update sequence
-    seqElement.textContent = sequence;
+    // Update sequence — handle both <input> and <div> elements
+    if (seqElement.tagName === 'INPUT') {
+        seqElement.value = sequence;
+    } else {
+        seqElement.textContent = sequence;
+    }
     seqElement.setAttribute('data-sequence', sequence);
     
     // Enable copy button
@@ -511,7 +573,9 @@ function updatePrimerOutput(seqId, sequence, length, gc, tm, dg5, dg3, hairpin) 
 // Copy sequence to clipboard
 function copySequence(seqId) {
     const seqElement = document.getElementById(seqId);
-    const sequence = seqElement.getAttribute('data-sequence');
+    const sequence = seqElement.tagName === 'INPUT'
+        ? seqElement.value
+        : seqElement.getAttribute('data-sequence');
     
     if (!sequence || sequence === '') {
         alert('No sequence to copy');
@@ -545,54 +609,7 @@ function clearForm() {
     document.querySelector('input[value="f2-only"]').checked = true;
 }
 
-// Slider updates
-function updateGCValue(value) {
-    document.getElementById('gc-value').textContent = value + '%';
-    designState.parameters.targetGC = parseInt(value);
-}
 
-function updateTmValue(value) {
-    document.getElementById('tm-value').textContent = value + '°C';
-    designState.parameters.targetTm = parseInt(value);
-}
-
-function updateLengthValue(value) {
-    const sign = value > 0 ? '+' : '';
-    document.getElementById('length-value').textContent = sign + value + ' bp';
-    designState.parameters.lengthAdjustment = parseInt(value);
-}
-
-// Update primers when microRNA changes
-function updatePrimers() {
-    const newSeq1 = document.getElementById('edit-mirna1').value;
-    const result = parseSequence(newSeq1);
-    
-    if (!result.valid) {
-        alert('Invalid sequence: ' + result.error);
-        return;
-    }
-    
-    alert('Updating all primers based on new microRNA sequence(s).\n\nThis will recalculate all primer components.');
-    // TODO: Call your algorithm here to regenerate primers with new sequence
-}
-
-// Apply customizations
-function applyCustomizations() {
-    alert('Applying customizations...\n\nTarget GC: ' + designState.parameters.targetGC + '%\n' +
-          'Target Tm: ' + designState.parameters.targetTm + '°C\n' +
-          'Length adjustment: ' + designState.parameters.lengthAdjustment + ' bp');
-    // TODO: Rerun algorithm with new parameters***********************************************??????
-}
-
-// Reset to default
-function resetToDefault() {
-    document.getElementById('gc-slider').value = 50;
-    document.getElementById('tm-slider').value = 60;
-    document.getElementById('length-slider').value = 0;
-    updateGCValue(50);
-    updateTmValue(60);
-    updateLengthValue(0);
-}
 
 //Get the reverse complement
 function reverseComplement(sequence){

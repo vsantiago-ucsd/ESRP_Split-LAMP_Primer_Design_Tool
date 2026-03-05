@@ -505,61 +505,6 @@ body {
     display: block;
 }
 
-.editor-panel {
-    background: #f8f9fa;
-    padding: 20px;
-    border-radius: 8px;
-    margin-top: 20px;
-    border: 1px solid #e9ecef;
-}
-
-.editor-panel h4 {
-    margin-bottom: 15px;
-    color: #333;
-}
-
-.slider-group {
-    margin-bottom: 20px;
-}
-
-.slider-group label {
-    display: block;
-    margin-bottom: 8px;
-    font-weight: 500;
-}
-
-.slider-group input[type="range"] {
-    width: 100%;
-    margin-bottom: 5px;
-    accent-color: #ff69b4;
-}
-
-.slider-value {
-    text-align: right;
-    font-weight: 600;
-    color: #ff69b4;
-}
-
-.tips-box {
-    margin-top: 30px;
-    padding: 20px;
-    background: white;
-    border-radius: 8px;
-    border: 1px solid #e9ecef;
-    border-left: 4px solid #ff69b4;
-}
-
-.tips-box h4 {
-    margin-bottom: 10px;
-    color: #333;
-}
-
-.tips-box ul {
-    margin-left: 20px;
-    line-height: 1.8;
-    color: #666;
-}
-
 .validation-error {
     background: #f8d7da;
     color: #721c24;
@@ -573,4 +518,63 @@ body {
 
 .validation-error.visible {
     display: block;
+}
+/* Editable primer input */
+input.primer-sequence.editable-primer {
+    width: 100%;
+    font-family: 'Courier New', monospace;
+    font-size: 0.9rem;
+    background: white;
+    padding: 12px;
+    border-radius: 4px;
+    border: 2px solid #ff69b4;
+    margin-bottom: 10px;
+    word-break: break-all;
+    color: #333;
+    transition: border-color 0.2s, box-shadow 0.2s;
+}
+
+input.primer-sequence.editable-primer:focus {
+    outline: none;
+    border-color: #C32C7F;
+    box-shadow: 0 0 0 3px rgba(255, 105, 180, 0.15);
+}
+
+input.primer-sequence.editable-primer:disabled {
+    border-color: #e9ecef;
+    background: #f8f9fa;
+    color: #aaa;
+}
+
+.editable-badge {
+    font-size: 0.7rem;
+    font-weight: 600;
+    background: #ff69b4;
+    color: white;
+    padding: 2px 7px;
+    border-radius: 10px;
+    vertical-align: middle;
+    letter-spacing: 0.03em;
+}
+
+.btn-reset {
+    padding: 6px 12px;
+    font-size: 0.85rem;
+    border: 2px solid #ff69b4;
+    border-radius: 4px;
+    cursor: pointer;
+    background: white;
+    color: #ff69b4;
+    font-weight: 600;
+    transition: all 0.2s;
+}
+
+.btn-reset:hover:not(:disabled) {
+    background: #ff69b4;
+    color: white;
+}
+
+.btn-reset:disabled {
+    opacity: 0.4;
+    cursor: not-allowed;
 }
