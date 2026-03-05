@@ -475,7 +475,7 @@ function f2InputHandler() {
     onF2Change(this.value);
 }
 
-// Live-edit handler for F2
+// Live edit handler for F2
 function onF2Change(rawValue) {
     const errorDiv = document.getElementById('f2-edit-error');
     const result = parseSequence(rawValue);
@@ -514,13 +514,12 @@ function onF2Change(rawValue) {
     updatePrimerOutput('template-seq', newTemplate, newTemplate.length, calculateGC(newTemplate));
 }
 
-// Reset F2 (and cascade) to originally generated sequence
+// Reset F2 to originally generated sequence (i still need to fix this is not working)
 function resetPrimer(primerName) {
     const original = designState.outputs[primerName].seq;
     const inputEl = document.getElementById(`${primerName}-seq`);
     inputEl.value = original;
     document.getElementById('f2-edit-error').classList.remove('visible');
-    // Trigger cascade directly with the stored DNA sequence (bypasses U/T validation edge cases)
     onF2Change(original);
 }
 
