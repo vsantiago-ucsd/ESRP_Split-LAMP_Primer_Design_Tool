@@ -24,7 +24,8 @@ let designState = {
     },
     // Snapshot written once at generation — never mutated, used by Reset
     original: {
-        f2: ''
+        f2: '',
+        b2: ''
     }
 };
 
@@ -312,6 +313,7 @@ function generatePrimers() {
             return;
         }
         
+        // Update state
         designState.inputs.mirna2.name = mirna2Name;
         designState.inputs.mirna2.sequence = mirna2Seq;
         designState.inputs.mirna2.parsed = mirna2Result.sequence;
@@ -326,12 +328,9 @@ function generatePrimers() {
     setState('loading');
     document.querySelector('[data-tab="output"]').click();
     
-    // Simulate processing (replace with actual Python algorithm call)
     setTimeout(() => {
-        // TODO: Call algorithm here
-        // For now, using mock data
         
-        // Update target info
+        // Update target info listed at top
         document.getElementById('result-architecture').textContent = 
             designState.architecture === 'f2-only' ? 'F2 Only' : 'F2 and B2 (AND-gate)';
         
@@ -363,13 +362,17 @@ function generatePrimers() {
         let fipSeq = 'CGGAGAGGTCGCGATAGTCAT' + f2Seq; // f1c + T + f2
         let b2Seq;
         let bipSeq;
-        
-        // Loop primers (LF, LB)
-        // Save loop primers to designState for template cascade
+
+        // Save primers to designState for template cascade
         designState.outputs.lf.seq = lfSeq;
         designState.outputs.lb.seq = lbSeq;
         designState.outputs.b1c.seq = b1cSeq;
-
+        designState.outputs.f2.seq = f2Seq;
+        designState.outputs.f1c.seq = f1cSeq;
+        // Lock in the original — never overwritten, used by Reset
+        designState.original.f2 = f2Seq;
+        
+        // Loop primers (LF, LB)
         updatePrimerOutput('lf-seq', lfSeq, lfSeq.length, 
             calculateGC(lfSeq), 
             calculateTm(lfSeq), 
@@ -391,12 +394,6 @@ function generatePrimers() {
             undefined, 
             undefined, 
             '1 weak');
-        
-        // Save f2 and f1c to designState for downstream cascade
-        designState.outputs.f2.seq = f2Seq;
-        designState.outputs.f1c.seq = f1cSeq;
-        // Lock in the original — never overwritten, used by Reset
-        designState.original.f2 = f2Seq;
 
         updatePrimerOutput('f2-seq', f2Seq, f2Seq.length, 
             calculateGC(f2Seq), 
@@ -462,6 +459,8 @@ function generatePrimers() {
                 calculateDeltaG5Prime(b2Seq), 
                 calculateDeltaG3Prime(b2Seq));
         }
+        // Lock in the original — never overwritten, used by Reset
+        designState.original.b2 = b2Seq;
         
         // Show results
         setState('results');
@@ -470,19 +469,28 @@ function generatePrimers() {
         const f2Input = document.getElementById('f2-seq');
         f2Input.disabled = false;
         document.getElementById('f2-reset').disabled = false;
-        f2Input.removeEventListener('input', f2InputHandler);
-        f2Input.addEventListener('input', f2InputHandler);
+        f2Input.removeEventListener('input', primerInputHandler('f2'));
+        f2Input.addEventListener('input', primerInputHandler('f2'));
+
+        // // Enable B2 input and attach live-edit listener (attach once per generation)
+        const b2Input = document.getElementById('b2-seq');
+        b2Input.disabled = false;
+        document.getElementById('b2-reset').disabled = false;
+        b2Input.removeEventListener('input', primerInputHandler('b2'));
+        b2Input.addEventListener('input', primerInputHandler('b2'));
     }, 1500);
 }
 
-// Named handler so we can remove/re-add it cleanly on each generation
-function f2InputHandler() {
-    onF2Change(this.value);
+// Generic handler for sequence editing
+function primerInputHandler(primerName) {
+    return function() {
+        onPrimerChange(primerName, this.value);
+    };
 }
 
-// Live-edit handler for F2
-function onF2Change(rawValue) {
-    const errorDiv = document.getElementById('f2-edit-error');
+// Generic live edit handler for any primer
+function onPrimerChange(primerName, rawValue) {
+    const errorDiv = document.getElementById(`${primerName}-edit-error`);
     const result = parseSequence(rawValue);
 
     if (!result.valid) {
@@ -492,23 +500,38 @@ function onF2Change(rawValue) {
     }
     errorDiv.classList.remove('visible');
 
-    const f2Seq = result.sequence;
+    const sequence = result.sequence;
 
-    // Update F2 stats and designState
-    designState.outputs.f2.seq = f2Seq;
-    updatePrimerOutput('f2-seq', f2Seq, f2Seq.length, calculateGC(f2Seq),
-        calculateTm(f2Seq), calculateDeltaG5Prime(f2Seq), calculateDeltaG3Prime(f2Seq));
+    // Update stats and designState
+    designState.outputs[primerName].seq = sequence;
+    updatePrimerOutput(
+        `${primerName}-seq`, 
+        sequence, 
+        sequence.length, 
+        calculateGC(sequence),
+        calculateTm(sequence), 
+        calculateDeltaG5Prime(sequence), 
+        calculateDeltaG3Prime(sequence)
+    );
 
-    // Recompute FIP: f1c + T + f2 (same join logic as generation)
-    const f1cSeq = designState.outputs.f1c.seq;
-    const newFip = f1cSeq + 'T' + f2Seq;
-    designState.outputs.fip.seq = newFip;
-    updatePrimerOutput('fip-seq', newFip, newFip.length, calculateGC(newFip),
-        undefined, undefined, undefined, 'None');
+    // Recompute dependent sequences based on primer type
+    if (primerName === 'f2') {
+        const f1cSeq = designState.outputs.f1c.seq;
+        const newFip = f1cSeq + 'T' + sequence;
+        designState.outputs.fip.seq = newFip;
+        updatePrimerOutput('fip-seq', newFip, newFip.length, calculateGC(newFip),
+            undefined, undefined, undefined, 'None');
+    } else if (primerName === 'b2') {
+        const b1cSeq = designState.outputs.b1c.seq;
+        const newBip = b1cSeq + 'T' + sequence;
+        designState.outputs.bip.seq = newBip;
+        updatePrimerOutput('bip-seq', newBip, newBip.length, calculateGC(newBip),
+            undefined, undefined, undefined, 'None');
+    }
 
     // Recompute template ultramer
     const newTemplate = generateTemplateUltramer(
-        newFip,
+        designState.outputs.fip.seq,
         designState.outputs.lf.seq,
         designState.outputs.f1c.seq,
         designState.outputs.b1c.seq,
@@ -519,13 +542,17 @@ function onF2Change(rawValue) {
     updatePrimerOutput('template-seq', newTemplate, newTemplate.length, calculateGC(newTemplate));
 }
 
-// Reset F2 to originally generated sequence
+// Reset primer to originally generated sequence
 function resetPrimer(primerName) {
     const original = designState.original[primerName];
+    if (!original) return;
+
     const inputEl = document.getElementById(`${primerName}-seq`);
     inputEl.value = original;
-    document.getElementById('f2-edit-error').classList.remove('visible');
-    onF2Change(original);
+    document.getElementById(`${primerName}-edit-error`).classList.remove('visible');
+
+    // Re-run the normal change handler so dependent sequences (FIP, template, etc.) update
+    onPrimerChange(primerName, original);
 }
 
 // Update primer output with stable IDs
