@@ -516,6 +516,13 @@ function generatePrimers() {
         document.getElementById('lf-reset').disabled = false;
         lfInput.removeEventListener('input', primerInputHandler('lf'));
         lfInput.addEventListener('input', primerInputHandler('lf'));
+
+        // Enable LB input and attach live-edit listener (attach once per generation)
+        const lbInput = document.getElementById('lb-seq');
+        lbInput.disabled = false;
+        document.getElementById('lb-reset').disabled = false;
+        lbInput.removeEventListener('input', primerInputHandler('lb'));
+        lbInput.addEventListener('input', primerInputHandler('lb'));
     }, 1500);
 }
 
