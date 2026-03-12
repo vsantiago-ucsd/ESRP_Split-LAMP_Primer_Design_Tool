@@ -565,25 +565,25 @@ function onPrimerChange(primerName, rawValue) {
         const newFip = f1cSeq + 'T' + sequence;
         designState.outputs.fip.seq = newFip;
         updatePrimerOutput('fip-seq', newFip, newFip.length, calculateGC(newFip),
-            undefined, undefined, undefined, 'None');
+            undefined, undefined, undefined);
     } else if (primerName === 'b2') {
         const b1cSeq = designState.outputs.b1c.seq;
         const newBip = b1cSeq + 'A' + sequence;
         designState.outputs.bip.seq = newBip;
         updatePrimerOutput('bip-seq', newBip, newBip.length, calculateGC(newBip),
-            undefined, undefined, undefined, 'None');
+            undefined, undefined, undefined);
     } else if (primerName == 'f1c'){
         const f2Seq = designState.outputs.f2.seq;
         const newFip = sequence + 'T' + f2Seq;
         designState.outputs.fip.seq = newFip;
         updatePrimerOutput('fip-seq', newFip, newFip.length, calculateGC(newFip),
-            undefined, undefined, undefined, 'None');
+            undefined, undefined, undefined);
     } else if (primerName == 'b1c'){
         const b2Seq = designState.outputs.b2.seq;
         const newBip = sequence + 'A' + b2Seq;
         designState.outputs.bip.seq = newBip;
         updatePrimerOutput('bip-seq', newBip, newBip.length, calculateGC(newBip),
-            undefined, undefined, undefined, 'None');
+            undefined, undefined, undefined);
     }
 
     // Recompute template ultramer
