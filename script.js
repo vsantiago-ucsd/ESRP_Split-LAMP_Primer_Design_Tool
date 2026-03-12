@@ -25,7 +25,8 @@ let designState = {
     // Snapshot written once at generation — never mutated, used by Reset
     original: {
         f2: '',
-        b2: ''
+        b2: '', 
+        f1c: ''
     }
 };
 
@@ -371,6 +372,7 @@ function generatePrimers() {
         designState.outputs.f2.seq = f2Seq;
         designState.outputs.fip.seq = fipSeq;
         // Lock in the original — never overwritten, used by Reset
+        designState.original.f1c = f1cSeq;
         designState.original.f2 = f2Seq;
         
         // Loop primers (LF, LB)
@@ -418,7 +420,7 @@ function generatePrimers() {
         if (designState.architecture === 'f2-and-b2') {
             const mirna2Result = parseSequence(document.getElementById('mirna2-sequence').value);
             b2Seq = mirna2Result.sequence;
-            bipSeq = 'GATGACAGTGACATCCTGCCTA' + b2Seq.substring(1); // b1c + A + (b2 - T)
+            bipSeq = 'GATGACAGTGACATCCTGCCTA' + b2Seq.substring(1); // b1c + A + (b2 - first T)
             
             // Save primers to designState for template cascade
             designState.outputs.b2.seq = b2Seq;
@@ -481,12 +483,19 @@ function generatePrimers() {
         f2Input.removeEventListener('input', primerInputHandler('f2'));
         f2Input.addEventListener('input', primerInputHandler('f2'));
 
-        // // Enable B2 input and attach live-edit listener (attach once per generation)
+        // Enable B2 input and attach live-edit listener (attach once per generation)
         const b2Input = document.getElementById('b2-seq');
         b2Input.disabled = false;
         document.getElementById('b2-reset').disabled = false;
         b2Input.removeEventListener('input', primerInputHandler('b2'));
         b2Input.addEventListener('input', primerInputHandler('b2'));
+
+        // Enable F1C input and attach live-edit listener (attach once per generation)
+        const f1cInput = document.getElementById('f1c-seq');
+        f1cInput.disabled = false;
+        document.getElementById('f1c-reset').disabled = false;
+        f1cInput.removeEventListener('input', primerInputHandler('f1c'));
+        f1cInput.addEventListener('input', primerInputHandler('f1c'));
     }, 1500);
 }
 
@@ -532,9 +541,15 @@ function onPrimerChange(primerName, rawValue) {
             undefined, undefined, undefined, 'None');
     } else if (primerName === 'b2') {
         const b1cSeq = designState.outputs.b1c.seq;
-        const newBip = b1cSeq + 'T' + sequence;
+        const newBip = b1cSeq + 'A' + sequence;
         designState.outputs.bip.seq = newBip;
         updatePrimerOutput('bip-seq', newBip, newBip.length, calculateGC(newBip),
+            undefined, undefined, undefined, 'None');
+    } else if (primerName == 'f1c'){
+        const f2Seq = designState.outputs.f2.seq;
+        const newFip = sequence + 'T' + f2Seq;
+        designState.outputs.fip.seq = newFip;
+        updatePrimerOutput('fip-seq', newFip, newFip.length, calculateGC(newFip),
             undefined, undefined, undefined, 'None');
     }
 

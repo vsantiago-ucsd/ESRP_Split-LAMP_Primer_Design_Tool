@@ -505,7 +505,7 @@ body {
     display: block;
 }
 
-.validation-error {
+/* .validation-error {
     background: #f8d7da;
     color: #721c24;
     padding: 10px;
@@ -514,7 +514,7 @@ body {
     border: 1px solid #f5c6cb;
     font-size: 0.9rem;
     display: none;
-}
+} */
 
 .validation-error.visible {
     display: block;
