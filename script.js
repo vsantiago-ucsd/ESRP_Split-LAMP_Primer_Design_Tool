@@ -416,6 +416,10 @@ function generatePrimers() {
             const mirna2Result = parseSequence(document.getElementById('mirna2-sequence').value);
             b2Seq = mirna2Result.sequence;
             bipSeq = 'GATGACAGTGACATCCTGCCTA' + b2Seq.substring(1); // b1c + A + (b2 - T)
+
+            designState.outputs.b2.seq = b2Seq;
+            designState.outputs.bip.seq = bipSeq;
+
             
             // Generate template
             templateSeq = generateTemplateUltramer(fipSeq, lfSeq, f1cSeq, b1cSeq, lbSeq, bipSeq);
@@ -532,7 +536,11 @@ function updatePrimerOutput(seqId, sequence, length, gc, tm, dg5, dg3, hairpin) 
     if (seqElement.tagName === 'INPUT') {
         seqElement.value = sequence;
     } else {
-        seqElement.textContent = sequence;
+        if (primerPrefix === "template") {
+            seqElement.innerHTML = highlightTemplate(sequence);
+        } else {
+            seqElement.textContent = sequence;
+        }
     }
     seqElement.setAttribute('data-sequence', sequence);
     
@@ -646,6 +654,35 @@ function reverseComplement(sequence){
         .reverse()
         .map(base => complement[base])
         .join('');
+}
+
+function highlightTemplate(template) {
+
+    const primers = {
+        f2: designState.outputs.f2.seq,
+        f1c: designState.outputs.f1c.seq ? reverseComplement(designState.outputs.f1c.seq) : '',
+        b2: designState.outputs.b2.seq ? reverseComplement(designState.outputs.b2.seq.substring(1)) : '',
+        b1c: designState.outputs.b1c.seq,
+        lf: designState.outputs.lf.seq ? reverseComplement(designState.outputs.lf.seq) : '',
+        lb: designState.outputs.lb.seq,
+    };
+
+    let highlighted = template;
+
+    const primerList = Object.entries(primers)
+        .filter(([_, seq]) => seq)
+        .sort((a, b) => b[1].length - a[1].length);
+
+    primerList.forEach(([primer, seq]) => {
+        const regex = new RegExp(seq, "g");
+
+        highlighted = highlighted.replace(
+            regex,
+            `<span class="highlight-${primer}" title="${primer.toUpperCase()} primer">${seq}</span>`
+        );
+    });
+
+    return highlighted;
 }
 
 //Create template ultramer, disclusing F1, B1, LF, and BF, and spacers
