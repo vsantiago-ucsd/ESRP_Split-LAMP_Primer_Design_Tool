@@ -838,10 +838,8 @@ function reverseComplement(sequence){
 function highlightTemplate(template) {
 
     const primers = {
-        f2: designState.outputs.f2.seq,
-        f1c: designState.outputs.f1c.seq ? reverseComplement(designState.outputs.f1c.seq) : '',
-        b2: designState.outputs.b2.seq ? reverseComplement(designState.outputs.b2.seq.substring(1)) : '',
-        b1c: designState.outputs.b1c.seq,
+        fip: designState.outputs.fip.seq,
+        bip: designState.outputs.bip.seq ? reverseComplement(designState.outputs.bip.seq) : '',
         lf: designState.outputs.lf.seq ? reverseComplement(designState.outputs.lf.seq) : '',
         lb: designState.outputs.lb.seq,
     };

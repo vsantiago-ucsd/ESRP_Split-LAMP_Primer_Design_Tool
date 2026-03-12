@@ -592,28 +592,14 @@ input.primer-sequence.editable-primer:disabled {
 
 /* Individual primer highlights */
 
-.highlight-f1c {
-    background: #F8BBD0;
-    color: #4a004e;
-    padding: 2px 3px;
-    border-radius: 4px;
-}
-
-.highlight-f2 {
+.highlight-fip {
     background: #F48FB1;
     color: white;
     padding: 2px 3px;
     border-radius: 4px;
 }
 
-.highlight-b1c {
-    background: #CE93D8;
-    color: #3b0040;
-    padding: 2px 3px;
-    border-radius: 4px;
-}
-
-.highlight-b2 {
+.highlight-bip {
     background: #BA68C8;
     color: white;
     padding: 2px 3px;
@@ -621,7 +607,7 @@ input.primer-sequence.editable-primer:disabled {
 }
 
 .highlight-lf {
-    background: #E1BEE7;
+    background: #f7b1d9;
     color: #3b0040;
     padding: 2px 3px;
     border-radius: 4px;
@@ -636,36 +622,22 @@ input.primer-sequence.editable-primer:disabled {
 
 /* Primer name highlights */
 
-.primer-f2 {
+.primer-fip {
     background:#F48FB1;
     color:white;
     padding:3px 8px;
     border-radius:6px;
 }
 
-.primer-b2 {
+.primer-bip {
     background:#BA68C8;
     color:white;
     padding:3px 8px;
     border-radius:6px;
 }
 
-.primer-f1c {
-    background:#F8BBD0;
-    color:#4a004e;
-    padding:3px 8px;
-    border-radius:6px;
-}
-
-.primer-b1c {
-    background:#CE93D8;
-    color:#3b0040;
-    padding:3px 8px;
-    border-radius:6px;
-}
-
 .primer-lf {
-    background:#E1BEE7;
+    background:#f7b1d9;
     color:#3b0040;
     padding:3px 8px;
     border-radius:6px;
