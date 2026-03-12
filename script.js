@@ -420,6 +420,12 @@ function generatePrimers() {
             b2Seq = mirna2Result.sequence;
             bipSeq = 'GATGACAGTGACATCCTGCCTA' + b2Seq.substring(1); // b1c + A + (b2 - T)
             
+            // Save primers to designState for template cascade
+            designState.outputs.b2.seq = b2Seq;
+            designState.outputs.bip.seq = bipSeq;
+            // Lock in the original — never overwritten, used by Reset
+            designState.original.b2 = b2Seq;
+
             // Generate template
             templateSeq = generateTemplateUltramer(fipSeq, lfSeq, f1cSeq, b1cSeq, lbSeq, bipSeq);
             updatePrimerOutput("template-seq", templateSeq, templateSeq.length, calculateGC(templateSeq));
@@ -440,7 +446,13 @@ function generatePrimers() {
         } else {
             // Single-input architecture
             b2Seq = 'TGGCAGTGTCTTAGCTGGTTGT';
-            bipSeq = 'GATGACAGTGACATCCTGCCTAGGCAGTGTCTTAGCTGGTTGT';
+            bipSeq = 'GATGACAGTGACATCCTGCCTA' + b2Seq.substring(1);
+
+            // Save primers to designState for template cascade
+            designState.outputs.b2.seq = b2Seq;
+            designState.outputs.bip.seq = bipSeq;
+            // Lock in the original — never overwritten, used by Reset
+            designState.original.b2 = b2Seq;
             
             templateSeq = generateTemplateUltramer(fipSeq, lfSeq, f1cSeq, b1cSeq, lbSeq, bipSeq);
             updatePrimerOutput("template-seq", templateSeq, templateSeq.length, calculateGC(templateSeq));
@@ -458,12 +470,6 @@ function generatePrimers() {
                 calculateDeltaG5Prime(b2Seq), 
                 calculateDeltaG3Prime(b2Seq));
         }
-        
-        // Save primers to designState for template cascade
-        designState.outputs.b2.seq = b2Seq;
-        designState.outputs.bip.seq = bipSeq;
-        // Lock in the original — never overwritten, used by Reset
-        designState.original.b2 = b2Seq;
         
         // Show results
         setState('results');
