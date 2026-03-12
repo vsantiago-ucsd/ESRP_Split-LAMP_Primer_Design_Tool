@@ -374,23 +374,23 @@ function generatePrimers() {
             calculateGC(lfSeq), 
             calculateTm(lfSeq), 
             calculateDeltaG5Prime(lfSeq), 
-            calculateDeltaG3Prime(lfSeq), 
-            'None');
+            calculateDeltaG3Prime(lfSeq)
+            );
         
         updatePrimerOutput('lb-seq', lbSeq, lbSeq.length, 
             calculateGC(lbSeq), 
             calculateTm(lbSeq), 
             calculateDeltaG5Prime(lbSeq), 
-            calculateDeltaG3Prime(lbSeq), 
-            'None');
+            calculateDeltaG3Prime(lbSeq)
+            );
         
         // Inner primers (FIP with F2, F1C, B1C)
         updatePrimerOutput('fip-seq', fipSeq, fipSeq.length, 
             calculateGC(fipSeq), 
             undefined, 
             undefined, 
-            undefined, 
-            '1 weak');
+            undefined,
+            );
         
         // Save f2 and f1c to designState for downstream cascade
         designState.outputs.f2.seq = f2Seq;
@@ -431,8 +431,8 @@ function generatePrimers() {
                 calculateGC(bipSeq), 
                 undefined, 
                 undefined, 
-                undefined, 
-                'None');
+                undefined
+                );
             
             updatePrimerOutput('b2-seq', b2Seq, b2Seq.length, 
                 calculateGC(b2Seq), 
@@ -453,8 +453,8 @@ function generatePrimers() {
                 calculateGC(bipSeq), 
                 undefined, 
                 undefined, 
-                undefined, 
-                'None');
+                undefined
+                );
             
             updatePrimerOutput('b2-seq', b2Seq, b2Seq.length, 
                 calculateGC(b2Seq), 
@@ -529,7 +529,7 @@ function resetPrimer(primerName) {
 }
 
 // Update primer output with stable IDs
-function updatePrimerOutput(seqId, sequence, length, gc, tm, dg5, dg3, hairpin) {
+function updatePrimerOutput(seqId, sequence, length, gc, tm, dg5, dg3) {
     const seqElement = document.getElementById(seqId);
     const primerPrefix = seqId.replace('-seq', '');
     
@@ -564,14 +564,63 @@ function updatePrimerOutput(seqId, sequence, length, gc, tm, dg5, dg3, hairpin) 
         if (dg3Element) dg3Element.textContent = dg3 + ' kcal/mol';
     }
     
-    if (hairpin !== undefined) {
-        const hairpinElement = document.getElementById(`${primerPrefix}-hairpin`);
-        if (hairpinElement) {
-            hairpinElement.textContent = hairpin;
-            hairpinElement.className = 'stat-value ' + 
-                (hairpin === 'None' ? 'good' : hairpin.includes('weak') ? 'warning' : 'bad');
+    // Run hairpin detection automatically
+    const hairpinElement = document.getElementById(`${primerPrefix}-hairpin`);
+    if (hairpinElement && sequence) {
+
+        let hairpinResult = detectHairpin(sequence);
+
+        hairpinElement.textContent = hairpinResult;
+
+        if (hairpinResult.includes("None")) {
+            hairpinElement.className = 'stat-value good';
+        } 
+        else if (hairpinResult.includes("Weak") || hairpinResult.includes("Mod")) {
+            hairpinElement.className = 'stat-value warning';
+        } 
+        else {
+            hairpinElement.className = 'stat-value bad';
         }
     }
+
+    // Run dimer detection for a primer against all other primers
+    const dimerElement = document.getElementById(`${primerPrefix}-dimer`);
+    if (dimerElement && sequence) {
+        // Collect all primer sequences from designState.outputs
+        const allPrimers = Object.keys(designState.outputs).filter(p => p !== 'template');
+        
+        let dimerPairs = [];
+
+        // Loop through each other primer
+        allPrimers.forEach(otherPrimer => {
+            // Skip self
+            if (otherPrimer === primerPrefix) return;
+
+            const otherSeq = designState.outputs[otherPrimer]?.seq;
+            if (!otherSeq) return;
+
+            const result = detectDimer(sequence, otherSeq);
+            if (!result.includes("None")) {
+                // If a dimer exists, store the primer and result
+                dimerPairs.push(`${otherPrimer.toUpperCase()}: ${result}`);
+            }
+        });
+
+        // Format output
+        if (dimerPairs.length === 0) {
+            dimerElement.textContent = "None";
+            dimerElement.className = 'stat-value good';
+        } else {
+            dimerElement.textContent = dimerPairs.join(", ");
+            // Decide class based on strongest dimer detected
+            if (dimerPairs.some(r => r.includes("Strong"))) {
+                dimerElement.className = 'stat-value bad';
+            } else {
+                dimerElement.className = 'stat-value warning';
+            }
+        }
+    }
+
 }
 
 // Copy sequence to clipboard
@@ -594,6 +643,53 @@ function copySequence(seqId) {
             btn.textContent = originalText;
         }, 1500);
     });
+}
+
+function detectHairpin(sequence) {
+    for(let i = 0; i < sequence.length - 2; i++){
+        let subSequence = sequence.substring(i, i + 3);
+        let reverseComplementSubSequence = reverseComplement(subSequence);
+        if(!reverseComplementSubSequence){
+            continue;
+        }
+        if(sequence.includes(reverseComplementSubSequence, i + 3)){
+            if(sequence.includes(reverseComplementSubSequence, i + 4)){
+                if(sequence.includes(reverseComplementSubSequence, i + 5)){
+                    return "Strong at " + (i+1); 
+                }
+                return "Mod. at " + (i+1); 
+            }   
+            return "Weak at " + (i+1);
+        }
+    }
+    return "None";
+}
+
+function detectDimer(sequence1, sequence2) {
+    let minSeq = sequence1.length >= sequence2.length ? sequence2 : sequence1;
+    let maxSeq = sequence1.length >= sequence2.length ? sequence1 : sequence2;
+
+    for(let i = 0; i < minSeq.length - 2; i++){
+        let subSequence = minSeq.substring(i, i + 3);
+        let reverseComplementSubSequence = reverseComplement(subSequence);
+        if(!reverseComplementSubSequence){
+            continue;
+        }
+        if(maxSeq.includes(reverseComplementSubSequence, i + 3)){
+            subSequence = minSeq.substring(i, i + 4);
+            reverseComplementSubSequence = reverseComplement(subSequence);
+            if(maxSeq.includes(reverseComplementSubSequence, i + 4)){
+                subSequence = minSeq.substring(i, i + 5);
+                reverseComplementSubSequence = reverseComplement(subSequence);
+                if(maxSeq.includes(reverseComplementSubSequence, i + 5)){
+                    return "Strong at " + (i+1); 
+                }
+                return "Mod. at " + (i+1);
+            }   
+            return "Weak at " + (i+1);
+        }
+    }
+    return "None";
 }
 
 // Clear form
@@ -650,6 +746,7 @@ function reverseComplement(sequence){
         .map(base => complement[base])
         .join('');
 }
+
 
 //Create template ultramer, disclusing F1, B1, LF, and BF, and spacers
 function generateTemplateUltramer(fip, lf, f1c, b1c, lb, bip){
