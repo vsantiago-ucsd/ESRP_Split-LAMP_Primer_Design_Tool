@@ -788,7 +788,6 @@ function reverseComplement(sequence){
         .join('');
 }
 
-<<<<<<< HEAD
 function highlightTemplate(template) {
 
     const primers = {
@@ -817,8 +816,6 @@ function highlightTemplate(template) {
 
     return highlighted;
 }
-=======
->>>>>>> 15cece2f9acc98c175994bb369c826d9892acb2a
 
 //Create template ultramer, disclusing F1, B1, LF, and BF, and spacers
 function generateTemplateUltramer(fip, lf, f1c, b1c, lb, bip){
