@@ -22,7 +22,11 @@ let designState = {
         f1c: { seq: '', len: 0, gc: 0, tm: 0, dg: 0 },
         b1c: { seq: '', len: 0, gc: 0, tm: 0, dg: 0 }
     },
-
+    // Snapshot written once at generation — never mutated, used by Reset
+    original: {
+        f2: '',
+        b2: ''
+    }
 };
 
 const NN_PARAMS = {
@@ -309,6 +313,7 @@ function generatePrimers() {
             return;
         }
         
+        // Update state
         designState.inputs.mirna2.name = mirna2Name;
         designState.inputs.mirna2.sequence = mirna2Seq;
         designState.inputs.mirna2.parsed = mirna2Result.sequence;
@@ -323,12 +328,9 @@ function generatePrimers() {
     setState('loading');
     document.querySelector('[data-tab="output"]').click();
     
-    // Simulate processing (replace with actual Python algorithm call)
     setTimeout(() => {
-        // TODO: Call algorithm here
-        // For now, using mock data
         
-        // Update target info
+        // Update target info listed at top
         document.getElementById('result-architecture').textContent = 
             designState.architecture === 'f2-only' ? 'F2 Only' : 'F2 and B2 (AND-gate)';
         
@@ -360,38 +362,44 @@ function generatePrimers() {
         let fipSeq = 'CGGAGAGGTCGCGATAGTCAT' + f2Seq; // f1c + T + f2
         let b2Seq;
         let bipSeq;
-        
-        // Loop primers (LF, LB)
-        // Save loop primers to designState for template cascade
+
+        // Save primers to designState for template cascade
         designState.outputs.lf.seq = lfSeq;
         designState.outputs.lb.seq = lbSeq;
         designState.outputs.b1c.seq = b1cSeq;
-
+        designState.outputs.f2.seq = f2Seq;
+        designState.outputs.f1c.seq = f1cSeq;
+        // Lock in the original — never overwritten, used by Reset
+        designState.original.f2 = f2Seq;
+        
+        // Loop primers (LF, LB)
         updatePrimerOutput('lf-seq', lfSeq, lfSeq.length, 
             calculateGC(lfSeq), 
             calculateTm(lfSeq), 
             calculateDeltaG5Prime(lfSeq), 
-            calculateDeltaG3Prime(lfSeq), 
-            'None');
+            calculateDeltaG3Prime(lfSeq)
+            );
         
         updatePrimerOutput('lb-seq', lbSeq, lbSeq.length, 
             calculateGC(lbSeq), 
             calculateTm(lbSeq), 
             calculateDeltaG5Prime(lbSeq), 
-            calculateDeltaG3Prime(lbSeq), 
-            'None');
+            calculateDeltaG3Prime(lbSeq)
+            );
         
         // Inner primers (FIP with F2, F1C, B1C)
         updatePrimerOutput('fip-seq', fipSeq, fipSeq.length, 
             calculateGC(fipSeq), 
             undefined, 
             undefined, 
-            undefined, 
-            '1 weak');
+            undefined,
+            );
         
         // Save f2 and f1c to designState for downstream cascade
         designState.outputs.f2.seq = f2Seq;
         designState.outputs.f1c.seq = f1cSeq;
+        // Lock in the original — never overwritten, used by Reset
+        designState.original.f2 = f2Seq;
 
         updatePrimerOutput('f2-seq', f2Seq, f2Seq.length, 
             calculateGC(f2Seq), 
@@ -430,8 +438,8 @@ function generatePrimers() {
                 calculateGC(bipSeq), 
                 undefined, 
                 undefined, 
-                undefined, 
-                'None');
+                undefined
+                );
             
             updatePrimerOutput('b2-seq', b2Seq, b2Seq.length, 
                 calculateGC(b2Seq), 
@@ -452,8 +460,8 @@ function generatePrimers() {
                 calculateGC(bipSeq), 
                 undefined, 
                 undefined, 
-                undefined, 
-                'None');
+                undefined
+                );
             
             updatePrimerOutput('b2-seq', b2Seq, b2Seq.length, 
                 calculateGC(b2Seq), 
@@ -461,6 +469,8 @@ function generatePrimers() {
                 calculateDeltaG5Prime(b2Seq), 
                 calculateDeltaG3Prime(b2Seq));
         }
+        // Lock in the original — never overwritten, used by Reset
+        designState.original.b2 = b2Seq;
         
         // Show results
         setState('results');
@@ -469,19 +479,28 @@ function generatePrimers() {
         const f2Input = document.getElementById('f2-seq');
         f2Input.disabled = false;
         document.getElementById('f2-reset').disabled = false;
-        f2Input.removeEventListener('input', f2InputHandler);
-        f2Input.addEventListener('input', f2InputHandler);
+        f2Input.removeEventListener('input', primerInputHandler('f2'));
+        f2Input.addEventListener('input', primerInputHandler('f2'));
+
+        // // Enable B2 input and attach live-edit listener (attach once per generation)
+        const b2Input = document.getElementById('b2-seq');
+        b2Input.disabled = false;
+        document.getElementById('b2-reset').disabled = false;
+        b2Input.removeEventListener('input', primerInputHandler('b2'));
+        b2Input.addEventListener('input', primerInputHandler('b2'));
     }, 1500);
 }
 
-// Named handler so we can remove/re-add it cleanly on each generation
-function f2InputHandler() {
-    onF2Change(this.value);
+// Generic handler for sequence editing
+function primerInputHandler(primerName) {
+    return function() {
+        onPrimerChange(primerName, this.value);
+    };
 }
 
-// Live edit handler for F2
-function onF2Change(rawValue) {
-    const errorDiv = document.getElementById('f2-edit-error');
+// Generic live edit handler for any primer
+function onPrimerChange(primerName, rawValue) {
+    const errorDiv = document.getElementById(`${primerName}-edit-error`);
     const result = parseSequence(rawValue);
 
     if (!result.valid) {
@@ -491,23 +510,38 @@ function onF2Change(rawValue) {
     }
     errorDiv.classList.remove('visible');
 
-    const f2Seq = result.sequence;
+    const sequence = result.sequence;
 
-    // Update F2 stats and designState
-    designState.outputs.f2.seq = f2Seq;
-    updatePrimerOutput('f2-seq', f2Seq, f2Seq.length, calculateGC(f2Seq),
-        calculateTm(f2Seq), calculateDeltaG5Prime(f2Seq), calculateDeltaG3Prime(f2Seq));
+    // Update stats and designState
+    designState.outputs[primerName].seq = sequence;
+    updatePrimerOutput(
+        `${primerName}-seq`, 
+        sequence, 
+        sequence.length, 
+        calculateGC(sequence),
+        calculateTm(sequence), 
+        calculateDeltaG5Prime(sequence), 
+        calculateDeltaG3Prime(sequence)
+    );
 
-    // Recompute FIP: f1c + T + f2 (same join logic as generation)
-    const f1cSeq = designState.outputs.f1c.seq;
-    const newFip = f1cSeq + 'T' + f2Seq;
-    designState.outputs.fip.seq = newFip;
-    updatePrimerOutput('fip-seq', newFip, newFip.length, calculateGC(newFip),
-        undefined, undefined, undefined, 'None');
+    // Recompute dependent sequences based on primer type
+    if (primerName === 'f2') {
+        const f1cSeq = designState.outputs.f1c.seq;
+        const newFip = f1cSeq + 'T' + sequence;
+        designState.outputs.fip.seq = newFip;
+        updatePrimerOutput('fip-seq', newFip, newFip.length, calculateGC(newFip),
+            undefined, undefined, undefined, 'None');
+    } else if (primerName === 'b2') {
+        const b1cSeq = designState.outputs.b1c.seq;
+        const newBip = b1cSeq + 'T' + sequence;
+        designState.outputs.bip.seq = newBip;
+        updatePrimerOutput('bip-seq', newBip, newBip.length, calculateGC(newBip),
+            undefined, undefined, undefined, 'None');
+    }
 
     // Recompute template ultramer
     const newTemplate = generateTemplateUltramer(
-        newFip,
+        designState.outputs.fip.seq,
         designState.outputs.lf.seq,
         designState.outputs.f1c.seq,
         designState.outputs.b1c.seq,
@@ -518,17 +552,21 @@ function onF2Change(rawValue) {
     updatePrimerOutput('template-seq', newTemplate, newTemplate.length, calculateGC(newTemplate));
 }
 
-// Reset F2 to originally generated sequence (i still need to fix this is not working)
+// Reset primer to originally generated sequence
 function resetPrimer(primerName) {
-    const original = designState.outputs[primerName].seq;
+    const original = designState.original[primerName];
+    if (!original) return;
+
     const inputEl = document.getElementById(`${primerName}-seq`);
     inputEl.value = original;
-    document.getElementById('f2-edit-error').classList.remove('visible');
-    onF2Change(original);
+    document.getElementById(`${primerName}-edit-error`).classList.remove('visible');
+
+    // Re-run the normal change handler so dependent sequences (FIP, template, etc.) update
+    onPrimerChange(primerName, original);
 }
 
 // Update primer output with stable IDs
-function updatePrimerOutput(seqId, sequence, length, gc, tm, dg5, dg3, hairpin) {
+function updatePrimerOutput(seqId, sequence, length, gc, tm, dg5, dg3) {
     const seqElement = document.getElementById(seqId);
     const primerPrefix = seqId.replace('-seq', '');
     
@@ -567,14 +605,63 @@ function updatePrimerOutput(seqId, sequence, length, gc, tm, dg5, dg3, hairpin) 
         if (dg3Element) dg3Element.textContent = dg3 + ' kcal/mol';
     }
     
-    if (hairpin !== undefined) {
-        const hairpinElement = document.getElementById(`${primerPrefix}-hairpin`);
-        if (hairpinElement) {
-            hairpinElement.textContent = hairpin;
-            hairpinElement.className = 'stat-value ' + 
-                (hairpin === 'None' ? 'good' : hairpin.includes('weak') ? 'warning' : 'bad');
+    // Run hairpin detection automatically
+    const hairpinElement = document.getElementById(`${primerPrefix}-hairpin`);
+    if (hairpinElement && sequence) {
+
+        let hairpinResult = detectHairpin(sequence);
+
+        hairpinElement.textContent = hairpinResult;
+
+        if (hairpinResult.includes("None")) {
+            hairpinElement.className = 'stat-value good';
+        } 
+        else if (hairpinResult.includes("Weak") || hairpinResult.includes("Mod")) {
+            hairpinElement.className = 'stat-value warning';
+        } 
+        else {
+            hairpinElement.className = 'stat-value bad';
         }
     }
+
+    // Run dimer detection for a primer against all other primers
+    const dimerElement = document.getElementById(`${primerPrefix}-dimer`);
+    if (dimerElement && sequence) {
+        // Collect all primer sequences from designState.outputs
+        const allPrimers = Object.keys(designState.outputs).filter(p => p !== 'template');
+        
+        let dimerPairs = [];
+
+        // Loop through each other primer
+        allPrimers.forEach(otherPrimer => {
+            // Skip self
+            if (otherPrimer === primerPrefix) return;
+
+            const otherSeq = designState.outputs[otherPrimer]?.seq;
+            if (!otherSeq) return;
+
+            const result = detectDimer(sequence, otherSeq);
+            if (!result.includes("None")) {
+                // If a dimer exists, store the primer and result
+                dimerPairs.push(`${otherPrimer.toUpperCase()}: ${result}`);
+            }
+        });
+
+        // Format output
+        if (dimerPairs.length === 0) {
+            dimerElement.textContent = "None";
+            dimerElement.className = 'stat-value good';
+        } else {
+            dimerElement.textContent = dimerPairs.join(", ");
+            // Decide class based on strongest dimer detected
+            if (dimerPairs.some(r => r.includes("Strong"))) {
+                dimerElement.className = 'stat-value bad';
+            } else {
+                dimerElement.className = 'stat-value warning';
+            }
+        }
+    }
+
 }
 
 // Copy sequence to clipboard
@@ -599,6 +686,53 @@ function copySequence(seqId) {
     });
 }
 
+function detectHairpin(sequence) {
+    for(let i = 0; i < sequence.length - 2; i++){
+        let subSequence = sequence.substring(i, i + 3);
+        let reverseComplementSubSequence = reverseComplement(subSequence);
+        if(!reverseComplementSubSequence){
+            continue;
+        }
+        if(sequence.includes(reverseComplementSubSequence, i + 3)){
+            if(sequence.includes(reverseComplementSubSequence, i + 4)){
+                if(sequence.includes(reverseComplementSubSequence, i + 5)){
+                    return "Strong at " + (i+1); 
+                }
+                return "Mod. at " + (i+1); 
+            }   
+            return "Weak at " + (i+1);
+        }
+    }
+    return "None";
+}
+
+function detectDimer(sequence1, sequence2) {
+    let minSeq = sequence1.length >= sequence2.length ? sequence2 : sequence1;
+    let maxSeq = sequence1.length >= sequence2.length ? sequence1 : sequence2;
+
+    for(let i = 0; i < minSeq.length - 2; i++){
+        let subSequence = minSeq.substring(i, i + 3);
+        let reverseComplementSubSequence = reverseComplement(subSequence);
+        if(!reverseComplementSubSequence){
+            continue;
+        }
+        if(maxSeq.includes(reverseComplementSubSequence, i + 3)){
+            subSequence = minSeq.substring(i, i + 4);
+            reverseComplementSubSequence = reverseComplement(subSequence);
+            if(maxSeq.includes(reverseComplementSubSequence, i + 4)){
+                subSequence = minSeq.substring(i, i + 5);
+                reverseComplementSubSequence = reverseComplement(subSequence);
+                if(maxSeq.includes(reverseComplementSubSequence, i + 5)){
+                    return "Strong at " + (i+1); 
+                }
+                return "Mod. at " + (i+1);
+            }   
+            return "Weak at " + (i+1);
+        }
+    }
+    return "None";
+}
+
 // Clear form
 function clearForm() {
     document.getElementById('mirna1-name').value = '';
@@ -615,8 +749,6 @@ function clearForm() {
     selectArchitecture('f2-only');
     document.querySelector('input[value="f2-only"]').checked = true;
 }
-
-
 
 //Get the reverse complement
 function reverseComplement(sequence){
@@ -656,6 +788,7 @@ function reverseComplement(sequence){
         .join('');
 }
 
+<<<<<<< HEAD
 function highlightTemplate(template) {
 
     const primers = {
@@ -684,6 +817,8 @@ function highlightTemplate(template) {
 
     return highlighted;
 }
+=======
+>>>>>>> 15cece2f9acc98c175994bb369c826d9892acb2a
 
 //Create template ultramer, disclusing F1, B1, LF, and BF, and spacers
 function generateTemplateUltramer(fip, lf, f1c, b1c, lb, bip){

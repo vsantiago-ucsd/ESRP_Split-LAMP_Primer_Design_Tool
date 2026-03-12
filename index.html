@@ -56,6 +56,7 @@
                     <input type="text" id="mirna1-sequence" placeholder="Enter first target microRNA sequence" oninput="parseAndValidateSequence('mirna1')">
                     <p class="help-text">Paste your target sequence in FASTA format or the plain sequence.</p>
                     <div class="validation-error" id="mirna1-error"></div>
+                    <div class="validation-error" id="mirna1-hairpin"></div>
                     <div class="sequence-info" id="mirna1-info">
                         <span class="sequence-info-item">
                             <span class="sequence-info-label">Length:</span>
@@ -81,6 +82,7 @@
                         <input type="text" id="mirna2-sequence" placeholder="Enter second target microRNA sequence" oninput="parseAndValidateSequence('mirna2')">
                         <p class="help-text">Paste your second target sequence in FASTA format or the plain sequence.</p>
                         <div class="validation-error" id="mirna2-error"></div>
+                        <div class="validation-error" id="mirna2-hairpin"></div>
                         <div class="sequence-info" id="mirna2-info">
                             <span class="sequence-info-item">
                                 <span class="sequence-info-label">Length:</span>
@@ -115,6 +117,8 @@
                         </div>
                     </div>
                 </div>
+
+                <div class="validation-error" id="mirna-dimer"></div>
 
                 <div class="button-group">
                     <button class="btn btn-primary" onclick="generatePrimers()">Generate Primers</button>
@@ -201,6 +205,10 @@
                                             <div class="stat-label">Hairpins</div>
                                             <div class="stat-value" id="fip-hairpin">--</div>
                                         </div>
+                                        <div class="stat-item">
+                                            <div class="stat-label">Dimers</div>
+                                            <div class="stat-value" id="fip-dimer">--</div>
+                                        </div>
                                     </div>
                                 </div>
 
@@ -225,6 +233,10 @@
                                         <div class="stat-item">
                                             <div class="stat-label">Hairpins</div>
                                             <div class="stat-value" id="bip-hairpin">--</div>
+                                        </div>
+                                        <div class="stat-item">
+                                            <div class="stat-label">Dimers</div>
+                                            <div class="stat-value" id="bip-dimer">--</div>
                                         </div>
                                     </div>
                                 </div>
@@ -271,10 +283,12 @@
                                     <div class="primer-header">
                                         <span class="primer-name primer-b2">B2</span>
                                         <div class="primer-controls">
+                                            <button class="btn-reset" id="b2-reset" onclick="resetPrimer('b2')" disabled>Reset</button>
                                             <button class="btn-copy" onclick="copySequence('b2-seq')" disabled>Copy</button>
                                         </div>
                                     </div>
-                                    <div class="primer-sequence" id="b2-seq" data-sequence="">Algorithm will generate this</div>
+                                    <input type="text" class="primer-sequence editable-primer" id="b2-seq" data-sequence="" placeholder="Algorithm will generate this" disabled>
+                                    <div class="edit-error" id="b2-edit-error"></div>
                                     <div class="primer-stats">
                                         <div class="stat-item">
                                             <div class="stat-label">Length</div>
@@ -400,6 +414,10 @@
                                             <div class="stat-label">Hairpins</div>
                                             <div class="stat-value" id="lf-hairpin">--</div>
                                         </div>
+                                        <div class="stat-item">
+                                            <div class="stat-label">Dimers</div>
+                                            <div class="stat-value" id="lf-dimer">--</div>
+                                        </div>
                                     </div>
                                 </div>
 
@@ -435,6 +453,10 @@
                                         <div class="stat-item">
                                             <div class="stat-label">Hairpins</div>
                                             <div class="stat-value" id="lb-hairpin">--</div>
+                                        </div>
+                                        <div class="stat-item">
+                                            <div class="stat-label">Dimers</div>
+                                            <div class="stat-value" id="lb-dimer">--</div>
                                         </div>
                                     </div>
                                 </div>
