@@ -26,7 +26,8 @@ let designState = {
     original: {
         f2: '',
         b2: '', 
-        f1c: ''
+        f1c: '', 
+        b1c: ''
     }
 };
 
@@ -373,6 +374,7 @@ function generatePrimers() {
         designState.outputs.fip.seq = fipSeq;
         // Lock in the original — never overwritten, used by Reset
         designState.original.f1c = f1cSeq;
+        designState.original.b1c = b1cSeq;
         designState.original.f2 = f2Seq;
         
         // Loop primers (LF, LB)
@@ -496,6 +498,13 @@ function generatePrimers() {
         document.getElementById('f1c-reset').disabled = false;
         f1cInput.removeEventListener('input', primerInputHandler('f1c'));
         f1cInput.addEventListener('input', primerInputHandler('f1c'));
+
+        // Enable B1C input and attach live-edit listener (attach once per generation)
+        const b1cInput = document.getElementById('b1c-seq');
+        b1cInput.disabled = false;
+        document.getElementById('b1c-reset').disabled = false;
+        b1cInput.removeEventListener('input', primerInputHandler('b1c'));
+        b1cInput.addEventListener('input', primerInputHandler('b1c'));
     }, 1500);
 }
 
@@ -550,6 +559,12 @@ function onPrimerChange(primerName, rawValue) {
         const newFip = sequence + 'T' + f2Seq;
         designState.outputs.fip.seq = newFip;
         updatePrimerOutput('fip-seq', newFip, newFip.length, calculateGC(newFip),
+            undefined, undefined, undefined, 'None');
+    } else if (primerName == 'b1c'){
+        const b2Seq = designState.outputs.b2.seq;
+        const newBip = sequence + 'A' + b2Seq;
+        designState.outputs.bip.seq = newBip;
+        updatePrimerOutput('bip-seq', newBip, newBip.length, calculateGC(newBip),
             undefined, undefined, undefined, 'None');
     }
 

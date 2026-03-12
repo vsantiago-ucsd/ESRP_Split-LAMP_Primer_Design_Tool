@@ -253,8 +253,8 @@
                                             <button class="btn-copy" onclick="copySequence('f2-seq')" disabled>Copy</button>
                                         </div>
                                     </div>
+                                    <div class="validation-error" id="f2-edit-error"></div>
                                     <input type="text" class="primer-sequence editable-primer" id="f2-seq" data-sequence="" placeholder="Algorithm will generate this" disabled>
-                                    <div class="edit-error" id="f2-edit-error"></div>
                                     <div class="primer-stats">
                                         <div class="stat-item">
                                             <div class="stat-label">Length</div>
@@ -287,8 +287,8 @@
                                             <button class="btn-copy" onclick="copySequence('b2-seq')" disabled>Copy</button>
                                         </div>
                                     </div>
+                                    <div class="validation-error" id="b2-edit-error"></div>
                                     <input type="text" class="primer-sequence editable-primer" id="b2-seq" data-sequence="" placeholder="Algorithm will generate this" disabled>
-                                    <div class="edit-error" id="b2-edit-error"></div>
                                     <div class="primer-stats">
                                         <div class="stat-item">
                                             <div class="stat-label">Length</div>
@@ -321,8 +321,8 @@
                                             <button class="btn-copy" onclick="copySequence('f1c-seq')" disabled>Copy</button>
                                         </div>
                                     </div>
+                                    <div class="validation-error" id="f1c-edit-error"></div>
                                     <input type="text" class="primer-sequence editable-primer" id="f1c-seq" data-sequence="" placeholder="Algorithm will generate this" disabled>
-                                    <div class="edit-error" id="f1c-edit-error"></div>
                                     <div class="primer-stats">
                                         <div class="stat-item">
                                             <div class="stat-label">Length</div>
@@ -351,10 +351,12 @@
                                     <div class="primer-header">
                                         <span class="primer-name primer-b1c">B1C</span>
                                         <div class="primer-controls">
+                                            <button class="btn-reset" id="b1c-reset" onclick="resetPrimer('b1c')" disabled>Reset</button>
                                             <button class="btn-copy" onclick="copySequence('b1c-seq')" disabled>Copy</button>
                                         </div>
                                     </div>
-                                    <div class="primer-sequence" id="b1c-seq" data-sequence="">Algorithm will generate this</div>
+                                    <div class="validation-error" id="b1c-edit-error"></div>
+                                    <input type="text" class="primer-sequence editable-primer" id="b1c-seq" data-sequence="" placeholder="Algorithm will generate this" disabled>
                                     <div class="primer-stats">
                                         <div class="stat-item">
                                             <div class="stat-label">Length</div>
