@@ -394,12 +394,6 @@ function generatePrimers() {
             undefined, 
             undefined,
             );
-        
-        // Save f2 and f1c to designState for downstream cascade
-        designState.outputs.f2.seq = f2Seq;
-        designState.outputs.f1c.seq = f1cSeq;
-        // Lock in the original — never overwritten, used by Reset
-        designState.original.f2 = f2Seq;
 
         updatePrimerOutput('f2-seq', f2Seq, f2Seq.length, 
             calculateGC(f2Seq), 
