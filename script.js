@@ -27,7 +27,9 @@ let designState = {
         f2: '',
         b2: '', 
         f1c: '', 
-        b1c: ''
+        b1c: '',
+        lf: '',
+        lb: ''
     }
 };
 
@@ -373,6 +375,8 @@ function generatePrimers() {
         designState.outputs.f2.seq = f2Seq;
         designState.outputs.fip.seq = fipSeq;
         // Lock in the original — never overwritten, used by Reset
+        designState.original.lf = lfSeq;
+        designState.original.lb = lbSeq
         designState.original.f1c = f1cSeq;
         designState.original.b1c = b1cSeq;
         designState.original.f2 = f2Seq;
@@ -505,6 +509,13 @@ function generatePrimers() {
         document.getElementById('b1c-reset').disabled = false;
         b1cInput.removeEventListener('input', primerInputHandler('b1c'));
         b1cInput.addEventListener('input', primerInputHandler('b1c'));
+
+        // Enable LF input and attach live-edit listener (attach once per generation)
+        const lfInput = document.getElementById('lf-seq');
+        lfInput.disabled = false;
+        document.getElementById('lf-reset').disabled = false;
+        lfInput.removeEventListener('input', primerInputHandler('lf'));
+        lfInput.addEventListener('input', primerInputHandler('lf'));
     }, 1500);
 }
 
