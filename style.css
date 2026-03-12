@@ -546,7 +546,7 @@ input.primer-sequence.editable-primer:disabled {
     color: #aaa;
 }
 
-.editable-badge {
+/* .editable-badge {
     font-size: 0.7rem;
     font-weight: 600;
     background: #ff69b4;
@@ -555,7 +555,7 @@ input.primer-sequence.editable-primer:disabled {
     border-radius: 10px;
     vertical-align: middle;
     letter-spacing: 0.03em;
-}
+} */
 
 .btn-reset {
     padding: 6px 12px;
