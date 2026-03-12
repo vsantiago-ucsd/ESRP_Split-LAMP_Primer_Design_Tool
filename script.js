@@ -25,7 +25,11 @@ let designState = {
     // Snapshot written once at generation — never mutated, used by Reset
     original: {
         f2: '',
-        b2: ''
+        b2: '', 
+        f1c: '', 
+        b1c: '',
+        lf: '',
+        lb: ''
     }
 };
 
@@ -366,10 +370,15 @@ function generatePrimers() {
         // Save primers to designState for template cascade
         designState.outputs.lf.seq = lfSeq;
         designState.outputs.lb.seq = lbSeq;
+        designState.outputs.f1c.seq = f1cSeq;
         designState.outputs.b1c.seq = b1cSeq;
         designState.outputs.f2.seq = f2Seq;
-        designState.outputs.f1c.seq = f1cSeq;
+        designState.outputs.fip.seq = fipSeq;
         // Lock in the original — never overwritten, used by Reset
+        designState.original.lf = lfSeq;
+        designState.original.lb = lbSeq
+        designState.original.f1c = f1cSeq;
+        designState.original.b1c = b1cSeq;
         designState.original.f2 = f2Seq;
         
         // Loop primers (LF, LB)
@@ -394,12 +403,6 @@ function generatePrimers() {
             undefined, 
             undefined,
             );
-        
-        // Save f2 and f1c to designState for downstream cascade
-        designState.outputs.f2.seq = f2Seq;
-        designState.outputs.f1c.seq = f1cSeq;
-        // Lock in the original — never overwritten, used by Reset
-        designState.original.f2 = f2Seq;
 
         updatePrimerOutput('f2-seq', f2Seq, f2Seq.length, 
             calculateGC(f2Seq), 
@@ -423,12 +426,14 @@ function generatePrimers() {
         if (designState.architecture === 'f2-and-b2') {
             const mirna2Result = parseSequence(document.getElementById('mirna2-sequence').value);
             b2Seq = mirna2Result.sequence;
-            bipSeq = 'GATGACAGTGACATCCTGCCTA' + b2Seq.substring(1); // b1c + A + (b2 - T)
-
+            bipSeq = 'GATGACAGTGACATCCTGCCTA' + b2Seq.substring(1); // b1c + A + (b2 - first T)
+            
+            // Save primers to designState for template cascade
             designState.outputs.b2.seq = b2Seq;
             designState.outputs.bip.seq = bipSeq;
+            // Lock in the original — never overwritten, used by Reset
+            designState.original.b2 = b2Seq;
 
-            
             // Generate template
             templateSeq = generateTemplateUltramer(fipSeq, lfSeq, f1cSeq, b1cSeq, lbSeq, bipSeq);
             updatePrimerOutput("template-seq", templateSeq, templateSeq.length, calculateGC(templateSeq));
@@ -449,11 +454,15 @@ function generatePrimers() {
         } else {
             // Single-input architecture
             b2Seq = 'TGGCAGTGTCTTAGCTGGTTGT';
-            bipSeq = 'GATGACAGTGACATCCTGCCTAGGCAGTGTCTTAGCTGGTTGT';
+            bipSeq = 'GATGACAGTGACATCCTGCCTA' + b2Seq.substring(1);
+
+            // Save primers to designState for template cascade
+            designState.outputs.b2.seq = b2Seq;
+            designState.outputs.bip.seq = bipSeq;
+            // Lock in the original — never overwritten, used by Reset
+            designState.original.b2 = b2Seq;
             
             templateSeq = generateTemplateUltramer(fipSeq, lfSeq, f1cSeq, b1cSeq, lbSeq, bipSeq);
-            designState.outputs.bip.seq = bipSeq;
-            designState.outputs.fip.seq = fipSeq;
             updatePrimerOutput("template-seq", templateSeq, templateSeq.length, calculateGC(templateSeq));
             
             updatePrimerOutput('bip-seq', bipSeq, bipSeq.length, 
@@ -469,8 +478,6 @@ function generatePrimers() {
                 calculateDeltaG5Prime(b2Seq), 
                 calculateDeltaG3Prime(b2Seq));
         }
-        // Lock in the original — never overwritten, used by Reset
-        designState.original.b2 = b2Seq;
         
         // Show results
         setState('results');
@@ -482,12 +489,40 @@ function generatePrimers() {
         f2Input.removeEventListener('input', primerInputHandler('f2'));
         f2Input.addEventListener('input', primerInputHandler('f2'));
 
-        // // Enable B2 input and attach live-edit listener (attach once per generation)
+        // Enable B2 input and attach live-edit listener (attach once per generation)
         const b2Input = document.getElementById('b2-seq');
         b2Input.disabled = false;
         document.getElementById('b2-reset').disabled = false;
         b2Input.removeEventListener('input', primerInputHandler('b2'));
         b2Input.addEventListener('input', primerInputHandler('b2'));
+
+        // Enable F1C input and attach live-edit listener (attach once per generation)
+        const f1cInput = document.getElementById('f1c-seq');
+        f1cInput.disabled = false;
+        document.getElementById('f1c-reset').disabled = false;
+        f1cInput.removeEventListener('input', primerInputHandler('f1c'));
+        f1cInput.addEventListener('input', primerInputHandler('f1c'));
+
+        // Enable B1C input and attach live-edit listener (attach once per generation)
+        const b1cInput = document.getElementById('b1c-seq');
+        b1cInput.disabled = false;
+        document.getElementById('b1c-reset').disabled = false;
+        b1cInput.removeEventListener('input', primerInputHandler('b1c'));
+        b1cInput.addEventListener('input', primerInputHandler('b1c'));
+
+        // Enable LF input and attach live-edit listener (attach once per generation)
+        const lfInput = document.getElementById('lf-seq');
+        lfInput.disabled = false;
+        document.getElementById('lf-reset').disabled = false;
+        lfInput.removeEventListener('input', primerInputHandler('lf'));
+        lfInput.addEventListener('input', primerInputHandler('lf'));
+
+        // Enable LB input and attach live-edit listener (attach once per generation)
+        const lbInput = document.getElementById('lb-seq');
+        lbInput.disabled = false;
+        document.getElementById('lb-reset').disabled = false;
+        lbInput.removeEventListener('input', primerInputHandler('lb'));
+        lbInput.addEventListener('input', primerInputHandler('lb'));
     }, 1500);
 }
 
@@ -530,13 +565,25 @@ function onPrimerChange(primerName, rawValue) {
         const newFip = f1cSeq + 'T' + sequence;
         designState.outputs.fip.seq = newFip;
         updatePrimerOutput('fip-seq', newFip, newFip.length, calculateGC(newFip),
-            undefined, undefined, undefined, 'None');
+            undefined, undefined, undefined);
     } else if (primerName === 'b2') {
         const b1cSeq = designState.outputs.b1c.seq;
-        const newBip = b1cSeq + 'T' + sequence;
+        const newBip = b1cSeq + 'A' + sequence;
         designState.outputs.bip.seq = newBip;
         updatePrimerOutput('bip-seq', newBip, newBip.length, calculateGC(newBip),
-            undefined, undefined, undefined, 'None');
+            undefined, undefined, undefined);
+    } else if (primerName == 'f1c'){
+        const f2Seq = designState.outputs.f2.seq;
+        const newFip = sequence + 'T' + f2Seq;
+        designState.outputs.fip.seq = newFip;
+        updatePrimerOutput('fip-seq', newFip, newFip.length, calculateGC(newFip),
+            undefined, undefined, undefined);
+    } else if (primerName == 'b1c'){
+        const b2Seq = designState.outputs.b2.seq;
+        const newBip = sequence + 'A' + b2Seq;
+        designState.outputs.bip.seq = newBip;
+        updatePrimerOutput('bip-seq', newBip, newBip.length, calculateGC(newBip),
+            undefined, undefined, undefined);
     }
 
     // Recompute template ultramer
@@ -788,14 +835,11 @@ function reverseComplement(sequence){
         .join('');
 }
 
-<<<<<<< HEAD
 function highlightTemplate(template) {
 
     const primers = {
-        f2: designState.outputs.f2.seq,
-        f1c: designState.outputs.f1c.seq ? reverseComplement(designState.outputs.f1c.seq) : '',
-        b2: designState.outputs.b2.seq ? reverseComplement(designState.outputs.b2.seq.substring(1)) : '',
-        b1c: designState.outputs.b1c.seq,
+        fip: designState.outputs.fip.seq,
+        bip: designState.outputs.bip.seq ? reverseComplement(designState.outputs.bip.seq) : '',
         lf: designState.outputs.lf.seq ? reverseComplement(designState.outputs.lf.seq) : '',
         lb: designState.outputs.lb.seq,
     };
@@ -817,8 +861,6 @@ function highlightTemplate(template) {
 
     return highlighted;
 }
-=======
->>>>>>> 15cece2f9acc98c175994bb369c826d9892acb2a
 
 //Create template ultramer, disclusing F1, B1, LF, and BF, and spacers
 function generateTemplateUltramer(fip, lf, f1c, b1c, lb, bip){
