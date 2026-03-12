@@ -366,9 +366,10 @@ function generatePrimers() {
         // Save primers to designState for template cascade
         designState.outputs.lf.seq = lfSeq;
         designState.outputs.lb.seq = lbSeq;
+        designState.outputs.f1c.seq = f1cSeq;
         designState.outputs.b1c.seq = b1cSeq;
         designState.outputs.f2.seq = f2Seq;
-        designState.outputs.f1c.seq = f1cSeq;
+        designState.outputs.fip.seq = fipSeq;
         // Lock in the original — never overwritten, used by Reset
         designState.original.f2 = f2Seq;
         
@@ -418,10 +419,6 @@ function generatePrimers() {
             const mirna2Result = parseSequence(document.getElementById('mirna2-sequence').value);
             b2Seq = mirna2Result.sequence;
             bipSeq = 'GATGACAGTGACATCCTGCCTA' + b2Seq.substring(1); // b1c + A + (b2 - T)
-
-            designState.outputs.b2.seq = b2Seq;
-            designState.outputs.bip.seq = bipSeq;
-
             
             // Generate template
             templateSeq = generateTemplateUltramer(fipSeq, lfSeq, f1cSeq, b1cSeq, lbSeq, bipSeq);
@@ -446,8 +443,6 @@ function generatePrimers() {
             bipSeq = 'GATGACAGTGACATCCTGCCTAGGCAGTGTCTTAGCTGGTTGT';
             
             templateSeq = generateTemplateUltramer(fipSeq, lfSeq, f1cSeq, b1cSeq, lbSeq, bipSeq);
-            designState.outputs.bip.seq = bipSeq;
-            designState.outputs.fip.seq = fipSeq;
             updatePrimerOutput("template-seq", templateSeq, templateSeq.length, calculateGC(templateSeq));
             
             updatePrimerOutput('bip-seq', bipSeq, bipSeq.length, 
@@ -463,6 +458,10 @@ function generatePrimers() {
                 calculateDeltaG5Prime(b2Seq), 
                 calculateDeltaG3Prime(b2Seq));
         }
+        
+        // Save primers to designState for template cascade
+        designState.outputs.b2.seq = b2Seq;
+        designState.outputs.bip.seq = bipSeq;
         // Lock in the original — never overwritten, used by Reset
         designState.original.b2 = b2Seq;
         
