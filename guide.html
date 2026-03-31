@@ -1,0 +1,445 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>User Guide – Split-LAMP Primer Design Tool</title>
+    <link rel="stylesheet" href="style.css">
+    <style>
+        /* Guide-specific layout */
+        .guide-container {
+            max-width: 900px;
+            margin: 0 auto;
+            background: white;
+            border-radius: 8px;
+            box-shadow: 0 2px 8px rgba(0,0,0,0.1);
+            overflow: hidden;
+        }
+
+        .guide-body {
+            padding: 40px;
+        }
+
+        .back-btn {
+            display: inline-block;
+            margin-bottom: 30px;
+            color: #ff69b4;
+            font-weight: 600;
+            text-decoration: none;
+            font-size: 0.95rem;
+        }
+
+        .back-btn:hover {
+            color: #C32C7F;
+        }
+
+        .guide-title {
+            font-size: 1.8rem;
+            font-weight: 700;
+            color: #333;
+            margin-bottom: 6px;
+        }
+
+        .guide-subtitle {
+            color: #6c757d;
+            font-size: 1rem;
+            margin-bottom: 36px;
+        }
+
+        .guide-section {
+            margin-bottom: 40px;
+        }
+
+        .guide-section h2 {
+            font-size: 1.2rem;
+            font-weight: 700;
+            color: #ff69b4;
+            margin-bottom: 14px;
+            padding-bottom: 8px;
+            border-bottom: 2px solid #ffeff1;
+        }
+
+        .guide-section p {
+            color: #444;
+            line-height: 1.7;
+            margin-bottom: 12px;
+            font-size: 0.95rem;
+        }
+
+        .guide-section ul, .guide-section ol {
+            margin-left: 20px;
+            color: #444;
+            line-height: 1.9;
+            font-size: 0.95rem;
+        }
+
+        .guide-section li {
+            margin-bottom: 4px;
+        }
+
+        /* Step cards */
+        .steps {
+            display: flex;
+            flex-direction: column;
+            gap: 14px;
+        }
+
+        .step-card {
+            display: flex;
+            gap: 16px;
+            align-items: flex-start;
+            background: #f8f9fa;
+            border: 1px solid #e9ecef;
+            border-radius: 8px;
+            padding: 16px;
+        }
+
+        .step-number {
+            background: #ff69b4;
+            color: white;
+            font-weight: 700;
+            font-size: 0.95rem;
+            width: 32px;
+            height: 32px;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            flex-shrink: 0;
+        }
+
+        .step-content h3 {
+            font-size: 1rem;
+            font-weight: 600;
+            color: #333;
+            margin-bottom: 4px;
+        }
+
+        .step-content p {
+            font-size: 0.9rem;
+            color: #555;
+            line-height: 1.6;
+            margin: 0;
+        }
+
+        /* Primer color legend */
+        .color-legend {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(180px, 1fr));
+            gap: 10px;
+            margin-top: 10px;
+        }
+
+        .color-item {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            font-size: 0.9rem;
+            color: #444;
+        }
+
+        .color-swatch {
+            width: 36px;
+            height: 22px;
+            border-radius: 4px;
+            flex-shrink: 0;
+        }
+
+        /* Stat definition table */
+        .stat-table {
+            width: 100%;
+            border-collapse: collapse;
+            font-size: 0.9rem;
+        }
+
+        .stat-table th {
+            background: #ff69b4;
+            color: white;
+            padding: 10px 14px;
+            text-align: left;
+            font-weight: 600;
+        }
+
+        .stat-table td {
+            padding: 10px 14px;
+            border-bottom: 1px solid #e9ecef;
+            color: #444;
+            line-height: 1.5;
+        }
+
+        .stat-table tr:nth-child(even) td {
+            background: #f8f9fa;
+        }
+
+        .stat-table tr:last-child td {
+            border-bottom: none;
+        }
+
+        /* Info box */
+        .info-box {
+            background: #ffeff1;
+            border-left: 4px solid #ff69b4;
+            padding: 14px 16px;
+            border-radius: 0 6px 6px 0;
+            margin-bottom: 14px;
+        }
+
+        .info-box p {
+            margin: 0;
+            font-size: 0.9rem;
+            color: #444;
+            line-height: 1.6;
+        }
+
+        .warning-box {
+            background: #fff3cd;
+            border-left: 4px solid #ffc107;
+            padding: 14px 16px;
+            border-radius: 0 6px 6px 0;
+            margin-bottom: 14px;
+        }
+
+        .warning-box p {
+            margin: 0;
+            font-size: 0.9rem;
+            color: #555;
+            line-height: 1.6;
+        }
+
+        code {
+            background: #f3f3f3;
+            padding: 2px 6px;
+            border-radius: 4px;
+            font-family: 'Courier New', monospace;
+            font-size: 0.88rem;
+            color: #C32C7F;
+        }
+    </style>
+</head>
+<body>
+    <div class="guide-container">
+
+        <!-- Header -->
+        <div class="header">
+            <a href="index.html" class="guide-btn">← Back to Tool</a>
+            <h1>User Guide</h1>
+            <p>Split-LAMP Primer Design Tool</p>
+        </div>
+
+        <div class="guide-body">
+            <p class="guide-subtitle">Everything you need to design Split-LAMP primers for miRNA detection.</p>
+
+            <!-- PURPOSE -->
+            <div class="guide-section">
+                <h2>🎯 Purpose</h2>
+                <p>This tool generates Split-LAMP primer sets for detecting microRNA (miRNA) targets. Unlike traditional LAMP, Split-LAMP uses the miRNA itself as a primer (F2 and/or B2), allowing direct detection without reverse transcription.</p>
+                <div class="info-box">
+                    <p><strong>F2 Only mode</strong> — one miRNA acts as the F2 primer. The algorithm generates B2 and all supporting primers around it.<br><br>
+                    <strong>F2 and B2 (AND-gate) mode</strong> — two miRNAs act as F2 and B2. A positive signal requires both miRNAs to be present simultaneously, which reduces false positives and enables multiplex detection.</p>
+                </div>
+            </div>
+
+            <!-- HOW TO USE -->
+            <div class="guide-section">
+                <h2>🚀 How to Use</h2>
+                <div class="steps">
+                    <div class="step-card">
+                        <div class="step-number">1</div>
+                        <div class="step-content">
+                            <h3>Select Architecture</h3>
+                            <p>Choose <strong>F2 Only</strong> if you have one miRNA target, or <strong>F2 and B2 (AND-gate)</strong> if you want to detect two miRNAs simultaneously.</p>
+                        </div>
+                    </div>
+                    <div class="step-card">
+                        <div class="step-number">2</div>
+                        <div class="step-content">
+                            <h3>Enter miRNA Name and Sequence</h3>
+                            <p>Type the miRNA name (e.g. <code>miR-21-5p</code>) and paste its sequence. Accepted formats: plain sequence or FASTA. Accepts A, C, G, T, and U — U is automatically converted to T. Example: <code>UAGCUUAUCAGACUGAUGUUGA</code></p>
+                        </div>
+                    </div>
+                    <div class="step-card">
+                        <div class="step-number">3</div>
+                        <div class="step-content">
+                            <h3>Configure Design Options</h3>
+                            <p>Choose whether to generate loop primers (LF, LB), optimize for specificity, check for hairpin structures, and calculate ΔG values. All options are on by default and recommended for most uses.</p>
+                        </div>
+                    </div>
+                    <div class="step-card">
+                        <div class="step-number">4</div>
+                        <div class="step-content">
+                            <h3>Click Generate Primers</h3>
+                            <p>The tool will compute your full primer set and switch to the Primer Output tab automatically.</p>
+                        </div>
+                    </div>
+                    <div class="step-card">
+                        <div class="step-number">5</div>
+                        <div class="step-content">
+                            <h3>Review and Edit</h3>
+                            <p>All primers are editable directly in the output. Changes to F2 automatically update FIP and the Template Ultramer in real time. Use the <strong>Reset</strong> button next to any primer to restore the original generated sequence.</p>
+                        </div>
+                    </div>
+                    <div class="step-card">
+                        <div class="step-number">6</div>
+                        <div class="step-content">
+                            <h3>Copy and Order</h3>
+                            <p>Use the <strong>Copy</strong> button next to any primer to copy the sequence to your clipboard for ordering.</p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- OUTPUT EXPLAINED -->
+            <div class="guide-section">
+                <h2>📋 Understanding the Output</h2>
+
+                <h3 style="font-size:1rem; font-weight:600; color:#333; margin: 16px 0 10px;">Template Ultramer</h3>
+                <p>The Template Ultramer is a synthetic DNA strand that encodes all primer-binding regions. It is color-coded to show where each primer component sits within the full sequence. Hover over any highlighted region to see which primer it corresponds to.</p>
+
+                <div class="color-legend" style="margin-bottom: 20px;">
+                    <div class="color-item">
+                        <div class="color-swatch" style="background:#F48FB1;"></div>
+                        <span>FIP</span>
+                    </div>
+                    <div class="color-item">
+                        <div class="color-swatch" style="background:#BA68C8;"></div>
+                        <span>BIP</span>
+                    </div>
+                    <div class="color-item">
+                        <div class="color-swatch" style="background:#f7b1d9;"></div>
+                        <span>LF (Loop Forward)</span>
+                    </div>
+                    <div class="color-item">
+                        <div class="color-swatch" style="background:#D1C4E9;"></div>
+                        <span>LB (Loop Backward)</span>
+                    </div>
+                </div>
+
+                <h3 style="font-size:1rem; font-weight:600; color:#333; margin: 0 0 10px;">Primer Statistics</h3>
+                <table class="stat-table">
+                    <tr>
+                        <th>Stat</th>
+                        <th>What it means</th>
+                        <th>Typical range</th>
+                    </tr>
+                    <tr>
+                        <td><strong>Length</strong></td>
+                        <td>Number of base pairs in the primer</td>
+                        <td>18–30 bp for most primers; ~22 bp for miRNA-derived F2/B2</td>
+                    </tr>
+                    <tr>
+                        <td><strong>GC Content</strong></td>
+                        <td>Percentage of G and C bases. Higher GC means stronger binding.</td>
+                        <td>40–60%</td>
+                    </tr>
+                    <tr>
+                        <td><strong>Tm</strong></td>
+                        <td>Melting temperature. The temperature at which half the primer-template duplexes dissociate.</td>
+                        <td>58–65°C for LAMP</td>
+                    </tr>
+                    <tr>
+                        <td><strong>ΔG (5' end)</strong></td>
+                        <td>Gibbs free energy of the first 6 bp. Less negative = less stable = better for avoiding secondary structure at the 5' end.</td>
+                        <td>Greater than –9 kcal/mol preferred</td>
+                    </tr>
+                    <tr>
+                        <td><strong>ΔG (3' end)</strong></td>
+                        <td>Gibbs free energy of the last 6 bp. A very negative 3' ΔG can cause non-specific extension. This is the more critical value.</td>
+                        <td>Greater than –9 kcal/mol preferred</td>
+                    </tr>
+                    <tr>
+                        <td><strong>Hairpins</strong></td>
+                        <td>Whether the primer folds back on itself. None is ideal. Weak is usually acceptable. Strong may interfere with amplification.</td>
+                        <td>None or Weak</td>
+                    </tr>
+                    <tr>
+                        <td><strong>Dimers</strong></td>
+                        <td>Whether this primer has 3' complementarity with other primers in the set. Cross-dimers can reduce amplification efficiency.</td>
+                        <td>None or Weak</td>
+                    </tr>
+                </table>
+            </div>
+
+            <!-- EDITING PRIMERS -->
+            <div class="guide-section">
+                <h2>✏️ Editing Primers</h2>
+                <p>All primers on the output tab are directly editable. Click into any sequence box and type to modify it.</p>
+                <ul>
+                    <li>Editing <strong>F2</strong> automatically recalculates FIP and the Template Ultramer.</li>
+                    <li>All stats (length, GC, Tm, ΔG) update instantly as you type.</li>
+                    <li>If you enter an invalid character, an error message appears and the cascade does not update until the sequence is valid.</li>
+                    <li>Click <strong>Reset</strong> next to any primer to restore the originally generated sequence.</li>
+                </ul>
+                <div class="warning-box">
+                    <p>⚠️ Editing a primer changes only that primer's sequence. The algorithm does not re-run automatically. If you make large changes, verify that the edited primer still satisfies LAMP design rules (length, GC, Tm).</p>
+                </div>
+            </div>
+
+            <!-- THERMODYNAMICS -->
+            <div class="guide-section">
+                <h2>🔬 Thermodynamic Methods</h2>
+                <p>All Tm and ΔG values are calculated using the <strong>SantaLucia 1998 nearest-neighbor model</strong> with the <strong>Owczarzy magnesium correction</strong>, which is appropriate for LAMP reaction conditions.</p>
+                <ul>
+                    <li>Default Mg²⁺: 8 mM (typical for LAMP)</li>
+                    <li>Default Na⁺: 50 mM</li>
+                    <li>Default dNTPs: 0.8 mM (used to calculate free Mg²⁺)</li>
+                    <li>Default primer concentration: 0.25 µM</li>
+                    <li>ΔG is evaluated at 65°C, the standard LAMP reaction temperature</li>
+                    <li>Primers shorter than 14 bp use the Wallace rule for Tm instead</li>
+                </ul>
+            </div>
+
+            <!-- EXAMPLE -->
+            <div class="guide-section">
+                <h2>📝 Example: miR-21 and miR-34a</h2>
+                <p>This is the validated miRNA pair from Chua et al. (2023), the foundational Split-LAMP paper.</p>
+                <div class="steps">
+                    <div class="step-card">
+                        <div class="step-number">1</div>
+                        <div class="step-content">
+                            <h3>Select F2 and B2 (AND-gate)</h3>
+                            <p>This pair requires both miRNAs for a positive signal.</p>
+                        </div>
+                    </div>
+                    <div class="step-card">
+                        <div class="step-number">2</div>
+                        <div class="step-content">
+                            <h3>First miRNA — miR-21-5p (F2)</h3>
+                            <p>Name: <code>miR-21-5p</code><br>Sequence: <code>UAGCUUAUCAGACUGAUGUUGA</code></p>
+                        </div>
+                    </div>
+                    <div class="step-card">
+                        <div class="step-number">3</div>
+                        <div class="step-content">
+                            <h3>Second miRNA — miR-34a-5p (B2)</h3>
+                            <p>Name: <code>miR-34a-5p</code><br>Sequence: <code>UGGCAGUGUCUUAGCUGGUUGU</code></p>
+                        </div>
+                    </div>
+                    <div class="step-card">
+                        <div class="step-number">4</div>
+                        <div class="step-content">
+                            <h3>Generate and review</h3>
+                            <p>Click Generate Primers. Check that hairpin warnings are None or Weak for all primers, particularly LF and LB. Check the Template Ultramer color map to confirm all regions are present.</p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- TROUBLESHOOTING -->
+            <div class="guide-section">
+                <h2>❓ Troubleshooting</h2>
+                <ul>
+                    <li><strong>Invalid characters error</strong> — only A, C, G, T, and U are accepted. Remove spaces, numbers, or other characters. FASTA headers (lines starting with >) are stripped automatically.</li>
+                    <li><strong>Sequence too short</strong> — miRNA sequences are typically 18–25 nt. Sequences under 14 nt use the Wallace rule for Tm, which is less accurate.</li>
+                    <li><strong>Reset not working</strong> — Reset restores the sequence from when primers were last generated. If you have not generated primers yet, Reset has nothing to restore.</li>
+                    <li><strong>Strong hairpin warning</strong> — try adjusting the primer sequence by 1–2 bases and check if the warning changes. A strong hairpin at the 3' end is the highest priority to resolve.</li>
+                    <li><strong>Template Ultramer looks wrong</strong> — if you edited F2, the template updates automatically. If another primer was edited manually, the template does not update for that change. Regenerate primers for a clean baseline.</li>
+                </ul>
+            </div>
+
+            <p style="text-align:center; color:#aaa; font-size:0.85rem; margin-top: 40px;">
+                ERSP Split-LAMP Primer Design Tool &nbsp;|&nbsp; Professor Debashish Sahoo Lab &nbsp;|&nbsp; UCSD
+            </p>
+        </div>
+    </div>
+</body>
+</html>

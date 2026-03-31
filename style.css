@@ -649,3 +649,27 @@ input.primer-sequence.editable-primer:disabled {
     padding:3px 8px;
     border-radius:6px;
 }
+/* User Guide button in header */
+.header {
+    position: relative;
+}
+
+.guide-btn {
+    position: absolute;
+    top: 20px;
+    right: 20px;
+    background: white;
+    color: #ff69b4;
+    padding: 8px 16px;
+    border-radius: 6px;
+    font-weight: 600;
+    font-size: 0.9rem;
+    text-decoration: none;
+    transition: all 0.2s;
+    box-shadow: 0 2px 6px rgba(0,0,0,0.1);
+}
+
+.guide-btn:hover {
+    background: #C32C7F;
+    color: white;
+}
