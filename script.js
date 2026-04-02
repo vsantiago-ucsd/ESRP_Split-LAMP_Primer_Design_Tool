@@ -361,7 +361,6 @@ function generatePrimers() {
         const f1cSeq = 'CGGAGAGGTCGCGATAGTCA';
         const b1cSeq = 'GATGACAGTGACATCCTGCCT';
 
-        let templateSeq;
         let f2Seq = mirna1Result.sequence.substring(2, mirna1Result.sequence.length);
         let fipSeq = 'CGGAGAGGTCGCGATAGTCAT' + f2Seq; // f1c + T + f2
         let b2Seq;
@@ -435,8 +434,10 @@ function generatePrimers() {
             designState.original.b2 = b2Seq;
 
             // Generate template
-            templateSeq = generateTemplateUltramer(fipSeq, lfSeq, f1cSeq, b1cSeq, lbSeq, bipSeq);
-            updatePrimerOutput("template-seq", templateSeq, templateSeq.length, calculateGC(templateSeq));
+
+            const { rawSequence: templateRaw }
+                = generateTemplateUltramer(fipSeq, lfSeq, f1cSeq, b1cSeq, lbSeq, bipSeq);
+            designState.outputs.template.seq = templateRaw;
             
             // BIP and B2 for two-input architecture
             updatePrimerOutput('bip-seq', bipSeq, bipSeq.length, 
@@ -451,6 +452,8 @@ function generatePrimers() {
                 calculateTm(b2Seq), 
                 calculateDeltaG5Prime(b2Seq), 
                 calculateDeltaG3Prime(b2Seq));
+
+            updatePrimerOutput("template-seq", templateRaw, templateRaw.length, calculateGC(templateRaw));
         } else {
             // Single-input architecture
             b2Seq = 'TGGCAGTGTCTTAGCTGGTTGT';
@@ -462,8 +465,10 @@ function generatePrimers() {
             // Lock in the original — never overwritten, used by Reset
             designState.original.b2 = b2Seq;
             
-            templateSeq = generateTemplateUltramer(fipSeq, lfSeq, f1cSeq, b1cSeq, lbSeq, bipSeq);
-            updatePrimerOutput("template-seq", templateSeq, templateSeq.length, calculateGC(templateSeq));
+            const { rawSequence: templateRaw }
+                = generateTemplateUltramer(fipSeq, lfSeq, f1cSeq, b1cSeq, lbSeq, bipSeq);
+            designState.outputs.template.seq = templateRaw;
+            updatePrimerOutput("template-seq", templateRaw, templateRaw.length, calculateGC(templateRaw));
             
             updatePrimerOutput('bip-seq', bipSeq, bipSeq.length, 
                 calculateGC(bipSeq), 
@@ -523,7 +528,7 @@ function generatePrimers() {
         document.getElementById('lb-reset').disabled = false;
         lbInput.removeEventListener('input', primerInputHandler('lb'));
         lbInput.addEventListener('input', primerInputHandler('lb'));
-    }, 1500);
+    updateDimerBox();}, 1500);
 }
 
 // Generic handler for sequence editing
@@ -587,7 +592,7 @@ function onPrimerChange(primerName, rawValue) {
     }
 
     // Recompute template ultramer
-    const newTemplate = generateTemplateUltramer(
+    const { rawSequence: newTemplate } = generateTemplateUltramer(
         designState.outputs.fip.seq,
         designState.outputs.lf.seq,
         designState.outputs.f1c.seq,
@@ -595,8 +600,12 @@ function onPrimerChange(primerName, rawValue) {
         designState.outputs.lb.seq,
         designState.outputs.bip.seq
     );
-    designState.outputs.template.seq = newTemplate;
+        designState.outputs.template.seq = newTemplate;
+
+    // updatePrimerOutput handles innerHTML via highlightTemplate internally
     updatePrimerOutput('template-seq', newTemplate, newTemplate.length, calculateGC(newTemplate));
+
+    updateDimerBox();
 }
 
 // Reset primer to originally generated sequence
@@ -618,11 +627,20 @@ function updatePrimerOutput(seqId, sequence, length, gc, tm, dg5, dg3) {
     const primerPrefix = seqId.replace('-seq', '');
     
     // Update sequence — handle both <input> and <div> elements
-    if (seqElement.tagName === 'INPUT') {
+        if (seqElement.tagName === 'INPUT') {
         seqElement.value = sequence;
     } else {
         if (primerPrefix === "template") {
             seqElement.innerHTML = highlightTemplate(sequence);
+            // Update template hairpin stat here, after highlightTemplate runs
+            const th = document.getElementById('template-hairpin');
+            if (th) {
+                const hr = detectHairpin(sequence);
+                th.textContent = hr.summary;
+                th.className = hr.summary === 'None' ? 'stat-value good'
+                            : hr.strong.length > 0  ? 'stat-value bad'
+                            : 'stat-value warning';
+            }
         } else {
             seqElement.textContent = sequence;
         }
@@ -634,8 +652,10 @@ function updatePrimerOutput(seqId, sequence, length, gc, tm, dg5, dg3) {
     if (copyBtn) copyBtn.disabled = false;
     
     // Update stats
-    document.getElementById(`${primerPrefix}-len`).textContent = length + ' bp';
-    document.getElementById(`${primerPrefix}-gc`).textContent = gc + '%';
+    const lenEl = document.getElementById(`${primerPrefix}-len`);
+    const gcEl  = document.getElementById(`${primerPrefix}-gc`);
+    if (lenEl) lenEl.textContent = length + ' bp';
+    if (gcEl)  gcEl.textContent  = gc + '%';
     
     if (tm !== undefined) {
         const tmElement = document.getElementById(`${primerPrefix}-tm`);
@@ -655,60 +675,17 @@ function updatePrimerOutput(seqId, sequence, length, gc, tm, dg5, dg3) {
     // Run hairpin detection automatically
     const hairpinElement = document.getElementById(`${primerPrefix}-hairpin`);
     if (hairpinElement && sequence) {
+        const hairpinResult = detectHairpin(sequence);
+        hairpinElement.textContent = hairpinResult.summary;
 
-        let hairpinResult = detectHairpin(sequence);
-
-        hairpinElement.textContent = hairpinResult;
-
-        if (hairpinResult.includes("None")) {
+        if (hairpinResult.summary === "None") {
             hairpinElement.className = 'stat-value good';
-        } 
-        else if (hairpinResult.includes("Weak") || hairpinResult.includes("Mod")) {
-            hairpinElement.className = 'stat-value warning';
-        } 
-        else {
+        } else if (hairpinResult.strong.length > 0) {
             hairpinElement.className = 'stat-value bad';
-        }
-    }
-
-    // Run dimer detection for a primer against all other primers
-    const dimerElement = document.getElementById(`${primerPrefix}-dimer`);
-    if (dimerElement && sequence) {
-        // Collect all primer sequences from designState.outputs
-        const allPrimers = Object.keys(designState.outputs).filter(p => p !== 'template');
-        
-        let dimerPairs = [];
-
-        // Loop through each other primer
-        allPrimers.forEach(otherPrimer => {
-            // Skip self
-            if (otherPrimer === primerPrefix) return;
-
-            const otherSeq = designState.outputs[otherPrimer]?.seq;
-            if (!otherSeq) return;
-
-            const result = detectDimer(sequence, otherSeq);
-            if (!result.includes("None")) {
-                // If a dimer exists, store the primer and result
-                dimerPairs.push(`${otherPrimer.toUpperCase()}: ${result}`);
-            }
-        });
-
-        // Format output
-        if (dimerPairs.length === 0) {
-            dimerElement.textContent = "None";
-            dimerElement.className = 'stat-value good';
         } else {
-            dimerElement.textContent = dimerPairs.join(", ");
-            // Decide class based on strongest dimer detected
-            if (dimerPairs.some(r => r.includes("Strong"))) {
-                dimerElement.className = 'stat-value bad';
-            } else {
-                dimerElement.className = 'stat-value warning';
-            }
+            hairpinElement.className = 'stat-value warning';
         }
     }
-
 }
 
 // Copy sequence to clipboard
@@ -734,50 +711,156 @@ function copySequence(seqId) {
 }
 
 function detectHairpin(sequence) {
-    for(let i = 0; i < sequence.length - 2; i++){
-        let subSequence = sequence.substring(i, i + 3);
-        let reverseComplementSubSequence = reverseComplement(subSequence);
-        if(!reverseComplementSubSequence){
-            continue;
-        }
-        if(sequence.includes(reverseComplementSubSequence, i + 3)){
-            if(sequence.includes(reverseComplementSubSequence, i + 4)){
-                if(sequence.includes(reverseComplementSubSequence, i + 5)){
-                    return "Strong at " + (i+1); 
+    if (!sequence) return { weak: [], mod: [], strong: [], summary: 'None' };  // ← ADD THIS
+    sequence = sequence.toUpperCase();
+
+    const results = { weak: [], mod: [], strong: [] };
+
+    // A real hairpin: stem + loop (3–8 nt) + reverse complement of stem
+    const MIN_LOOP = 3;
+    const MAX_LOOP = 8;
+
+    let i = 0;
+    while (i < sequence.length - 2) {
+        let found = false;
+
+        // Try stem lengths: strong=5, mod=4, weak=3
+        const stemLengths = [
+            { len: 5, bucket: 'strong' },
+            { len: 4, bucket: 'mod' },
+            { len: 3, bucket: 'weak' }
+        ];
+
+        for (const { len, bucket } of stemLengths) {
+            if (found) break;
+            if (i + len + MIN_LOOP + len > sequence.length) continue;
+
+            const stem = sequence.substring(i, i + len);
+            const rc   = reverseComplement(stem);
+            if (!rc) continue;
+
+            // Check every possible loop size from MIN to MAX
+            for (let loop = MIN_LOOP; loop <= MAX_LOOP; loop++) {
+                const rcStart = i + len + loop;
+                if (rcStart + len > sequence.length) break;
+
+                // RC arm must start exactly at rcStart
+                if (sequence.substring(rcStart, rcStart + len) === rc) {
+                    results[bucket].push({ seq: stem, pos: i, loopSize: loop });
+                    i += len; // skip past stem, no overlaps
+                    found = true;
+                    break;
                 }
-                return "Mod. at " + (i+1); 
-            }   
-            return "Weak at " + (i+1);
+            }
         }
+
+        if (!found) i++;
     }
-    return "None";
+
+    const total = results.weak.length + results.mod.length + results.strong.length;
+
+    const summary = total === 0
+        ? "None"
+        : [
+            results.strong.length ? `Strong: ${results.strong.length}` : null,
+            results.mod.length    ? `Mod: ${results.mod.length}`       : null,
+            results.weak.length   ? `Weak: ${results.weak.length}`     : null,
+        ].filter(Boolean).join('\n');
+    
+    return { weak: results.weak, mod: results.mod, strong: results.strong, summary };
 }
 
 function detectDimer(sequence1, sequence2) {
-    let minSeq = sequence1.length >= sequence2.length ? sequence2 : sequence1;
-    let maxSeq = sequence1.length >= sequence2.length ? sequence1 : sequence2;
-
-    for(let i = 0; i < minSeq.length - 2; i++){
-        let subSequence = minSeq.substring(i, i + 3);
-        let reverseComplementSubSequence = reverseComplement(subSequence);
-        if(!reverseComplementSubSequence){
-            continue;
+    const results = [];
+    let i = 0;
+ 
+    while (i < sequence1.length - 2) {
+        let found = false;
+ 
+        if (i + 5 <= sequence1.length) {
+            const sub5 = sequence1.substring(i, i + 5);
+            const rc5  = reverseComplement(sub5);
+            if (rc5 && sequence2.includes(rc5)) {
+                results.push({ label: `Strong at ${i+1}`, pos: i, len: 5 });
+                i += 5;
+                found = true;
+            }
         }
-        if(maxSeq.includes(reverseComplementSubSequence, i + 3)){
-            subSequence = minSeq.substring(i, i + 4);
-            reverseComplementSubSequence = reverseComplement(subSequence);
-            if(maxSeq.includes(reverseComplementSubSequence, i + 4)){
-                subSequence = minSeq.substring(i, i + 5);
-                reverseComplementSubSequence = reverseComplement(subSequence);
-                if(maxSeq.includes(reverseComplementSubSequence, i + 5)){
-                    return "Strong at " + (i+1); 
-                }
-                return "Mod. at " + (i+1);
-            }   
-            return "Weak at " + (i+1);
+        if (!found && i + 4 <= sequence1.length) {
+            const sub4 = sequence1.substring(i, i + 4);
+            const rc4  = reverseComplement(sub4);
+            if (rc4 && sequence2.includes(rc4)) {
+                results.push({ label: `Mod. at ${i+1}`, pos: i, len: 4 });
+                i += 4;
+                found = true;
+            }
+        }
+ 
+        if (!found) i++;
+    }
+ 
+    if (results.length === 0) return [{ label: "None", pos: -1, len: 0 }];
+    return results;
+}
+
+function countAllDimers() {
+    const primerNames = Object.keys(designState.outputs).filter(p => p !== 'template');
+
+    // Keys are always nameA:nameB where nameA comes first in primerNames order
+    // so we only need one direction per pair here — no need for reverse keys
+    const skipPairs = new Set([
+        'fip:f2', 'fip:f1c',
+        'bip:b2', 'bip:b1c',
+        'lf:f2', 'lb:f2', 'f1c:f2', 'b1c:f2', 'f2:b2',
+        'lf:b2', 'lb:b2', 'f1c:b2', 'b1c:b2',
+        'fip:b2', 'bip:f2'
+    ]);
+
+    let total = 0;
+    // let hasStrong = false;
+    // const pairs = [];
+
+    for (let i = 0; i < primerNames.length; i++) {
+        for (let j = i + 1; j < primerNames.length; j++) {
+            const nameA = primerNames[i];
+            const nameB = primerNames[j];
+
+            const key1 = `${nameA}:${nameB}`;
+            const key2 = `${nameB}:${nameA}`;
+            if (skipPairs.has(key1) || skipPairs.has(key2)) continue;
+
+            const seqA = designState.outputs[nameA]?.seq;
+            const seqB = designState.outputs[nameB]?.seq;
+            if (!seqA || !seqB) continue;
+
+            const results = detectDimer(seqA, seqB);
+            const realDimers = results.filter(r => r.pos >= 0);
+
+            if (realDimers.length > 0) {
+                total += 1;
+                // if (realDimers.some(r => r.label.includes("Strong"))) hasStrong = true;
+                // pairs.push({ nameA, nameB, dimers: realDimers });
+            }
         }
     }
-    return "None";
+
+    return { total };
+    // return { total, hasStrong, pairs };
+}
+
+function updateDimerBox() {
+    const el = document.getElementById('dimer-summary');
+    if (!el) return;
+
+    const { total } = countAllDimers();
+
+    if (total === 0) {
+        el.textContent = 'No primer dimers';
+        el.className   = 'stat-value good';
+        return;
+    }
+
+    el.innerHTML = `<u>${total} dimer pair${total !== 1 ? 's' : ''}</u>`;
 }
 
 // Clear form
@@ -835,38 +918,114 @@ function reverseComplement(sequence){
         .join('');
 }
 
-function highlightTemplate(template) {
+function highlightTemplate(rawSequence) {
 
+    // Step 1 — apply primer color spans first, on the clean raw sequence
     const primers = {
         fip: designState.outputs.fip.seq,
         bip: designState.outputs.bip.seq ? reverseComplement(designState.outputs.bip.seq) : '',
-        lf: designState.outputs.lf.seq ? reverseComplement(designState.outputs.lf.seq) : '',
-        lb: designState.outputs.lb.seq,
+        lf:  designState.outputs.lf.seq  ? reverseComplement(designState.outputs.lf.seq)  : '',
+        lb:  designState.outputs.lb.seq,
     };
 
-    let highlighted = template;
+    let annotated = rawSequence;
 
     const primerList = Object.entries(primers)
         .filter(([_, seq]) => seq)
         .sort((a, b) => b[1].length - a[1].length);
 
     primerList.forEach(([primer, seq]) => {
-        const regex = new RegExp(seq, "g");
-
-        highlighted = highlighted.replace(
+        const regex = new RegExp(seq, 'g');
+        annotated = annotated.replace(
             regex,
             `<span class="highlight-${primer}" title="${primer.toUpperCase()} primer">${seq}</span>`
         );
     });
 
-    return highlighted;
+    // Step 2 — bold hairpins by replacing raw subseq in the already-spanned string
+    const hairpinResult = detectHairpin(rawSequence);
+    const allHairpins = [
+        ...hairpinResult.strong.map(h => ({ pos: h.pos, len: 5 })),
+        ...hairpinResult.mod.map(h =>    ({ pos: h.pos, len: 4 })),
+        ...hairpinResult.weak.map(h =>   ({ pos: h.pos, len: 3 })),
+    ].sort((a, b) => a.pos - b.pos);
+
+    for (const hp of allHairpins) {
+        const subseq = rawSequence.slice(hp.pos, hp.pos + hp.len);
+        // Replace only first untagged occurrence to stay accurate
+        annotated = annotated.replace(subseq, `<b>${subseq}</b>`);
+    }
+
+    // Step 3 — underline dimer regions by finding RC in rawSequence for position,
+    // then replacing the raw subseq in the annotated string
+    function underlineDimersInTemplate(rawSequence, annotated) {
+        // Collect every dimer region (in raw-sequence coordinates) as {start, end}.
+        // Use a Set to deduplicate identical coordinate ranges.
+        const dimerRanges = new Set();
+    
+        const allPrimerSeqs = Object.entries(designState.outputs)
+            .filter(([name]) => name !== 'template')
+            .map(([name, obj]) => ({ name, seq: obj.seq }))
+            .filter(p => p.seq);
+    
+        allPrimerSeqs.forEach(({ name, seq }) => {
+            const results = detectDimer(seq, rawSequence);
+            results.filter(r => r.pos >= 0).forEach(result => {
+                const primerSub = seq.slice(result.pos, result.pos + result.len);
+                const rc        = reverseComplement(primerSub);
+                if (!rc) return;
+    
+                // Find ALL occurrences in the template, not just the first.
+                let searchFrom = 0;
+                while (searchFrom <= rawSequence.length - rc.length) {
+                    const hit = rawSequence.indexOf(rc, searchFrom);
+                    if (hit < 0) break;
+                    dimerRanges.add(`${hit}:${hit + rc.length}:${name}`);
+                    searchFrom = hit + 1;   // allow overlapping hits
+                }
+            });
+        });
+    
+        // Parse the collected ranges into objects and sort by start position.
+        const ranges = [...dimerRanges].map(key => {
+            const [start, end, name] = key.split(':');
+            return { start: +start, end: +end, name };
+        }).sort((a, b) => a.start - b.start);
+    
+        // Inject <u> tags by replacing raw substrings in `annotated`.
+        // We replace from right-to-left so earlier string positions stay valid.
+        // But since annotated already has <span> tags, we can't use character
+        // positions directly — instead we replace each literal raw subseq text
+        // carefully, wrapped with a dimer title hint.
+        // To avoid double-underlining the same span, track replaced subseqs.
+        const replaced = new Set();
+        for (const { start, end, name } of ranges) {
+            const subseq = rawSequence.slice(start, end);
+            const key    = `${start}:${end}`;
+            if (replaced.has(key)) continue;
+            replaced.add(key);
+            // Replace only the FIRST untagged plain occurrence of subseq
+            // (i.e., not one already inside a <u> or <b> tag).
+            const safeSubseq = subseq.replace(/[.*+?^${}()|[\]\\]/g, '\\$&');
+            const notInsideTag = new RegExp(`(?<!<[^>]*)${safeSubseq}`, 'g');
+            annotated = annotated.replace(notInsideTag, (match) => {
+                return `<u title="Dimer with ${name.toUpperCase()}">${match}</u>`;
+            });
+        }
+    
+        return annotated;
+    }
+    annotated = underlineDimersInTemplate(rawSequence, annotated);
+    return annotated;
 }
 
 //Create template ultramer, disclusing F1, B1, LF, and BF, and spacers
-function generateTemplateUltramer(fip, lf, f1c, b1c, lb, bip){
-    //Ultramer = F1c+F2+LF+F1+B1c+LB+B2c+B1
-    let lf_rc = reverseComplement(lf);
-    let bip_rc = reverseComplement(bip);
-    let f1 = reverseComplement(f1c)
-    return fip + lf_rc + 'C' + f1 + 'GT' + b1c + 'G' + lb + 'T' + bip_rc;
+function generateTemplateUltramer(fip, lf, f1c, b1c, lb, bip) {
+    const lf_rc = reverseComplement(lf);
+    const bip_rc = reverseComplement(bip);
+    const f1 = reverseComplement(f1c);
+
+    const rawSequence = fip + lf_rc + 'C' + f1 + 'GT' + b1c + 'G' + lb + 'T' + bip_rc;
+
+    return { rawSequence };
 }
