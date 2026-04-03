@@ -594,14 +594,14 @@ input.primer-sequence.editable-primer:disabled {
 
 .highlight-fip {
     background: #F48FB1;
-    color: white;
+    color: black;
     padding: 2px 3px;
     border-radius: 4px;
 }
 
 .highlight-bip {
     background: #BA68C8;
-    color: white;
+    color: black;
     padding: 2px 3px;
     border-radius: 4px;
 }
@@ -624,14 +624,14 @@ input.primer-sequence.editable-primer:disabled {
 
 .primer-fip {
     background:#F48FB1;
-    color:white;
+    color:black;
     padding:3px 8px;
     border-radius:6px;
 }
 
 .primer-bip {
     background:#BA68C8;
-    color:white;
+    color:black;
     padding:3px 8px;
     border-radius:6px;
 }
@@ -649,27 +649,17 @@ input.primer-sequence.editable-primer:disabled {
     padding:3px 8px;
     border-radius:6px;
 }
-/* User Guide button in header */
-.header {
-    position: relative;
+
+#template-seq b.hairpin {
+    font-weight: bolder;
+
 }
 
-.guide-btn {
-    position: absolute;
-    top: 20px;
-    right: 20px;
-    background: white;
-    color: #ff69b4;
-    padding: 8px 16px;
-    border-radius: 6px;
-    font-weight: 600;
-    font-size: 0.9rem;
-    text-decoration: none;
-    transition: all 0.2s;
-    box-shadow: 0 2px 6px rgba(0,0,0,0.1);
-}
-
-.guide-btn:hover {
-    background: #C32C7F;
-    color: white;
+.primer-sequence u {
+    text-decoration: underline;
+    text-decoration-thickness: 2px;
+    text-decoration-color: black;
+    text-underline-offset: 3px;
+    /*Shows which dimer pair it belongs to*/
+    cursor: help;
 }
