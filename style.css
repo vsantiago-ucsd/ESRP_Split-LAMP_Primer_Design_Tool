@@ -593,58 +593,58 @@ input.primer-sequence.editable-primer:disabled {
 /* Individual primer highlights */
 
 .highlight-fip {
-    background: #F48FB1;
+    background: #F48FB188;
     color: black;
-    padding: 2px 3px;
+    padding: 1px 1px;
     border-radius: 4px;
 }
 
 .highlight-bip {
-    background: #BA68C8;
+    background: #BA68C888;
     color: black;
-    padding: 2px 3px;
+    padding: 1px 1px;
     border-radius: 4px;
 }
 
 .highlight-lf {
-    background: #f7b1d9;
+    background: #f7b1d988;
     color: #3b0040;
-    padding: 2px 3px;
+    padding: 1px 1px;
     border-radius: 4px;
 }
 
 .highlight-lb {
-    background: #D1C4E9;
+    background: #D1C4E988;
     color: #3b0040;
-    padding: 2px 3px;
+    padding: 1px 1px;
     border-radius: 4px;
 }
 
 /* Primer name highlights */
 
 .primer-fip {
-    background:#F48FB1;
+    background:#F48FB188;
     color:black;
     padding:3px 8px;
     border-radius:6px;
 }
 
 .primer-bip {
-    background:#BA68C8;
+    background:#BA68C888;
     color:black;
     padding:3px 8px;
     border-radius:6px;
 }
 
 .primer-lf {
-    background:#f7b1d9;
+    background:#f7b1d988;
     color:#3b0040;
     padding:3px 8px;
     border-radius:6px;
 }
 
 .primer-lb {
-    background:#D1C4E9;
+    background:#D1C4E988;
     color:#3b0040;
     padding:3px 8px;
     border-radius:6px;
