@@ -4,7 +4,7 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Split-LAMP Primer Design Tool</title>
-    <link rel="stylesheet" href="style.css"> 
+    <link rel="stylesheet" href="test.css"> 
 </head>
 <body>
     <div class="container">
@@ -248,10 +248,15 @@
                                         <div class="primer-controls">
                                             <button class="btn-reset" id="f2-reset" onclick="resetPrimer('f2')" disabled>Reset</button>
                                             <button class="btn-copy" onclick="copySequence('f2-seq')" disabled>Copy</button>
+                                            <button class="btn-hairpin" id="f2-hp-btn" onclick="toggleHairpin('f2')" disabled>Hairpins</button>
                                         </div>
                                     </div>
                                     <div class="validation-error" id="f2-edit-error"></div>
                                     <input type="text" class="primer-sequence editable-primer" id="f2-seq" data-sequence="" placeholder="Algorithm will generate this" disabled>
+                                    <div class="hp-item" id="f2-hp-item">
+                                        <div class="hp-label" id="f2-hp-label">Hairpin</div>
+                                        <div class="hp-dropdown" id="f2-hp-panel"></div>
+                                    </div>
                                     <div class="primer-stats">
                                         <div class="stat-item">
                                             <div class="stat-label">Length</div>
@@ -282,10 +287,15 @@
                                         <div class="primer-controls">
                                             <button class="btn-reset" id="b2-reset" onclick="resetPrimer('b2')" disabled>Reset</button>
                                             <button class="btn-copy" onclick="copySequence('b2-seq')" disabled>Copy</button>
+                                            <button class="btn-hairpin" id="b2-hp-btn" onclick="toggleHairpin('b2')" disabled>Hairpins</button>
                                         </div>
                                     </div>
                                     <div class="validation-error" id="b2-edit-error"></div>
                                     <input type="text" class="primer-sequence editable-primer" id="b2-seq" data-sequence="" placeholder="Algorithm will generate this" disabled>
+                                    <div class="hp-item" id="b2-hp-item">
+                                        <div class="hp-label" id="b2-hp-label">Hairpin</div>
+                                        <div class="hp-dropdown" id="b2-hp-panel"></div>
+                                    </div>
                                     <div class="primer-stats">
                                         <div class="stat-item">
                                             <div class="stat-label">Length</div>
@@ -316,10 +326,15 @@
                                         <div class="primer-controls">
                                             <button class="btn-reset" id="f1c-reset" onclick="resetPrimer('f1c')" disabled>Reset</button>
                                             <button class="btn-copy" onclick="copySequence('f1c-seq')" disabled>Copy</button>
+                                            <button class="btn-hairpin" id="f1c-hp-btn" onclick="toggleHairpin('f1c')" disabled>Hairpins</button>
                                         </div>
                                     </div>
                                     <div class="validation-error" id="f1c-edit-error"></div>
                                     <input type="text" class="primer-sequence editable-primer" id="f1c-seq" data-sequence="" placeholder="Algorithm will generate this" disabled>
+                                    <div class="hp-item" id="f1c-hp-item">
+                                        <div class="hp-label" id="f1c-hp-label">Hairpin</div>
+                                        <div class="hp-dropdown" id="f1c-hp-panel"></div>
+                                    </div>
                                     <div class="primer-stats">
                                         <div class="stat-item">
                                             <div class="stat-label">Length</div>
@@ -350,10 +365,15 @@
                                         <div class="primer-controls">
                                             <button class="btn-reset" id="b1c-reset" onclick="resetPrimer('b1c')" disabled>Reset</button>
                                             <button class="btn-copy" onclick="copySequence('b1c-seq')" disabled>Copy</button>
+                                            <button class="btn-hairpin" id="b1c-hp-btn" onclick="toggleHairpin('b1c')" disabled>Hairpins</button>
                                         </div>
                                     </div>
                                     <div class="validation-error" id="b1c-edit-error"></div>
                                     <input type="text" class="primer-sequence editable-primer" id="b1c-seq" data-sequence="" placeholder="Algorithm will generate this" disabled>
+                                    <div class="hp-item" id="b1c-hp-item">
+                                        <div class="hp-label" id="b1c-hp-label">Hairpin</div>
+                                        <div class="hp-dropdown" id="b1c-hp-panel"></div>
+                                    </div>
                                     <div class="primer-stats">
                                         <div class="stat-item">
                                             <div class="stat-label">Length</div>
@@ -388,10 +408,15 @@
                                         <div class="primer-controls">
                                             <button class="btn-reset" id="lf-reset" onclick="resetPrimer('lf')" disabled>Reset</button>
                                             <button class="btn-copy" onclick="copySequence('lf-seq')" disabled>Copy</button>
+                                            <button class="btn-hairpin" id="lf-hp-btn" onclick="toggleHairpin('lf')" disabled>Hairpins</button>
                                         </div>
                                     </div>
                                     <div class="validation-error" id="lf-edit-error"></div>
                                     <input type="text" class="primer-sequence editable-primer" id="lf-seq" data-sequence="" placeholder="Algorithm will generate this" disabled>
+                                    <div class="hp-item" id="lf-hp-item">
+                                        <div class="hp-label" id="lf-hp-label">Hairpin</div>
+                                        <div class="hp-dropdown" id="lf-hp-panel"></div>
+                                    </div>
                                     <div class="primer-stats">
                                         <div class="stat-item">
                                             <div class="stat-label">Length</div>
@@ -413,10 +438,6 @@
                                             <div class="stat-label">ΔG (3' end)</div>
                                             <div class="stat-value" id="lf-dg3">-- kcal/mol</div>
                                         </div>
-                                        <div class="stat-item">
-                                            <div class="stat-label">Hairpins</div>
-                                            <div class="stat-value" id="lf-hairpin">--</div>
-                                        </div>
                                     </div>
                                 </div>
 
@@ -426,10 +447,15 @@
                                         <div class="primer-controls">
                                             <button class="btn-reset" id="lb-reset" onclick="resetPrimer('lb')" disabled>Reset</button>
                                             <button class="btn-copy" onclick="copySequence('lb-seq')" disabled>Copy</button>
+                                            <button class="btn-hairpin" id="lb-hp-btn" onclick="toggleHairpin('lb')" disabled>Hairpins</button>
                                         </div>
                                     </div>
                                     <div class="validation-error" id="lb-edit-error"></div>
                                     <input type="text" class="primer-sequence editable-primer" id="lb-seq" data-sequence="" placeholder="Algorithm will generate this" disabled>
+                                    <div class="hp-item" id="lb-hp-item">
+                                        <div class="hp-label" id="lb-hp-label">Hairpin</div>
+                                        <div class="hp-dropdown" id="lb-hp-panel"></div>
+                                    </div>
                                     <div class="primer-stats">
                                         <div class="stat-item">
                                             <div class="stat-label">Length</div>
@@ -451,10 +477,6 @@
                                             <div class="stat-label">ΔG (3' end)</div>
                                             <div class="stat-value" id="lb-dg3">-- kcal/mol</div>
                                         </div>
-                                        <div class="stat-item">
-                                            <div class="stat-label">Hairpins</div>
-                                            <div class="stat-value" id="lb-hairpin">--</div>
-                                        </div>
                                     </div>
                                 </div>
                             </div>
@@ -464,6 +486,6 @@
             </div>
         </div>
     </div>
-    <script src="script.js"></script>
+    <script src="test.js"></script>
 </body>
 </html>

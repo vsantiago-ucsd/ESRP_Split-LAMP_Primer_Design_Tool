@@ -494,12 +494,24 @@ function generatePrimers() {
         f2Input.removeEventListener('input', primerInputHandler('f2'));
         f2Input.addEventListener('input', primerInputHandler('f2'));
 
+        const f2HpBtn = document.getElementById('f2-hp-btn');
+        if (f2HpBtn) {
+            f2HpBtn.disabled = false;
+            updateHairpinBtn('f2');
+        }
+
         // Enable B2 input and attach live-edit listener (attach once per generation)
         const b2Input = document.getElementById('b2-seq');
         b2Input.disabled = false;
         document.getElementById('b2-reset').disabled = false;
         b2Input.removeEventListener('input', primerInputHandler('b2'));
         b2Input.addEventListener('input', primerInputHandler('b2'));
+
+        const b2HpBtn = document.getElementById('b2-hp-btn');
+        if (b2HpBtn) {
+            b2HpBtn.disabled = false;
+            updateHairpinBtn('b2');
+        }
 
         // Enable F1C input and attach live-edit listener (attach once per generation)
         const f1cInput = document.getElementById('f1c-seq');
@@ -508,12 +520,24 @@ function generatePrimers() {
         f1cInput.removeEventListener('input', primerInputHandler('f1c'));
         f1cInput.addEventListener('input', primerInputHandler('f1c'));
 
+        const f1cHpBtn = document.getElementById('f1c-hp-btn');
+        if (f1cHpBtn) {
+            f1cHpBtn.disabled = false;
+            updateHairpinBtn('f1c');
+        }
+
         // Enable B1C input and attach live-edit listener (attach once per generation)
         const b1cInput = document.getElementById('b1c-seq');
         b1cInput.disabled = false;
         document.getElementById('b1c-reset').disabled = false;
         b1cInput.removeEventListener('input', primerInputHandler('b1c'));
         b1cInput.addEventListener('input', primerInputHandler('b1c'));
+
+        const b1cHpBtn = document.getElementById('b1c-hp-btn');
+        if (b1cHpBtn) {
+            b1cHpBtn.disabled = false;
+            updateHairpinBtn('b1c');
+        }
 
         // Enable LF input and attach live-edit listener (attach once per generation)
         const lfInput = document.getElementById('lf-seq');
@@ -522,12 +546,24 @@ function generatePrimers() {
         lfInput.removeEventListener('input', primerInputHandler('lf'));
         lfInput.addEventListener('input', primerInputHandler('lf'));
 
+        const lfHpBtn = document.getElementById('lf-hp-btn');
+        if (lfHpBtn) {
+            lfHpBtn.disabled = false;
+            updateHairpinBtn('lf');
+        }
+
         // Enable LB input and attach live-edit listener (attach once per generation)
         const lbInput = document.getElementById('lb-seq');
         lbInput.disabled = false;
         document.getElementById('lb-reset').disabled = false;
         lbInput.removeEventListener('input', primerInputHandler('lb'));
         lbInput.addEventListener('input', primerInputHandler('lb'));
+
+        const lbHpBtn = document.getElementById('lb-hp-btn');
+        if (lbHpBtn) {
+            lbHpBtn.disabled = false;
+            updateHairpinBtn('lb');
+        }
     updateDimerBox();}, 1500);
 }
 
@@ -606,6 +642,12 @@ function onPrimerChange(primerName, rawValue) {
     updatePrimerOutput('template-seq', newTemplate, newTemplate.length, calculateGC(newTemplate));
 
     updateDimerBox();
+
+    updateHairpinBtn(primerName);
+    const panel = document.getElementById(`${primerName}-hp-panel`);
+    if (panel && panel.classList.contains('open')) {
+        renderHairpinPanel(primerName);
+    }
 }
 
 // Reset primer to originally generated sequence
@@ -637,9 +679,7 @@ function updatePrimerOutput(seqId, sequence, length, gc, tm, dg5, dg3) {
             if (th) {
                 const hr = detectHairpin(sequence);
                 th.textContent = hr.summary;
-                th.className = hr.summary === 'None' ? 'stat-value good'
-                            : hr.strong.length > 0  ? 'stat-value bad'
-                            : 'stat-value warning';
+                th.className = hr.found ? 'stat-value warning' : 'stat-value good';
             }
         } else {
             seqElement.textContent = sequence;
@@ -671,21 +711,6 @@ function updatePrimerOutput(seqId, sequence, length, gc, tm, dg5, dg3) {
         const dg3Element = document.getElementById(`${primerPrefix}-dg3`);
         if (dg3Element) dg3Element.textContent = dg3 + ' kcal/mol';
     }
-    
-    // Run hairpin detection automatically
-    const hairpinElement = document.getElementById(`${primerPrefix}-hairpin`);
-    if (hairpinElement && sequence) {
-        const hairpinResult = detectHairpin(sequence);
-        hairpinElement.textContent = hairpinResult.summary;
-
-        if (hairpinResult.summary === "None") {
-            hairpinElement.className = 'stat-value good';
-        } else if (hairpinResult.strong.length > 0) {
-            hairpinElement.className = 'stat-value bad';
-        } else {
-            hairpinElement.className = 'stat-value warning';
-        }
-    }
 }
 
 // Copy sequence to clipboard
@@ -711,63 +736,68 @@ function copySequence(seqId) {
 }
 
 function detectHairpin(sequence) {
-    if (!sequence) return { weak: [], mod: [], strong: [], summary: 'None' };  // ← ADD THIS
+    if (!sequence) return { found: false, summary: 'None', pairs: [] };
     sequence = sequence.toUpperCase();
 
-    const results = { weak: [], mod: [], strong: [] };
-
-    // A real hairpin: stem + loop (3–8 nt) + reverse complement of stem
+    const MIN_STEM = 3;
+    const MAX_STEM = 5;
     const MIN_LOOP = 3;
-    const MAX_LOOP = 8;
+    const pairs = [];
 
-    let i = 0;
-    while (i < sequence.length - 2) {
-        let found = false;
+    // Check 3' end — stem is last N bases, RC must appear somewhere earlier
+    for (let stemLen = MAX_STEM; stemLen >= MIN_STEM; stemLen--) {
+        if (sequence.length < stemLen + MIN_LOOP + stemLen) continue;
 
-        // Try stem lengths: strong=5, mod=4, weak=3
-        const stemLengths = [
-            { len: 5, bucket: 'strong' },
-            { len: 4, bucket: 'mod' },
-            { len: 3, bucket: 'weak' }
-        ];
+        const stem   = sequence.slice(-stemLen);
+        const stemRC = reverseComplement(stem);
+        if (!stemRC) continue;
 
-        for (const { len, bucket } of stemLengths) {
-            if (found) break;
-            if (i + len + MIN_LOOP + len > sequence.length) continue;
+        // Search the whole sequence except the last stem + min loop bases
+        const searchRegion = sequence.slice(0, sequence.length - stemLen - MIN_LOOP);
+        const hit = searchRegion.indexOf(stemRC);
+        if (hit < 0) continue;
 
-            const stem = sequence.substring(i, i + len);
-            const rc   = reverseComplement(stem);
-            if (!rc) continue;
-
-            // Check every possible loop size from MIN to MAX
-            for (let loop = MIN_LOOP; loop <= MAX_LOOP; loop++) {
-                const rcStart = i + len + loop;
-                if (rcStart + len > sequence.length) break;
-
-                // RC arm must start exactly at rcStart
-                if (sequence.substring(rcStart, rcStart + len) === rc) {
-                    results[bucket].push({ seq: stem, pos: i, loopSize: loop });
-                    i += len; // skip past stem, no overlaps
-                    found = true;
-                    break;
-                }
-            }
-        }
-
-        if (!found) i++;
+        // No max loop check — any distance is valid for end hairpins
+        pairs.push({
+            end: "3'",
+            stem,
+            stemRC,
+            stemPos: sequence.length - stemLen,
+            rcPos: hit,
+            stemLen
+        });
+        break;
     }
 
-    const total = results.weak.length + results.mod.length + results.strong.length;
+    // Check 5' end — stem is first N bases, RC must appear somewhere later
+    for (let stemLen = MAX_STEM; stemLen >= MIN_STEM; stemLen--) {
+        if (sequence.length < stemLen + MIN_LOOP + stemLen) continue;
 
-    const summary = total === 0
-        ? "None"
-        : [
-            results.strong.length ? `Strong: ${results.strong.length}` : null,
-            results.mod.length    ? `Mod: ${results.mod.length}`       : null,
-            results.weak.length   ? `Weak: ${results.weak.length}`     : null,
-        ].filter(Boolean).join('\n');
-    
-    return { weak: results.weak, mod: results.mod, strong: results.strong, summary };
+        const stem   = sequence.slice(0, stemLen);
+        const stemRC = reverseComplement(stem);
+        if (!stemRC) continue;
+
+        const searchStart  = stemLen + MIN_LOOP;
+        const searchRegion = sequence.slice(searchStart);
+        const hit          = searchRegion.indexOf(stemRC);
+        if (hit < 0) continue;
+
+        // No max loop check
+        pairs.push({
+            end: "5'",
+            stem,
+            stemRC,
+            stemPos: 0,
+            rcPos: searchStart + hit,
+            stemLen
+        });
+        break;
+    }
+
+    if (pairs.length === 0) return { found: false, summary: 'None', pairs: [] };
+
+    const summary = pairs.map(p => p.end).join(' & ');
+    return { found: true, summary, pairs };
 }
 
 function detectDimer(sequence1, sequence2) {
@@ -942,21 +972,7 @@ function highlightTemplate(rawSequence) {
         );
     });
 
-    // Step 2 — bold hairpins by replacing raw subseq in the already-spanned string
-    const hairpinResult = detectHairpin(rawSequence);
-    const allHairpins = [
-        ...hairpinResult.strong.map(h => ({ pos: h.pos, len: 5 })),
-        ...hairpinResult.mod.map(h =>    ({ pos: h.pos, len: 4 })),
-        ...hairpinResult.weak.map(h =>   ({ pos: h.pos, len: 3 })),
-    ].sort((a, b) => a.pos - b.pos);
-
-    for (const hp of allHairpins) {
-        const subseq = rawSequence.slice(hp.pos, hp.pos + hp.len);
-        // Replace only first untagged occurrence to stay accurate
-        annotated = annotated.replace(subseq, `<b>${subseq}</b>`);
-    }
-
-    // Step 3 — underline dimer regions by finding RC in rawSequence for position,
+    // Underline dimer regions by finding RC in rawSequence for position,
     // then replacing the raw subseq in the annotated string
     function underlineDimersInTemplate(rawSequence, annotated) {
         // Collect every dimer region (in raw-sequence coordinates) as {start, end}.
@@ -1029,3 +1045,96 @@ function generateTemplateUltramer(fip, lf, f1c, b1c, lb, bip) {
 
     return { rawSequence };
 }
+
+function toggleHairpin(name) {
+    const panel = document.getElementById(`${name}-hp-panel`);
+    const btn   = document.getElementById(`${name}-hp-btn`);
+    const item = document.getElementById(`${name}-hp-item`);
+
+    if (!panel) return;
+
+    const isOpen = panel.classList.contains('open');
+    if (isOpen) {
+        panel.classList.remove('open');
+        item.classList.remove('open');
+        btn.classList.remove('active');
+    } else {
+        renderHairpinPanel(name);
+        panel.classList.add('open');
+        item.classList.add('open');
+        btn.classList.add('active');
+    }
+
+}
+
+function renderHairpinPanel(name) {
+    const panel = document.getElementById(`${name}-hp-panel`);
+    const seq   = designState.outputs[name]?.seq;
+
+    if (!seq) {
+        panel.innerHTML = '<div class="hp-none">No sequence</div>';
+        return;
+    }
+
+    const result = detectHairpin(seq);
+
+    if (!result.found) {
+        panel.innerHTML = '<div class="hp-none">No hairpins detected</div>';
+        return;
+    }
+
+    // Build a map of which positions get which highlight class
+    // so we never accidentally match by string — only by position
+    const highlights = {}; // position -> class
+
+    result.pairs.forEach(p => {
+        // Stem positions
+        for (let i = p.stemPos; i < p.stemPos + p.stemLen; i++) {
+            highlights[i] = 'hp-stem';
+        }
+        // RC partner positions
+        for (let i = p.rcPos; i < p.rcPos + p.stemLen; i++) {
+            highlights[i] = 'hp-rc';
+        }
+    });
+
+    // Build HTML character by character using positions
+    let html = '';
+    let i = 0;
+    while (i < seq.length) {
+        if (highlights[i]) {
+            const cls = highlights[i];
+            // Collect consecutive characters with the same class
+            let chunk = '';
+            while (i < seq.length && highlights[i] === cls) {
+                chunk += seq[i];
+                i++;
+            }
+            html += `<mark class="${cls}">${chunk}</mark>`;
+        } else {
+            html += seq[i];
+            i++;
+        }
+    }
+
+    panel.innerHTML = `<div class="hp-full-seq">${html}</div>`;
+}
+
+function updateHairpinBtn(name) {
+    const btn = document.getElementById(`${name}-hp-btn`);
+    if (!btn) return;
+    const seq    = designState.outputs[name]?.seq;
+    const result = seq ? detectHairpin(seq) : null;
+
+    btn.innerHTML = 'Hairpins';
+    if (!result) return;
+
+    if (!result.found) {
+        btn.innerHTML += ' <span class="hp-badge hp-badge-good">None</span>';
+    } else {
+        btn.innerHTML += ` <span class="hp-badge hp-badge-warn">${result.pairs.length}</span>`;
+    }
+}
+
+/*GLOBAL VARIABLE FOR HAIRPIN */
+const STEM_LEN = 3;
