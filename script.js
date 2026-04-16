@@ -1,3 +1,6 @@
+/*GLOBAL VARIABLE*/
+const STEM_LEN = 3;
+
 // Global state object - single source of truth
 let designState = {
     architecture: 'f2-only',
@@ -1135,6 +1138,3 @@ function updateHairpinBtn(name) {
         btn.innerHTML += ` <span class="hp-badge hp-badge-warn">${result.pairs.length}</span>`;
     }
 }
-
-/*GLOBAL VARIABLE FOR HAIRPIN */
-const STEM_LEN = 3;
