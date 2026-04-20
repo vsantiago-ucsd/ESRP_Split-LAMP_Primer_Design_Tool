@@ -8,12 +8,6 @@ let designState = {
         mirna1: { name: '', sequence: '', parsed: '', length: 0, gc: 0 },
         mirna2: { name: '', sequence: '', parsed: '', length: 0, gc: 0 }
     },
-    options: {
-        generateLoop: true,
-        optimizeSpecificity: true,
-        checkHairpins: true,
-        calculateDG: true
-    },
     outputs: {
         template: { seq: '', len: 0, gc: 0 },
         lf: { seq: '', len: 0, gc: 0, tm: 0, dg: 0, hairpin: 'None' },
@@ -829,6 +823,16 @@ function detectDimer(sequence1, sequence2) {
             }
         }
  
+        if (!found && i + 3 <= sequence1.length) {
+            const sub3 = sequence1.substring(i, i + 3);
+            const rc3  = reverseComplement(sub3);
+            if (rc3 && sequence2.includes(rc3)) {
+                results.push({ label: `Weak. at ${i+1}`, pos: i, len: 3 });
+                i += 3;
+                found = true;
+            }
+        }
+
         if (!found) i++;
     }
  
@@ -844,9 +848,9 @@ function countAllDimers() {
     const skipPairs = new Set([
         'fip:f2', 'fip:f1c',
         'bip:b2', 'bip:b1c',
-        'lf:f2', 'lb:f2', 'f1c:f2', 'b1c:f2', 'f2:b2',
-        'lf:b2', 'lb:b2', 'f1c:b2', 'b1c:b2',
-        'fip:b2', 'bip:f2'
+        'fip:b2', 'bip:f2',
+        'lf:f2', 'lb:f2', 'f1c:f2', 'b1c:f2', 'f2:b2', 
+        'lf:b2', 'lb:b2', 'f1c:b2', 'b1c:b2'
     ]);
 
     let total = 0;
