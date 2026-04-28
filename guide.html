@@ -50,29 +50,16 @@
                     <div class="step-card">
                         <div class="step-number">3</div>
                         <div class="step-content">
-                            <h3>Configure Design Options</h3>
-                            <p>Choose whether to generate loop primers (LF, LB), optimize for specificity, check for hairpin structures, and calculate ΔG values. All options are on by default and recommended for most uses.</p>
+                            <h3>Click Generate Primers</h3>
+                            <p>The tool will compute your full primer set and directing you to the Primer Output tab with primer calculations and labeled properties.</p>
                         </div>
                     </div>
                     <div class="step-card">
                         <div class="step-number">4</div>
                         <div class="step-content">
-                            <h3>Click Generate Primers</h3>
-                            <p>The tool will compute your full primer set and switch to the Primer Output tab automatically.</p>
-                        </div>
-                    </div>
-                    <div class="step-card">
-                        <div class="step-number">5</div>
-                        <div class="step-content">
                             <h3>Review and Edit</h3>
-                            <p>All primers are editable directly in the output. Changes to F2 automatically update FIP and the Template Ultramer in real time. Use the <strong>Reset</strong> button next to any primer to restore the original generated sequence.</p>
-                        </div>
-                    </div>
-                    <div class="step-card">
-                        <div class="step-number">6</div>
-                        <div class="step-content">
-                            <h3>Copy and Order</h3>
-                            <p>Use the <strong>Copy</strong> button next to any primer to copy the sequence to your clipboard for ordering.</p>
+                            <p>All primers are editable directly in the output. Changes to F2 and/or B2 automatically update FIP and/or BiP and the Template Ultramer in real time. Use the <strong>Reset</strong> button next to any primer to restore the original generated sequence.
+                            To access detected hairpins, use the <strong>Hairpins</strong> button. Use the <strong>Copy</strong> button next to any primer to copy the sequence to your clipboard.</p>
                         </div>
                     </div>
                 </div>
@@ -138,13 +125,13 @@
                     </tr>
                     <tr>
                         <td><strong>Hairpins</strong></td>
-                        <td>Whether the primer folds back on itself. None is ideal. Weak is usually acceptable. Strong may interfere with amplification.</td>
-                        <td>None at 3' end. 5 bp or longer should be checked.</td>
+                        <td>Whether the primer folds back on itself at the 3' and 5' ends. None is ideal. Hairpins can disrupt the amplification process. </td>
+                        <td>None at 3' end. 3bp is the minimum hairpin length</td>
                     </tr>
                     <tr>
                         <td><strong>Dimers</strong></td>
                         <td>Whether this primer has 3' complementarity with other primers in the set. Cross-dimers can reduce amplification efficiency.</td>
-                        <td>None at 3' end. 5 bp or longer should be checked.</td>
+                        <td>None at 3' end. 3bp is the minimum hairpin length</td>
                     </tr>
                 </table>
             </div>
@@ -152,10 +139,10 @@
             <!-- EDITING PRIMERS -->
             <div class="guide-section">
                 <h2>✏️ Editing Primers</h2>
-                <p>All primers on the output tab are directly editable. Click into any sequence box and type to modify it.</p>
+                <p>All primers on the output tab are editable. Click any sequence box to modify it.</p>
                 <ul>
-                    <li>Editing <strong>F2</strong> automatically recalculates FIP and the Template Ultramer.</li>
-                    <li>All stats (length, GC, Tm, ΔG) update instantly as you type.</li>
+                    <li>Editing <strong>F2 and/or B2 </strong> automatically recalculates FIP and/or BIP and the Template Ultramer.</li>
+                    <li>All stats (length, GC, Tm, ΔG) update with changes.</li>
                     <li>If you enter an invalid character, an error message appears and the cascade does not update until the sequence is valid.</li>
                     <li>Click <strong>Reset</strong> next to any primer to restore the originally generated sequence.</li>
                 </ul>
@@ -208,7 +195,7 @@
                         <div class="step-number">4</div>
                         <div class="step-content">
                             <h3>Generate and review</h3>
-                            <p>Click Generate Primers. Check that hairpin warnings are None or Weak for all primers, particularly LF and LB. Check the Template Ultramer color map to confirm all regions are present.</p>
+                            <p>Click Generate Primers. Check the hairpin warnings for for all primers, particularly LF and LB. Check the Template Ultramer color map to confirm all regions are present.</p>
                         </div>
                     </div>
                 </div>
@@ -221,8 +208,7 @@
                     <li><strong>Invalid characters error</strong> — only A, C, G, T, and U are accepted. Remove spaces, numbers, or other characters. FASTA headers (lines starting with >) are stripped automatically.</li>
                     <li><strong>Sequence too short</strong> — miRNA sequences are typically 18–25 nt. Sequences under 14 nt use the Wallace rule for Tm, which is less accurate.</li>
                     <li><strong>Reset not working</strong> — Reset restores the sequence from when primers were last generated. If you have not generated primers yet, Reset has nothing to restore.</li>
-                    <li><strong>Strong hairpin warning</strong> — try adjusting the primer sequence by 1–2 bases and check if the warning changes. A strong hairpin at the 3' end is the highest priority to resolve.</li>
-                    <li><strong>Template Ultramer looks wrong</strong> — if you edited F2, the template updates automatically. If another primer was edited manually, the template does not update for that change. Regenerate primers for a clean baseline.</li>
+                    <li><strong>Hairpin Warning</strong> — try adjusting the primer sequence by 1–2 bases and check if the warning changes. Hairpins at the 3' end should be resolved.</li>
                 </ul>
             </div>
 
