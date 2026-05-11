@@ -813,22 +813,12 @@ function detectDimer(sequence1, sequence2) {
                 found = true;
             }
         }
-        if (!found && i + 4 <= sequence1.length) {
-            const sub4 = sequence1.substring(i, i + 4);
-            const rc4  = reverseComplement(sub4);
-            if (rc4 && sequence2.includes(rc4)) {
-                results.push({ label: `Mod. at ${i+1}`, pos: i, len: 4 });
-                i += 4;
-                found = true;
-            }
-        }
- 
-        if (!found && i + 3 <= sequence1.length) {
-            const sub3 = sequence1.substring(i, i + 3);
-            const rc3  = reverseComplement(sub3);
-            if (rc3 && sequence2.includes(rc3)) {
-                results.push({ label: `Weak. at ${i+1}`, pos: i, len: 3 });
-                i += 3;
+        if (!found && i + 6 <= sequence1.length) {
+            const sub6 = sequence1.substring(i, i + 6);
+            const rc6  = reverseComplement(sub6);
+            if (rc6 && sequence2.includes(rc6)) {
+                results.push({ label: `Mod. at ${i+1}`, pos: i, len: 6 });
+                i += 6;
                 found = true;
             }
         }
@@ -843,28 +833,32 @@ function detectDimer(sequence1, sequence2) {
 function countAllDimers() {
     const primerNames = Object.keys(designState.outputs).filter(p => p !== 'template');
 
-    // Keys are always nameA:nameB where nameA comes first in primerNames order
-    // so we only need one direction per pair here — no need for reverse keys
     const skipPairs = new Set([
-        'fip:f2', 'fip:f1c',
-        'bip:b2', 'bip:b1c',
-        'fip:b2', 'bip:f2',
-        'lf:f2', 'lb:f2', 'f1c:f2', 'b1c:f2', 'f2:b2', 
-        'lf:b2', 'lb:b2', 'f1c:b2', 'b1c:b2'
+        //Ensured that f2, b2, f1c, b1c are not included/considered as primer pairs
+        'fip:f2', 'fip:fip', 'fip:f1c', 'fip:b2', 'fip:b1c',
+        'f2:f2', 'f2:fip', 'f2:f1c', 'f2:lf', 'f2:lb', 'f2:b2', 'f2:b1c',
+        'f1c:f1c', 'f1c:f2', 'f1c:fip', 'f1c:lf', 'f1c:lb', 'f1c:b1c', 'f1c:b2',
+        'bip:b2', 'bip:b1c', 'bip:bip', 'bip:f2', 'bip:f1c',
+        'b2:b2', 'b2:b1c', 'b2:bip', 'b2:lf', 'b2:lb', 
+        'b1c:b1c',
+        'lf:lf', 'lf:f1c', 'lf:f2', 'lf:b2', 'lf:b1c',
+        'lb:lb', 'lb:f1c', 'lb:f2', 'lb:b2', 'lb:b1c',
+
+        //Other cases
     ]);
 
+    function pairShouldBeSkipped(nameA, nameB) {
+        return skipPairs.has(`${nameA}:${nameB}`) || skipPairs.has(`${nameB}:${nameA}`);
+    }
+
     let total = 0;
-    // let hasStrong = false;
-    // const pairs = [];
 
     for (let i = 0; i < primerNames.length; i++) {
         for (let j = i + 1; j < primerNames.length; j++) {
             const nameA = primerNames[i];
             const nameB = primerNames[j];
 
-            const key1 = `${nameA}:${nameB}`;
-            const key2 = `${nameB}:${nameA}`;
-            if (skipPairs.has(key1) || skipPairs.has(key2)) continue;
+            if (pairShouldBeSkipped(nameA, nameB)) continue; // ✅ inside the loop
 
             const seqA = designState.outputs[nameA]?.seq;
             const seqB = designState.outputs[nameB]?.seq;
@@ -875,14 +869,14 @@ function countAllDimers() {
 
             if (realDimers.length > 0) {
                 total += 1;
-                // if (realDimers.some(r => r.label.includes("Strong"))) hasStrong = true;
-                // pairs.push({ nameA, nameB, dimers: realDimers });
+                console.log(`Dimer found: ${nameA} vs ${nameB}`);
             }
         }
     }
 
+
+
     return { total };
-    // return { total, hasStrong, pairs };
 }
 
 function updateDimerBox() {
@@ -986,35 +980,65 @@ function highlightTemplate(rawSequence) {
         // Use a Set to deduplicate identical coordinate ranges.
         const dimerRanges = new Set();
     
-        const allPrimerSeqs = Object.entries(designState.outputs)
-            .filter(([name]) => name !== 'template')
-            .map(([name, obj]) => ({ name, seq: obj.seq }))
-            .filter(p => p.seq);
-    
-        allPrimerSeqs.forEach(({ name, seq }) => {
-            const results = detectDimer(seq, rawSequence);
-            results.filter(r => r.pos >= 0).forEach(result => {
-                const primerSub = seq.slice(result.pos, result.pos + result.len);
-                const rc        = reverseComplement(primerSub);
-                if (!rc) return;
-    
-                // Find ALL occurrences in the template, not just the first.
-                let searchFrom = 0;
-                while (searchFrom <= rawSequence.length - rc.length) {
-                    const hit = rawSequence.indexOf(rc, searchFrom);
-                    if (hit < 0) break;
-                    dimerRanges.add(`${hit}:${hit + rc.length}:${name}`);
-                    searchFrom = hit + 1;   // allow overlapping hits
-                }
-            });
-        });
-    
+        //Skip Pairs:
+        const skipPairs = new Set([
+            'fip:f2', 'fip:fip', 'fip:f1c', 'fip:b2', 'fip:b1c',
+            'f2:f2', 'f2:fip', 'f2:f1c', 'f2:lf', 'f2:lb', 'f2:b2', 'f2:b1c',
+            'f1c:f1c', 'f1c:f2', 'f1c:fip', 'f1c:lf', 'f1c:lb', 'f1c:b1c', 'f1c:b2',
+            'bip:b2', 'bip:b1c', 'bip:bip', 'bip:f2', 'bip:f1c',
+            'b2:b2', 'b2:b1c', 'b2:bip', 'b2:lf', 'b2:lb', 
+            'lf:lf', 'lf:f1c', 'lf:f2', 'lf:b2', 'lf:b1c',
+            'lb:lb', 'lb:f1c', 'lb:f2', 'lb:b2', 'lb:b1c',
+
+            //Other cases
+        ]);
+        function pairShouldBeSkipped(nameA, nameB) {
+            return skipPairs.has(`${nameA}:${nameB}`) || skipPairs.has(`${nameB}:${nameA}`);
+        }
+
+            const primerNames = Object.keys(designState.outputs).filter(p => p !== 'template');
+
+        for (let i = 0; i < primerNames.length; i++) {
+            for (let j = i + 1; j < primerNames.length; j++) {
+                const nameA = primerNames[i];
+                const nameB = primerNames[j];
+
+                if (pairShouldBeSkipped(nameA, nameB)) continue;
+
+                const seqA = designState.outputs[nameA]?.seq;
+                const seqB = designState.outputs[nameB]?.seq;
+                if (!seqA || !seqB) continue;
+
+                const results = detectDimer(seqA, seqB);
+                results.filter(r => r.pos >= 0).forEach(result => {
+                    const primerSub = seqA.slice(result.pos, result.pos + result.len);
+                    const rc = reverseComplement(primerSub);
+                    if (!rc) return;
+
+                    // Find where this dimer's RC appears in the template and mark it
+                    let searchFrom = 0;
+                    while (searchFrom <= rawSequence.length - rc.length) {
+                        const hit = rawSequence.indexOf(rc, searchFrom);
+                        if (hit < 0) break;
+                        dimerRanges.add(`${hit}:${hit + rc.length}:${nameA}`);
+                        searchFrom = hit + 1;
+                    }
+                });
+            }
+        }
+
         // Parse the collected ranges into objects and sort by start position.
         const ranges = [...dimerRanges].map(key => {
             const [start, end, name] = key.split(':');
             return { start: +start, end: +end, name };
         }).sort((a, b) => a.start - b.start);
-    
+        
+        console.log('=== underlineDimersInTemplate ===');
+        console.log('dimerRanges found:', dimerRanges.size);
+        for (const entry of dimerRanges) {
+            const [start, end, name] = entry.split(':');
+            console.log(`  pos ${start}-${end} | primer: ${name} | subseq: ${rawSequence.slice(+start, +end)}`);
+        }
         // Inject <u> tags by replacing raw substrings in `annotated`.
         // We replace from right-to-left so earlier string positions stay valid.
         // But since annotated already has <span> tags, we can't use character
