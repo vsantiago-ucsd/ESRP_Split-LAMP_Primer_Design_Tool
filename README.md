@@ -1,1 +1,3 @@
+Check out the site! https://vsantiago-ucsd.github.io/ESRP_Split-LAMP_Primer_Design_Tool/
+
 Our project for ERSP is to build a web-based tool that designs Split-LAMP primers for microRNA detection. The tool accepts one or two microRNA inputs depending on the selected architecture, calculates GC content, melting temperatures (Tm), and ΔG values, and generates primer sets that avoid secondary structures. Our work focuses on implementing an algorithm programmed in Python that analyzes sequence features and produces primer outputs. The algorithm is integrated into our website built with HTML/CSS/JavaScript, allowing users to input microRNA sequences with ease and view the generated primer outputs with real-time feedback.
